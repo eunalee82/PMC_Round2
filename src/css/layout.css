@@ -1,0 +1,60 @@
+/* AppShell — 2-column dashboard grid (Header / Left Sidebar / Main).
+   Right info panel removed. Prioritizes 1920×1080 and 1366×768; sidebar collapses to a drawer on mobile. */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  grid-template-rows: var(--header-h) minmax(0, 1fr);
+  grid-template-areas:
+    'header header'
+    'sidebar main';
+  height: 100vh;
+  height: 100dvh;
+  position: relative;
+}
+
+.app-header { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.app-main { grid-area: main; overflow-y: auto; overflow-x: hidden; }
+
+.app-main__inner { padding: var(--s-8); max-width: 1180px; margin: 0 auto; }
+
+/* Scrim behind the mobile sidebar drawer */
+.scrim { display: none; }
+
+/* 1366-class laptops: tighten the sidebar so main content keeps room */
+@media (max-width: 1440px) {
+  :root { --sidebar-w: 248px; }
+  .app-main__inner { padding: var(--s-6); }
+}
+
+/* Below 900: sidebar becomes a drawer; single-column main */
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'header'
+      'main';
+  }
+  .sidebar {
+    position: fixed;
+    top: var(--header-h);
+    left: 0;
+    bottom: 0;
+    width: min(300px, 86vw);
+    transform: translateX(-100%);
+    transition: transform var(--dur-2) var(--ease);
+    z-index: var(--z-drawer);
+    box-shadow: var(--shadow-3);
+  }
+  .app-shell.is-sidebar-open .sidebar { transform: none; }
+  .app-shell.is-sidebar-open .scrim {
+    display: block;
+    position: fixed;
+    inset: var(--header-h) 0 0;
+    background: var(--overlay);
+    z-index: calc(var(--z-drawer) - 1);
+    animation: fade-in var(--dur-2) var(--ease);
+  }
+  .app-main__inner { padding: var(--s-4); }
+}
