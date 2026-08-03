@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **PM Protection Bureau (PM보호국)** — PMBOK® 8th Edition 기반 PM 역량 검증 **크라임씬 게임**. 교육용 실시간 컴페티션으로, 참가자는 "시험 응시자"가 아니라 **PM보호국 신입 수사관**이 되어 프로젝트 현장의 "사건"을 해결한다.
 
-- **최종 목표(제품)**: 여러 팀이 동시에 참여하는 행사에서, Opening → 팀 선택 → 서약 → 대기 → Stage 1~3 → 아이템 획득 → 사무관 임명 → Final Raid → 엔딩 → 랭킹까지 **끊김 없는 몰입형 플로우**를 제공한다.
+- **최종 목표(제품)**: 여러 팀이 동시에 참여하는 행사에서, Opening → 팀 선택 → 서약 → 대기 → Stage 1~3 → 아이템 획득 → 감독관 임명 → Final Raid → 엔딩 → 랭킹까지 **끊김 없는 몰입형 플로우**를 제공한다.
 - **핵심 품질 목표**: (1) AAA 게임/비밀기관 HUD 수준의 몰입감, (2) 행사 운영 안정성(관리자 제어, 새로고침 복구, 종료 시간 강제), (3) 정답·점수의 서버 보호.
 - **비목표(Non-goals)**: 일반 퀴즈/설문 UI, 자유로운 화면 이동, 클라이언트에서의 채점.
 
@@ -162,7 +162,7 @@ PMC_ROUND2/
   - **임시 뷰 상태**: 선택 중인 보기, 모달 open 등 → 컴포넌트 로컬.
 - **실시간 동기화**: `waiting_room`·랭킹·게임 상태는 Supabase Realtime 구독으로 새로고침 없이 반영한다(`SCR-005`). 관리자 Start → 자동 화면 전환.
 - **복구(Rehydrate)**: 앱 시작 시 서버에서 (내 팀의) 진행 상태를 조회해 store를 채우고, 라우터가 해당 화면으로 이동한다.
-- **저장 시점**: 팀 선택 / 서약 완료 / Mission 시작 / 답안 제출 / 사건 완료 / Stage 완료 / 아이템 획득 / 사무관 임명 / Raid 시작·완료 / 게임 종료 직후 서버 저장(`docs/game-flow.md §18`).
+- **저장 시점**: 팀 선택 / 서약 완료 / Mission 시작 / 답안 제출 / 사건 완료 / Stage 완료 / 아이템 획득 / 감독관 임명 / Raid 시작·완료 / 게임 종료 직후 서버 저장(`docs/game-flow.md §18`).
 - **중복 방지**: 이미 제출한 사건은 재제출 불가(서버 유니크 제약 + 클라이언트 가드 이중화).
 
 ---
@@ -197,7 +197,8 @@ PMC_ROUND2/
 - **접근 제어 이중화**: 순차 진행(이전 Stage 미통과 시 다음 Stage 차단)은 클라이언트 가드 + **서버 정책/RPC 검증** 둘 다.
 - **실시간**: game 상태, 팀 진행/점수, 랭킹은 Realtime 채널 구독. 종료 시각 도달·관리자 End 시 서버가 상태를 바꾸면 클라이언트가 반응.
 - **스키마 관리**: 테이블/정책/함수는 `supabase/`에 SQL(마이그레이션)로 버전 관리. 임시로 대시보드에서만 바꾸지 않는다.
-- **핵심 엔터티(초안)**: `teams`, `participants`, `game`(단일 상태 로우), `questions`(정답 분리), `submissions`(팀×사건 유니크), `items`, `rankings(view)`. 실제 스키마는 구현 시 확정하고 이 문서에 반영.
+- **핵심 엔터티(초안)**: `teams`, `team_entries`(팀×1 유니크 — 입장/점유), `game`(단일 상태 로우), `questions`(정답 분리), `submissions`(팀×사건 유니크), `items`, `rankings(view)`. 실제 스키마는 구현 시 확정하고 이 문서에 반영.
+- **팀 입장(확정, 2026-08-03)**: 팀별 비밀번호를 쓰지 않는다. **팀 선택 + 팀원 3명 전체 이메일 등록 = 입장**이고, 등록한 기기가 그 팀을 **점유**한다(팀당 1기기 · 기기당 1팀). 다른 기기는 **등록된 이메일 중 하나**를 입력해야 인계받는다(배포 없는 자연 비밀번호). 입력은 정규화 후 **빈칸·팀 내 중복만 차단**하고 형식 의심은 통과시키되 플래그를 남긴다. 같은 이메일이 2개 팀에 등록되면 팀 오선택 신호로 표시해 운영진이 **시작 전에 정정**한다. 상세는 `docs/screen-list.md SCR-003`·`docs/implementation-plan.md §8.5`, 클라이언트 격리 지점은 `src/js/lib/entries.js`(서버 이관 시 이 파일 내부만 RPC로 교체).
 
 ---
 
@@ -228,7 +229,7 @@ PMC_ROUND2/
 ## 13. 애니메이션 및 사운드 구현 원칙
 
 **애니메이션**
-- **전환 시간(`docs/game-flow.md §21`)**: 일반 화면 전환 300~700ms, 중요 연출(아이템 획득·사무관 임명·금배지)은 2~5초 허용.
+- **전환 시간(`docs/game-flow.md §21`)**: 일반 화면 전환 300~700ms, 중요 연출(아이템 획득·감독관 임명·금배지)은 2~5초 허용.
 - **전환 유형**: Fade / Slide / Blur / Scan Line. Stage 전환은 해당 Stage 컬러가 확산되는 효과.
 - **구현**: CSS `transition`/`@keyframes`(`animations.css`) + 복잡한 시퀀스는 Web Animations API. 타임라인/상수는 코드에서 관리.
 - **접근성**: `prefers-reduced-motion: reduce`면 화면 흔들림·과한 파티클을 줄이고 즉시 전환으로 대체. 로직 진행은 애니메이션 완료에 의존하되 **타임아웃 fallback**을 둔다(연출이 멈춰도 게임이 멈추지 않게).
@@ -268,7 +269,7 @@ PMC_ROUND2/
 | 점수 | **Investigation Score** | `score` |
 | Stage | **Mission** | `stage` |
 | 아이템 | **Evidence / Equipment** | `item` |
-| 응시자 | **신입 수사관 → (정식) 사무관** | `agent` |
+| 응시자 | **신입 수사관 → (정식) 감독관** | `agent` |
 
 **규칙**: UI 문자열은 `src/js/constants/terms.js`에 모아 한 곳에서 관리(오탈자·톤 일관성). 코드 식별자는 중립 영어를 써도 되지만, **화면 출력 시점에 반드시 게임 용어로 변환**한다.
 
@@ -299,7 +300,7 @@ PMC_ROUND2/
 - Admin Login/Dashboard/Game Control(Start·End 확인 모달)/Team Monitor/Ranking Control (+ 이후 Question 관리, Asset Preview, System Test)
 
 **Step 5 — 연출 강화**
-- Stage 전환/아이템 획득/사무관 임명/긴급 경보 Glitch/Final Raid 타격감/금배지 수여/사운드
+- Stage 전환/아이템 획득/감독관 임명/긴급 경보 Glitch/Final Raid 타격감/금배지 수여/사운드
 
 각 Step은 "완료 기준(§17)"을 통과해야 다음으로 넘어간다.
 
@@ -315,7 +316,7 @@ PMC_ROUND2/
 - [ ] 이전 Stage 미통과 시 다음 Stage 접근이 서버에서 차단된다.
 - [ ] 15개 사건 답안이 저장되고, Stage별·총 Investigation Score가 계산된다.
 - [ ] Stage 완료 후(최소 1문제 정답 시) 아이템이 사이드 패널에 활성화된다.
-- [ ] Stage 3 완료 → 사무관 임명 → Final Raid(20초) → 빌런왕 격퇴 → 금배지 → 최종 랭킹까지 이어진다.
+- [ ] Stage 3 완료 → 감독관 임명 → Final Raid(20초) → 빌런왕 격퇴 → 금배지 → 최종 랭킹까지 이어진다.
 
 **복구·예외**
 - [ ] 새로고침/재접속 후 서버 저장 지점으로 복구된다.

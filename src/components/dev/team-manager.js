@@ -1,9 +1,11 @@
-// DEV Team Manager — add / edit / delete teams in the browser (name, password, color, members).
+// DEV Team Manager — add / edit / delete teams in the browser (name, color, members).
+// 팀 비밀번호 칸은 없다 — 입장은 수사관 3명 이메일 등록이고, 현황은 "입장 현황"(entry-monitor)에서 본다.
 // Persists to localStorage via lib/teams.js; export dumps JSON to paste back into source later.
 // Opened from the (password-gated) DEV menu; never present in production builds.
 import { el } from '../../js/utils/dom.js'
 import { icon } from '../../js/utils/icons.js'
 import { getTeams, addTeam, updateTeam, removeTeam, resetTeams, exportTeams } from '../../js/lib/teams.js'
+import { releaseTeam } from '../../js/lib/entries.js'
 
 export function createTeamManager ({ onClose } = {}) {
   const count = el('span', { class: 'tm-count mono' })
@@ -16,16 +18,14 @@ export function createTeamManager ({ onClose } = {}) {
     const name = el('input', { class: 'tm-field', type: 'text', value: team.name, placeholder: '팀 이름' })
     name.addEventListener('input', () => updateTeam(team.id, { name: name.value }))
 
-    const pass = el('input', { class: 'tm-field tm-field--pass', type: 'text', value: team.pass, placeholder: '비번' })
-    pass.addEventListener('input', () => updateTeam(team.id, { pass: pass.value }))
-
     const members = el('input', { class: 'tm-field tm-field--num', type: 'number', min: '1', max: '20', value: String(team.members) })
     members.addEventListener('input', () => updateTeam(team.id, { members: Number(members.value) || 1 }))
 
     const del = el('button', { class: 'tm-del', type: 'button', 'aria-label': '팀 삭제' }, [icon('close', { size: 16 })])
-    del.addEventListener('click', () => { removeTeam(team.id); render() })
+    // 팀을 지우면 그 팀의 입장 기록도 함께 지운다(고아 기록 방지).
+    del.addEventListener('click', () => { releaseTeam(team.id); removeTeam(team.id); render() })
 
-    return el('div', { class: 'tm-row' }, [color, name, pass, members, del])
+    return el('div', { class: 'tm-row' }, [color, name, members, del])
   }
 
   function render () {
@@ -59,7 +59,7 @@ export function createTeamManager ({ onClose } = {}) {
     ]),
     el('div', { class: 'tm-toolbar' }, [addBtn, exportBtn, resetBtn]),
     el('div', { class: 'tm-cols' }, [
-      el('span', { text: '색' }), el('span', { text: '팀 이름' }), el('span', { text: '비번' }), el('span', { text: '인원' }), el('span', {})
+      el('span', { text: '색' }), el('span', { text: '팀 이름' }), el('span', { text: '인원' }), el('span', {})
     ]),
     list
   ])

@@ -29,5 +29,14 @@ export const ASSETS = {
     opening: '/audio/bgm/opening.mp3',
     quizPass: '/audio/bgm/quiz-pass.mp3',
     killBillian: '/audio/bgm/kill-billian.mp3'
+  },
+  // 사건 단서 이미지 (파일명은 소문자 .png — Vercel/Linux는 대소문자 구분, CLAUDE.md §14).
+  questions: {
+    q1: '/images/questions/question1.png',
+    q2_1: '/images/questions/question2-1.png',
+    q2_2: '/images/questions/question2-2.png',
+    q2_3: '/images/questions/question2-3.png',
+    q2_4: '/images/questions/question2-4.png',
+    q3: '/images/questions/question3.png'
   }
 }

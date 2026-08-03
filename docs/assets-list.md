@@ -32,11 +32,25 @@
 | /images/characters/all-members.png | 전체 캐릭터(엔딩 대체 연출) | 있음 |
 | /images/characters/billian.png | 빌런왕(등장/공격 대상) | 있음 |
 | /images/characters/billian-dead.png | 빌런왕 피격·격퇴 상태 | 있음 |
-| /images/characters/boss.png | 국장(사무관 임명·엔딩 메시지) | 있음 |
+| /images/characters/boss.png | 국장(감독관 임명·엔딩 메시지) | 있음 |
+
+### 사건 단서 이미지 — `/images/questions/`
+
+| File | Purpose | Status |
+|---|---|---|
+| /images/questions/question1.png | Stage 1 · 사건 #007 단서 5 (Proactive Mindset) | 있음 |
+| /images/questions/question2-1.png | Stage 2 · 단서 1/4 | 있음 |
+| /images/questions/question2-2.png | Stage 2 · 단서 2/4 | 있음 |
+| /images/questions/question2-3.png | Stage 2 · 단서 3/4 | 있음 |
+| /images/questions/question2-4.png | Stage 2 · 단서 4/4 | 있음 |
+| /images/questions/question3.png | Stage 3 · 단서 | 있음 |
+
+> 파일명은 소문자 `.png`로 통일(대문자 `.PNG`에서 변경) — Vercel/Linux 대소문자 구분 대응(§14). 경로 상수는 `src/js/constants/assets.js`의 `ASSETS.questions`가 단일 출처다.
+> ⚠️ 원본이 각 2MB 내외로 큼 — 배포 전 WebP/적정 해상도로 최적화 권장(`CLAUDE.md §12`).
 
 ### 기타 이미지 폴더 (준비)
 
-`/images/badges/`, `/images/icons/`, `/images/ui/`, `/images/questions/` 폴더는 생성되어 있으나 현재 파일은 없다. 아이콘 세트, UI 조각, 사건 단서 이미지 등을 여기에 추가한다.
+`/images/badges/`, `/images/icons/`, `/images/ui/` 폴더는 생성되어 있으나 현재 파일은 없다. 아이콘 세트, UI 조각 등을 여기에 추가한다.
 
 ## Videos — `/videos/`
 
@@ -64,7 +78,7 @@
 | /audio/sfx/case-success.mp3 | 사건 해결 성공 | 준비 |
 | /audio/sfx/case-fail.mp3 | 추가 조사 필요 | 준비 |
 | /audio/sfx/item-acquire.mp3 | 아이템 획득 | 준비 |
-| /audio/sfx/appointment.mp3 | 사무관 임명 | 준비 |
+| /audio/sfx/appointment.mp3 | 감독관 임명 | 준비 |
 | /audio/sfx/ceremony.mp3 | 금배지 수여식 | 준비 |
 
 > SFX 파일명은 예시이며, 실제 추가 시 이 표와 `src/js/constants/assets.js`를 함께 갱신한다.

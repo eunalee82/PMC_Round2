@@ -1,0 +1,199 @@
+/* Gameplay · 사건(Case) 화면 + EvidenceViewer / QuestionChoice.
+   토큰만 소비한다 (CLAUDE.md §5). Stage 컬러는 [data-stage]가 --accent를 교체하는 방식으로만 반영. */
+
+.screen--case {
+  min-height: 100dvh;
+  padding: var(--s-8) var(--s-6) var(--s-16);
+  overflow-y: auto;
+  background:
+    radial-gradient(120% 90% at 50% -10%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
+    linear-gradient(180deg, rgba(4, 5, 8, 0.86), rgba(4, 5, 8, 0.94)),
+    var(--bg-0) url('/images/backgrounds/question-bg.png') center top / cover no-repeat fixed;
+}
+
+.case__inner {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+
+/* ── Head ── */
+.case__head { display: flex; flex-direction: column; gap: var(--s-2); }
+.case__mission { color: var(--accent); font-size: var(--text-xs); letter-spacing: var(--tracking-caps); }
+.case__file {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  color: var(--text-2); font-size: var(--text-sm);
+}
+.case__file svg { color: var(--accent); }
+.case__title {
+  margin: 0; color: var(--text-1);
+  font-size: var(--text-3xl); font-weight: var(--fw-black);
+  letter-spacing: var(--tracking-tight); line-height: var(--leading-tight);
+}
+
+.case__label { color: var(--text-3); font-size: var(--text-xs); letter-spacing: var(--tracking-caps); }
+
+/* ── Brief (사건 개요) ── */
+.case__brief {
+  display: flex; flex-direction: column; gap: var(--s-3);
+  padding: var(--s-5) var(--s-6);
+  background: var(--glass-card); border: 1px solid var(--border);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-1);
+  backdrop-filter: blur(6px);
+}
+.case__brief-body { margin: 0; color: var(--text-1); line-height: var(--leading); white-space: pre-line; }
+
+/* ── Evidence (단서 이미지) ── */
+.evidence { margin: 0; display: flex; flex-direction: column; gap: var(--s-2); }
+.evidence__frame {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--border-strong); border-radius: var(--r-lg);
+  background: var(--bg-1); box-shadow: var(--shadow-2);
+}
+.evidence__img { display: block; width: 100%; height: auto; cursor: zoom-in; }
+.evidence__zoom {
+  position: absolute; top: var(--s-3); right: var(--s-3);
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: var(--r-sm);
+  background: var(--glass-header); color: var(--text-1);
+  border: 1px solid var(--border); cursor: pointer;
+  transition: background var(--dur-1) var(--ease);
+}
+.evidence__zoom:hover { background: var(--bg-active); }
+.evidence__zoom:focus-visible { outline: none; box-shadow: var(--ring); }
+.evidence__cap { color: var(--text-3); font-size: var(--text-xs); letter-spacing: var(--tracking-caps); }
+.evidence__fallback {
+  display: none; flex-direction: column; align-items: center; gap: var(--s-2);
+  padding: var(--s-12) var(--s-6); text-align: center; color: var(--text-2);
+}
+.evidence__fallback-title { margin: 0; }
+.evidence__fallback-sub { margin: 0; color: var(--text-3); font-size: var(--text-xs); }
+.evidence.is-broken .evidence__img,
+.evidence.is-broken .evidence__zoom { display: none; }
+.evidence.is-broken .evidence__fallback { display: flex; }
+.evidence__zoomimg { display: block; width: 100%; height: auto; border-radius: var(--r-md); }
+
+/* ── Prompt ── */
+.case__prompt { display: flex; flex-direction: column; gap: var(--s-2); }
+.case__prompt-text {
+  margin: 0; color: var(--text-1);
+  font-size: var(--text-lg); font-weight: var(--fw-semibold); line-height: var(--leading);
+}
+.case__hint { color: var(--text-3); font-size: var(--text-sm); }
+
+/* ── Choices (5지선다) ── */
+.choices { display: flex; flex-direction: column; gap: var(--s-3); }
+.choice {
+  display: flex; align-items: center; gap: var(--s-4);
+  width: 100%; padding: var(--s-4) var(--s-5); text-align: left;
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r-md);
+  color: var(--text-1); cursor: pointer;
+  transition: border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+}
+.choice:hover { border-color: var(--accent-border); background: var(--bg-3); }
+.choice:focus-visible { outline: none; box-shadow: var(--ring); }
+.choice__marker {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: var(--r-full);
+  background: var(--bg-3); border: 1px solid var(--border-strong);
+  font-weight: var(--fw-bold); font-size: var(--text-sm); color: var(--text-2);
+}
+.choice__text { flex: 1; font-size: var(--text-base); }
+.choice__state { flex: none; color: var(--accent); opacity: 0; transition: opacity var(--dur-1) var(--ease); }
+
+.choice.is-selected { border-color: var(--accent); background: var(--accent-soft); box-shadow: var(--glow-accent); }
+.choice.is-selected .choice__marker { background: var(--accent); border-color: var(--accent); color: #0b0c11; }
+.choice.is-selected .choice__state { opacity: 1; }
+
+.choices.is-locked .choice { cursor: default; }
+.choices.is-locked .choice:hover { border-color: var(--border); background: var(--bg-2); }
+
+/* revealed — 정답/오답 */
+.choice.is-correct { border-color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); box-shadow: none; }
+.choice.is-correct .choice__marker { background: var(--success); border-color: var(--success); color: #04120b; }
+.choice.is-correct .choice__state { opacity: 1; color: var(--success); }
+.choice.is-wrong { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+.choice.is-wrong .choice__marker { background: var(--danger); border-color: var(--danger); color: #1a0406; }
+
+/* ── Result (사건 해결 / 추가 조사 필요 + 분석 보고서) ── */
+.case-result {
+  display: flex; flex-direction: column; gap: var(--s-4);
+  padding: var(--s-5) var(--s-6); border-radius: var(--r-lg);
+  border: 1px solid var(--border); background: var(--glass-card);
+  animation: caseResultIn var(--dur-3) var(--ease-out);
+}
+.case-result.is-correct { border-color: color-mix(in srgb, var(--success) 45%, transparent); }
+.case-result.is-wrong { border-color: color-mix(in srgb, var(--danger) 40%, transparent); }
+.case-result__badge { display: flex; align-items: center; gap: var(--s-3); }
+.case-result__badge svg { flex: none; }
+.case-result.is-correct .case-result__badge svg { color: var(--success); }
+.case-result.is-wrong .case-result__badge svg { color: var(--danger); }
+.case-result__title {
+  display: block; font-family: var(--font-mono); font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-wide); font-size: var(--text-base);
+}
+.case-result.is-correct .case-result__title { color: var(--success); }
+.case-result.is-wrong .case-result__title { color: var(--danger); }
+.case-result__sub { display: block; color: var(--text-2); font-size: var(--text-sm); }
+
+.case-report {
+  display: flex; flex-direction: column; gap: var(--s-2);
+  padding-top: var(--s-4); border-top: 1px solid var(--border-subtle);
+}
+.case-report__label { color: var(--text-3); font-size: var(--text-xs); letter-spacing: var(--tracking-caps); }
+.case-report__body { margin: 0; color: var(--text-1); line-height: var(--leading); white-space: pre-line; }
+.case-result__note { margin: 0; color: var(--text-3); font-size: var(--text-sm); }
+
+@keyframes caseResultIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Evidence 확대 모달 — 큰 이미지 폭 확보 */
+.modal--lg { max-width: min(920px, 92vw); }
+
+/* ── Responsive ── */
+@media (max-width: 1366px) {
+  .case__title { font-size: var(--text-2xl); }
+}
+@media (max-width: 640px) {
+  .screen--case { padding: var(--s-6) var(--s-4) var(--s-12); background-attachment: scroll; }
+  .case__title { font-size: var(--text-2xl); }
+  .case__brief { padding: var(--s-4); }
+  .choice { padding: var(--s-3) var(--s-4); gap: var(--s-3); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .case-result { animation: none; }
+  .choice, .choice__state, .evidence__zoom { transition: none; }
+}
+
+/* ── 캡처 억제 (워터마크 · 전체화면 게이트 · 경고) — components/game/capture-guard.js ── */
+/* 게임플레이 콘텐츠는 텍스트 선택 방지 (복사 억제 보조) */
+.case__inner { user-select: none; -webkit-user-select: none; }
+.case__inner img { -webkit-user-drag: none; user-drag: none; }
+
+.wm-overlay { position: fixed; inset: 0; z-index: 1040; pointer-events: none; overflow: hidden; }
+.wm-overlay__inner { position: absolute; inset: -25%; display: flex; flex-wrap: wrap; gap: 90px 70px; transform: rotate(-24deg); }
+.wm-overlay__cell { color: rgba(255, 255, 255, 0.05); font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.08em; white-space: nowrap; user-select: none; }
+
+.fs-gate {
+  position: fixed; inset: 0; z-index: 1050; display: grid; place-items: center; padding: var(--s-6);
+  background: rgba(6, 7, 11, 0.82); backdrop-filter: blur(14px);
+}
+.fs-gate.is-hidden { display: none; }
+.fs-gate__panel {
+  max-width: 440px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--s-4);
+  padding: var(--s-8); border: 1px solid var(--border); border-radius: var(--r-lg);
+  background: var(--glass-card); box-shadow: var(--shadow-3);
+}
+.fs-gate__panel svg { color: var(--accent); }
+.fs-gate__title { margin: 0; font-size: var(--text-xl); font-weight: var(--fw-bold); }
+.fs-gate__msg { margin: 0; color: var(--text-2); font-size: var(--text-sm); line-height: var(--leading); }
+
+.cap-toast {
+  position: fixed; top: var(--s-6); left: 50%; transform: translateX(-50%); z-index: 1101;
+  display: inline-flex; align-items: center; gap: var(--s-2); padding: 10px 16px; border-radius: var(--r-md);
+  color: #ffd7da; background: color-mix(in srgb, var(--danger) 24%, rgba(8, 9, 13, 0.92));
+  border: 1px solid color-mix(in srgb, var(--danger) 55%, transparent);
+  font-size: var(--text-sm); font-weight: var(--fw-semibold); box-shadow: var(--shadow-2);
+}

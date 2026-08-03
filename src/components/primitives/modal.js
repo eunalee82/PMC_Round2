@@ -1,5 +1,7 @@
 // Modal — overlay dialog with ESC / backdrop close and focus restore.
-// createModal(props) -> { el, open, close, destroy }
+// createModal(props) -> { el, open, close, destroy, actions }
+// `actions` exposes the footer button handles so callers can toggle disabled/label
+// (e.g. SCR-003 수사관 등록: [입장] stays disabled until the three emails validate).
 import { el } from '../../js/utils/dom.js'
 import { icon } from '../../js/utils/icons.js'
 import { createButton } from './button.js'
@@ -19,6 +21,7 @@ export function createModal (props = {}) {
     label: a.label,
     variant: a.variant || 'secondary',
     size: 'md',
+    disabled: !!a.disabled,
     onClick: () => { if (a.onClick) a.onClick(); if (a.close !== false) close() }
   }))
   const footer = actions.length
@@ -80,5 +83,5 @@ export function createModal (props = {}) {
     document.body.style.overflow = ''
   }
 
-  return { el: overlay, open, close, destroy }
+  return { el: overlay, open, close, destroy, actions: footerButtons }
 }

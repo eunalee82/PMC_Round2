@@ -7,6 +7,7 @@ import './css/animations.css'
 import './css/layout.css'
 import './css/components.css'
 import './css/screens.css'
+import './css/gameplay.css'
 
 import { el } from './js/utils/dom.js'
 import { createFlow } from './js/flow.js'

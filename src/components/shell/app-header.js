@@ -77,7 +77,7 @@ export function createAppHeader (props = {}) {
   }
   if (running) startTimer()
 
-  const conn = CONNECTION_STATES[connection] || CONNECTION_STATES.online
+  const conn = connected ? CONNECTION_STATES.online : CONNECTION_STATES.offline
   const statusEl = el('div', {
     class: 'app-header__status', role: 'status', 'aria-live': 'polite', title: '서버 연결 상태'
   }, [

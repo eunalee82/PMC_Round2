@@ -2,9 +2,11 @@
 // Additionally gated by a password (2026) so it can't be used casually on shared/preview builds.
 import { el } from '../../js/utils/dom.js'
 import { icon } from '../../js/utils/icons.js'
-import { FLOW_ORDER, FLOW_LABELS } from '../../js/constants/flow.js'
+import { FLOW, FLOW_ORDER, FLOW_LABELS } from '../../js/constants/flow.js'
 import { enableCopyEdit, isCopyEditing, exportCopy, resetCopy } from '../../js/lib/copy.js'
 import { createTeamManager } from './team-manager.js'
+import { createEntryMonitor } from './entry-monitor.js'
+import { startGame, resetGame } from '../../js/lib/game.js'
 
 const DEV_PASSWORD = '2026'
 const UNLOCK_KEY = 'pmb.dev.unlocked'
@@ -14,7 +16,9 @@ export function createDevMenu ({ flow }) {
   try { unlocked = localStorage.getItem(UNLOCK_KEY) === '1' } catch { unlocked = false }
 
   // Re-render the current screen after team edits so changes show immediately.
-  const teamManager = createTeamManager({ onClose: () => flow.goTo(flow.current(), { skipGuard: true }) })
+  const rerender = () => flow.goTo(flow.current(), { skipGuard: true })
+  const teamManager = createTeamManager({ onClose: rerender })
+  const entryMonitor = createEntryMonitor({ onClose: rerender })
 
   const body = el('div', { class: 'devmenu__body' })
 
@@ -69,14 +73,23 @@ export function createDevMenu ({ flow }) {
 
     const resetCopyBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => resetCopy() } }, ['문구 되돌리기'])
 
-    const teamsBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => teamManager.open() } }, ['팀 관리 (이름·비번)'])
+    const teamsBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => teamManager.open() } }, ['팀 관리 (이름·색상)'])
+    const entriesBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => entryMonitor.open() } }, ['입장 현황'])
+
+    const caseBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => flow.goTo(FLOW.CASE, { skipGuard: true }) } }, ['사건 · Stage 1 Q1'])
+    // 관리자 Start 흉내 — 대기실이 구독 중이면 자동으로 Stage 1로 전환된다 (lib/game.js).
+    const startGameBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => startGame() } }, ['관리자: 게임 시작 ▶'])
+    const resetGameBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => resetGame() } }, ['대기 상태로 되돌리기'])
 
     body.replaceChildren(
       el('span', { class: 'devmenu__label', text: 'JUMP TO SCREEN' }),
       el('div', { class: 'devmenu__jumps' }, jumpButtons),
       el('div', { class: 'devmenu__divider' }),
+      el('span', { class: 'devmenu__label', text: 'GAMEPLAY (게임)' }),
+      el('div', { class: 'devmenu__jumps' }, [startGameBtn, resetGameBtn, caseBtn]),
+      el('div', { class: 'devmenu__divider' }),
       el('span', { class: 'devmenu__label', text: 'TEAMS (팀)' }),
-      el('div', { class: 'devmenu__jumps' }, [teamsBtn]),
+      el('div', { class: 'devmenu__jumps' }, [teamsBtn, entriesBtn]),
       el('div', { class: 'devmenu__divider' }),
       el('span', { class: 'devmenu__label', text: 'COPY (문구)' }),
       el('div', { class: 'devmenu__jumps' }, [editBtn, exportBtn, resetCopyBtn]),
@@ -102,6 +115,6 @@ export function createDevMenu ({ flow }) {
   return {
     el: panel,
     mount (parent) { parent.append(panel); return panel },
-    destroy () { teamManager.destroy(); panel.remove() }
+    destroy () { teamManager.destroy(); entryMonitor.destroy(); panel.remove() }
   }
 }

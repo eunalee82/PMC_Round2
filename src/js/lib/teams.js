@@ -3,14 +3,16 @@
 // exportTeams() dumps the current list to paste back into mocks/teams.js (or hand to the server later).
 import { BASE_TEAMS } from '../mocks/teams.js'
 
-const KEY = 'pmb.teams.v1'
+// v2 — 32개 팀 로스터로 교체하며 키를 올려 예전 DEV '팀 관리' 캐시(v1)를 무시한다.
+const KEY = 'pmb.teams.v2'
 
 function load () {
   try { const v = JSON.parse(localStorage.getItem(KEY)); return Array.isArray(v) ? v : null } catch { return null }
 }
 function persist () { try { localStorage.setItem(KEY, JSON.stringify(teams)) } catch { /* storage off */ } }
 
-let teams = load() || BASE_TEAMS.map((t) => ({ ...t }))
+// `pass`는 이전 버전(팀 비번) 잔재 — 저장된 값이 있어도 떨궈낸다. 입장은 lib/entries.js가 담당한다.
+let teams = (load() || BASE_TEAMS).map(({ pass, ...team }) => team) // eslint-disable-line no-unused-vars
 
 export function getTeams () { return teams }
 export function findTeam (id) { return teams.find((t) => t.id === id) || null }
@@ -21,8 +23,7 @@ export function addTeam (data = {}) {
     id,
     name: data.name || '새 팀',
     color: data.color || '#7c87ff',
-    members: data.members ?? 3,
-    pass: data.pass || ''
+    members: data.members ?? 3
   })
   persist()
   return id
@@ -39,7 +40,7 @@ export function removeTeam (id) {
 }
 
 export function resetTeams () {
-  teams = BASE_TEAMS.map((t) => ({ ...t }))
+  teams = BASE_TEAMS.map((team) => ({ ...team }))
   persist()
 }
 

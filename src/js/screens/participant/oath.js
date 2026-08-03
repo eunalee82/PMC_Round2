@@ -1,6 +1,7 @@
 // SCR-004 Oath Agreement — sign the confidentiality pledge. BGM loops here (opening.mp3).
 // see docs/screen-list.md SCR-004, docs/game-flow.md §6.4.
 import { el } from '../../utils/dom.js'
+import { icon } from '../../utils/icons.js'
 import { ASSETS } from '../../constants/assets.js'
 import { FLOW } from '../../constants/flow.js'
 import { findTeam } from '../../lib/teams.js'
@@ -9,6 +10,7 @@ import { createButton } from '../../../components/primitives/button.js'
 
 export function createOathScreen (ctx) {
   const team = findTeam(ctx.session.teamId)
+  const agents = ctx.session.memberEmails || []
 
   const nameInput = el('input', {
     class: 'field', type: 'text', maxlength: '24', autocomplete: 'off', spellcheck: 'false',
@@ -43,6 +45,14 @@ export function createOathScreen (ctx) {
       copyEl('span', { class: 'form-screen__step mono' }, 'oath.step'),
       copyEl('h1', { class: 'form-screen__title' }, 'oath.title'),
       team ? el('span', { class: 'oath__team' }, [el('span', { class: 'oath__team-dot', style: { background: team.color } }), el('span', { text: team.name })]) : null,
+      // 등록한 수사관 3명을 다시 보여준다 — 팀을 잘못 골랐다면 서약 전에 알아차릴 마지막 지점.
+      agents.length ? el('div', { class: 'oath__agents' }, [
+        copyEl('span', { class: 'oath__agents-label mono caps' }, 'oath.agents'),
+        el('div', { class: 'team-roster__chips' }, agents.map((email) => el('span', { class: 'email-chip' }, [
+          icon('check', { size: 13 }),
+          el('span', { text: email })
+        ])))
+      ]) : null,
       copyEl('pre', { class: 'oath__text' }, 'oath.text'),
       el('label', { class: 'oath__field' }, [
         copyEl('span', { class: 'oath__field-label caps' }, 'oath.fieldLabel'),
