@@ -7,6 +7,7 @@ import { enableCopyEdit, isCopyEditing, exportCopy, resetCopy } from '../../js/l
 import { createTeamManager } from './team-manager.js'
 import { createEntryMonitor } from './entry-monitor.js'
 import { startGame, resetGame } from '../../js/lib/game.js'
+import { resetAllProgress } from '../../js/lib/progress.js'
 
 const DEV_PASSWORD = '2026'
 const UNLOCK_KEY = 'pmb.dev.unlocked'
@@ -79,7 +80,7 @@ export function createDevMenu ({ flow }) {
     const caseBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => flow.goTo(FLOW.CASE, { skipGuard: true }) } }, ['사건 · Stage 1 Q1'])
     // 관리자 Start 흉내 — 대기실이 구독 중이면 자동으로 Stage 1로 전환된다 (lib/game.js).
     const startGameBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => startGame() } }, ['관리자: 게임 시작 ▶'])
-    const resetGameBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => resetGame() } }, ['대기 상태로 되돌리기'])
+    const resetGameBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => { resetGame(); resetAllProgress() } } }, ['대기 상태로 되돌리기'])
 
     body.replaceChildren(
       el('span', { class: 'devmenu__label', text: 'JUMP TO SCREEN' }),

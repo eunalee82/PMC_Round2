@@ -85,8 +85,6 @@ export function createAppHeader (props = {}) {
     el('span', { class: 'status__label', text: conn.label })
   ])
 
-  const bell = iconButton('bell', '알림', onNotifications, hasNotification ? el('span', { class: 'icon-btn__dot' }) : null)
-
   const node = el('header', { class: 'app-header' }, [
     menuBtn,
     brandEl,
@@ -94,9 +92,8 @@ export function createAppHeader (props = {}) {
     statusEl,
     el('div', { class: 'app-header__spacer' }),
     el('div', { class: 'app-header__actions' }, [
-      bell,
-      iconButton('volume', '음향', onAudio),
-      iconButton('settings', '설정', onSettings)
+      // 종(알림)·설정 아이콘은 동작 없는 placeholder라 제거. 음향(mute 토글)만 유지.
+      iconButton('volume', '음향', onAudio)
     ])
   ])
 

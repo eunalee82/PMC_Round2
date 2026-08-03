@@ -1,7 +1,7 @@
 // SCR — 사건(Case) 화면. 3단 셸(AppShell: 헤더 + 좌측 사이드바) 안에 사건 본문을 렌더한다 (LayOut.png).
 // 좌측 패널(LeftSidebar) = 팀/Investigation Score · 랭킹 · Stage Score · Evidence 아이템.
 // 문제 엔진 데모: 지금은 Stage 1 · 사건 #007 하나만. 채점은 lib/grade.js(MOCK) 결과로만 확정한다 (CLAUDE.md §7 §11).
-// 사이드바 데이터는 아직 store와 연결 전이라 스냅샷(0점/미획득)으로 채운다 — 서버 연동 시 store 구독으로 교체.
+// 진행 상황(점수·정답 수·제출 시각)은 lib/progress.js(MOCK)에 기록 → 서버 연동 시 store 구독으로 교체.
 // 용어는 게임 용어로 출력 (CLAUDE.md §15): 문제=사건, 제출=판단 제출, 정답=사건 해결 …
 import { el } from '../../utils/dom.js'
 import { icon } from '../../utils/icons.js'
@@ -9,7 +9,8 @@ import { t } from '../../lib/copy.js'
 import { CASES } from '../../data/cases.js'
 import { gradeCase } from '../../lib/grade.js'
 import { findTeam } from '../../lib/teams.js'
-import { remainingSeconds } from '../../lib/game.js'
+import { remainingSeconds, ensureStarted } from '../../lib/game.js'
+import { getProgress, recordSubmission, getRanking, STAGE_TOTALS } from '../../lib/progress.js'
 import { createButton } from '../../../components/primitives/button.js'
 import { createAppShell } from '../../../components/shell/app-shell.js'
 import { createEvidenceViewer } from '../../../components/game/evidence-viewer.js'
@@ -22,20 +23,26 @@ const STAGE_LABELS = {
   3: 'MISSION 03 · AI USE CASE'
 }
 
-// 좌측 사이드바 스냅샷 — LayOut.png 구성. 현재는 게임 시작 시점(0점·미획득) 고정값.
-function sidebarSnapshot (teamName) {
+// 좌측 사이드바 스냅샷 — 진행 상황(progress) + 랭킹(getRanking)을 반영한다.
+// 점수 = 20점 × 정답 수, Stage Score = 스테이지별 정답 수/총 사건 수.
+// EVIDENCE 아이템 = 해당 스테이지의 모든 사건을 '제출 완료'했을 때 해제 (정답 여부 무관).
+function sidebarSnapshot (teamId, teamName, p) {
+  const ranking = getRanking()
+  const scored = ranking.filter((r) => r.score > 0)
+  const base = scored.length ? scored : ranking.filter((r) => r.teamId === teamId)
+  const rankingRows = base.slice(0, 4).map((r) => ({ rank: r.rank, name: r.name, score: r.score, isMe: r.teamId === teamId }))
   return {
-    team: { name: teamName, rank: '신입 수사관', score: 0, scoreMax: 300 },
-    ranking: teamName !== 'UNASSIGNED' ? [{ rank: 1, name: teamName, score: 0, isMe: true }] : [],
+    team: { name: teamName, rank: '신입 수사관', score: p.score, scoreMax: 300 },
+    ranking: teamName !== 'UNASSIGNED' ? rankingRows : [],
     stageScore: [
-      { key: 'mindset', label: 'Mindset', score: 0, max: 3 },
-      { key: 'domain', label: 'Domain', score: 0, max: 7 },
-      { key: 'ai', label: 'AI', score: 0, max: 5 }
+      { key: 'mindset', label: 'Mindset', score: p.stage[1] || 0, max: 3 },
+      { key: 'domain', label: 'Domain', score: p.stage[2] || 0, max: 7 },
+      { key: 'ai', label: 'AI', score: p.stage[3] || 0, max: 5 }
     ],
     items: [
-      { label: 'STAGE 1', acquired: false },
-      { label: 'STAGE 2', acquired: false },
-      { label: 'STAGE 3', acquired: false }
+      { label: 'STAGE 1', acquired: (p.submittedStage[1] || 0) >= STAGE_TOTALS[1] },
+      { label: 'STAGE 2', acquired: (p.submittedStage[2] || 0) >= STAGE_TOTALS[2] },
+      { label: 'STAGE 3', acquired: (p.submittedStage[3] || 0) >= STAGE_TOTALS[3] }
     ],
     version: '1.0.0'
   }
@@ -49,6 +56,13 @@ export function createCaseScreen (ctx) {
   // Stage 테마 — 이 화면이 살아있는 동안만 accent를 Stage 컬러로 교체 (CLAUDE.md §5, tokens [data-stage]).
   const prevStage = document.documentElement.dataset.stage
   document.documentElement.dataset.stage = String(caseData.stage)
+
+  // 문제 입장 = 미션 타이머 시작 시점 보장 (아직 시작 전이면 지금부터 60분 카운트다운).
+  ensureStarted()
+
+  const teamId = ctx && ctx.session ? ctx.session.teamId : null
+  const team = findTeam(teamId)
+  const teamName = team ? team.name : 'UNASSIGNED'
 
   const evidence = track(createEvidenceViewer({ evidence: caseData.evidence, label: t('case.evidenceLabel') }))
   const choice = track(createQuestionChoice({
@@ -74,6 +88,9 @@ export function createCaseScreen (ctx) {
     const { isCorrect, correctIndex, analysis } = gradeCase(caseData.id, idx)
     choice.reveal(correctIndex, idx)
     submitBtn.el.hidden = true
+    // 제출 시각 기록(종료 시간·동점 처리용) + 정답 시 점수 가산 → 좌측 패널 갱신
+    const p = recordSubmission(teamId, caseData.id, caseData.stage, isCorrect)
+    shell.sidebar.update(sidebarSnapshot(teamId, teamName, p))
     renderResult(isCorrect, analysis)
   }
 
@@ -131,14 +148,13 @@ export function createCaseScreen (ctx) {
   ])
 
   // 3단 셸 — 좌측 패널(LeftSidebar) 포함 (요구사항: 게임플레이 화면에 좌측 패널 표시)
-  const team = findTeam(ctx && ctx.session ? ctx.session.teamId : null)
   const shell = track(createAppShell({
     header: {
       running: true, // 게임플레이 진입 = 미션 타이머 진행 (STANDBY → MISSION TIME)
-      timerSeconds: remainingSeconds(), // 관리자 시작 시각 기준 남은 시간 (lib/game.js)
+      timerSeconds: remainingSeconds(), // 시작 시각 기준 남은 시간 (60분, lib/game.js)
       onAudio: () => { if (ctx && ctx.audio) ctx.audio.setMuted(!ctx.audio.muted) }
     },
-    sidebar: sidebarSnapshot(team ? team.name : 'UNASSIGNED')
+    sidebar: sidebarSnapshot(teamId, teamName, getProgress(teamId))
   }))
   shell.content.append(caseInner)
 

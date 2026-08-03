@@ -6,7 +6,6 @@
 const PALETTE = ['#7c87ff', '#2cc7e6', '#37d089', '#e7b24c', '#f0555f', '#b98bff', '#4ea3ff', '#4ade80', '#ff8a52']
 
 // 참가 팀 32개 (운영 확정). 순서 = 화면 표시 순서. 색상은 팔레트에서 순환 배정.
-// 주의: 22·23번 'webOS Titans'는 중복 입력분 그대로 유지. 필요 시 이름만 교체.
 const TEAM_NAMES = [
   'Agentic Titans',
   'Automation Avengers',
@@ -29,7 +28,7 @@ const TEAM_NAMES = [
   'The Guardians',
   'Trivisions',
   'Value Guardians',
-  'webOS Titans',
+  'webOS Rangers',
   'webOS Titans',
   '가치수사대',
   '본선만 가자',

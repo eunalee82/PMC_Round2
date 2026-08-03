@@ -8,7 +8,7 @@
 const KEY = 'pmb.game.v2' // v2 — 저장 형태를 문자열 → { status, startedAt } 객체로 변경
 const SCHEDULED = 'scheduled'
 const STARTED = 'started'
-const DURATION_MS = 45 * 60 * 1000 // 게임 제한시간(임시) — 서버 연동 시 관리자 설정값으로 교체
+const DURATION_MS = 60 * 60 * 1000 // 게임 제한시간 60분 — 서버 연동 시 관리자 설정값으로 교체
 
 function read () {
   try {
@@ -45,6 +45,14 @@ export function remainingSeconds () {
   const startedAt = getStartedAt()
   if (!startedAt) return Math.floor(DURATION_MS / 1000)
   return Math.max(0, Math.round((startedAt + DURATION_MS - Date.now()) / 1000))
+}
+
+// 미션 타이머 기준 시각 보장 — 문제 입장 시점에 아직 시작 안 됐으면 지금부터 흐르게 한다.
+// (관리자 Start로 이미 startedAt이 있으면 그 값을 유지 = 게임 시작 = 문제 입장 시점)
+export function ensureStarted () {
+  state = read()
+  if (!state.startedAt) { state = { status: STARTED, startedAt: Date.now() }; persist() }
+  return state.startedAt
 }
 
 // 관리자 액션 (MOCK). 서버 연결 시 관리자 전용 RPC로 교체 (권한 확인은 서버, CLAUDE.md §11).
