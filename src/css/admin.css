@@ -1,0 +1,54 @@
+/* 관리자 콘솔 (?admin) — 참가자 흐름과 분리된 게임 제어 화면. 토큰만 소비 (CLAUDE.md §5). */
+.admin {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--s-6);
+  background:
+    radial-gradient(120% 90% at 50% -10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+    var(--bg-0);
+}
+.admin__card {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  padding: var(--s-8);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg-2);
+  box-shadow: var(--shadow-3);
+}
+.admin__eyebrow { color: var(--accent); font-size: var(--text-xs); letter-spacing: var(--tracking-caps); }
+.admin__title { margin: 0; font-size: var(--text-2xl); font-weight: var(--fw-black); letter-spacing: var(--tracking-tight); }
+.admin__lead { margin: 0; color: var(--text-2); font-size: var(--text-sm); }
+.admin__head { display: flex; flex-direction: column; gap: var(--s-1); }
+
+.admin__row {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--border-subtle); border-radius: var(--r-md); background: var(--bg-1);
+}
+.admin__row-key { color: var(--text-3); font-size: var(--text-xs); letter-spacing: var(--tracking-caps); }
+.admin__status-val.is-on { color: var(--success); }
+.admin__status-val.is-wait { color: var(--warning); }
+.admin__meta-val { color: var(--text-1); }
+
+.admin__actions { display: flex; flex-direction: column; gap: var(--s-3); }
+.admin__actions .btn { width: 100%; }
+
+.admin__link {
+  display: inline-flex; align-items: center; gap: var(--s-2); align-self: flex-start;
+  color: var(--text-2); font-size: var(--text-sm);
+}
+.admin__link:hover { color: var(--text-1); }
+
+.admin__warn {
+  display: flex; gap: var(--s-2); align-items: flex-start; margin: 0;
+  padding: var(--s-3) var(--s-4); border-radius: var(--r-md);
+  color: var(--warning); font-size: var(--text-xs); line-height: var(--leading);
+  background: color-mix(in srgb, var(--warning) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
+}
+.admin__warn svg { flex: none; margin-top: 2px; }
