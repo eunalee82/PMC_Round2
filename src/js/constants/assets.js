@@ -44,7 +44,8 @@ export const ASSETS = {
     q12_1: '/images/questions/question12-1.webp',
     q12_2: '/images/questions/question12-2.webp',
     q12_3: '/images/questions/question12-3.webp',
-    q12_4: '/images/questions/question12-4.webp'
+    q12_4: '/images/questions/question12-4.webp',
+    q13: '/images/questions/question13.webp'
   },
   // 사건 단서 오디오(녹취) — #021(Accountability/Empowered Mindset) · #011(AI Adoption)
   questionAudio: {

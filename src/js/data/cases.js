@@ -3,7 +3,9 @@
 // 이관한다 (CLAUDE.md §10, docs/game-flow.md §7.3). 그전까지는 lib/grade.js가 SOLUTIONS로 임시 채점한다.
 // evidence.images = 단서 이미지 배열(1장 또는 다중). choices = 보기(개수 자유). 용어는 화면 출력 시 게임 용어로.
 // ▶ 영문(i18n): 각 사건에 en: { title, brief, prompt, choices } 를, 정답에 SOLUTIONS[id].en = { analysis } 를
-//   추가하면 en 로케일에서 사용된다(없으면 ko 폴백). evidence(이미지/오디오)는 로케일 공용.
+//   추가하면 en 로케일에서 사용된다(없으면 ko 폴백). 지금은 en.evidence도 국문 미디어를 그대로 가리키고
+//   라벨/alt만 영문이다 — 영문 이미지·음성이 준비되면 en.evidence 안의 src만 교체한다(localizeCase가 우선 적용).
+// ▶ choices 항목은 문자열 또는 { label, desc } — desc는 보기 아래 보조 설명으로 붙는다(question-choice.js).
 import { ASSETS } from '../constants/assets.js'
 import { getLocale } from '../lib/i18n.js'
 
@@ -269,6 +271,59 @@ export const CASES = [
       },
       choices: ['Clue A', 'Clue B', 'Clue C', 'Clue D']
     }
+  },
+  {
+    id: 'case-013',
+    stage: 3, // Stage 3 · AI Use Case (Early Warning Signals)
+    caseNo: 3,
+    fileNo: '#013',
+    title: 'AI는 왜 경고를 보냈는가?',
+    brief: [
+      '차세대 스마트팩토리 플랫폼 프로젝트는 출시를 4개월 앞두고 있었다. 프로젝트는 순조롭게 진행되는 것으로 보였다.',
+      '· 일정 상태 정상\n· 비용 상태 정상\n· 주요 마일스톤 달성\n· 프로젝트 상태 GREEN',
+      '프로젝트 매니저는 임원회의에서 다음과 같이 보고하였다.',
+      '"현재 특별한 문제는 없으며 계획대로 진행 중입니다."',
+      '그러나 같은 날, AI 관제 시스템은 관리자의 추가 검토를 권고하는 경고를 생성하였다.',
+      '이후 감사 과정에서 AI의 상세 분석 로그는 삭제되었고, 사건 현장에서는 대시보드 스크린샷 1장만 발견되었다. PM보호국은 이 스크린샷을 분석하여 AI가 어떤 방식으로 위험을 감지했는지 밝혀내고자 한다.'
+    ].join('\n'),
+    prompt: '프로젝트 상태는 전반적으로 정상으로 보인다. 그럼에도 AI가 추가 검토를 권고한 가장 적절한 이유는 무엇인가?',
+    evidence: {
+      caption: 'EVIDENCE · 현장에서 복구된 AI 프로젝트 대시보드',
+      images: [
+        { src: ASSETS.questions.q13, alt: '사건 현장에서 복구된 AI 프로젝트 대시보드' }
+      ]
+    },
+    // 보기 = PMBOK AI 활용 유형 4개. desc는 보기 아래 보조 설명으로 붙는다(question-choice.js).
+    choices: [
+      { label: 'Risk Identification & Assessment', desc: 'AI가 새롭게 등록된 리스크들의 발생 가능성과 영향을 평가하여 경고를 생성하였다.' },
+      { label: 'Predictive Analytics for Planning', desc: 'AI가 향후 자원 부족과 일정 병목 현상을 예측하여 계획 재수립이 필요하다고 판단하였다.' },
+      { label: 'Real-Time Monitoring', desc: 'AI가 기준선 대비 일정과 비용 편차를 감시하던 중 허용 범위를 초과한 이상 징후를 발견하였다.' },
+      { label: 'Early Warning Signals', desc: 'AI가 현재 지표는 정상으로 보이지만 여러 지표의 변화 패턴이 과거 문제 프로젝트와 유사하게 나타남을 감지하였다.' }
+    ],
+    en: {
+      title: 'Why Did the AI Raise a Warning?',
+      brief: [
+        'A next-generation smart-factory platform project was four months from launch, and everything appeared to be on track.',
+        '· Schedule status normal\n· Cost status normal\n· Key milestones met\n· Project status GREEN',
+        'The project manager reported the following at the executive meeting:',
+        '"There are no particular problems at present; we are proceeding as planned."',
+        'That same day, however, the AI monitoring system generated a warning recommending further review by the manager.',
+        'The AI\'s detailed analysis logs were later deleted during the audit, and only a single dashboard screenshot was found at the scene. The Bureau intends to analyze that screenshot and determine how the AI detected the risk.'
+      ].join('\n'),
+      prompt: 'The project status looks normal overall. What is the most appropriate reason the AI still recommended further review?',
+      evidence: {
+        caption: 'EVIDENCE · AI project dashboard recovered at the scene',
+        images: [
+          { src: ASSETS.questions.q13, alt: 'AI project dashboard recovered at the scene of the case' }
+        ]
+      },
+      choices: [
+        { label: 'Risk Identification & Assessment', desc: 'The AI assessed the probability and impact of newly registered risks and generated the warning.' },
+        { label: 'Predictive Analytics for Planning', desc: 'The AI forecast future resource shortfalls and schedule bottlenecks and judged that replanning was needed.' },
+        { label: 'Real-Time Monitoring', desc: 'While watching schedule and cost variance against the baseline, the AI found an anomaly exceeding the allowed range.' },
+        { label: 'Early Warning Signals', desc: 'Although current indicators look normal, the AI detected that the change patterns across several indicators resemble past troubled projects.' }
+      ]
+    }
   }
 ]
 
@@ -366,6 +421,23 @@ export const SOLUTIONS = {
         'PMBOK® Guide 8th Edition stresses that adopting AI requires examining not only the delivered capability but also long-term impact and feasibility — operating cost, maintainability, scalability.',
         '② Clue B made the decision without examining a raised possibility of increased operating cost. It connects most directly to the problems that surfaced after pilot operation: the spike in AI usage costs, the operations organization refusing handover, and the demand for additional investment planning.',
         '[Option-by-option]\n① Clue A — Concerns the verification procedure for AI output; closer to a quality-management issue than to long-term impact.\n② Clue B (answer) — Aware of a possible rise in future operating cost, it deferred the review and so did not consider sustainability and feasibility.\n③ Clue C — Securing operational capability matters too, but its core is staffing and capability management, not a direct link to long-term cost impact.\n④ Clue D — Approving the AI capability alone cannot be judged a wrong decision; changing project scope is a normal management activity in itself.'
+      ].join('\n\n')
+    }
+  },
+  'case-013': {
+    answerIndex: 3, // 정답: 4번 (Early Warning Signals)
+    analysis: [
+      '정답은 ④ Early Warning Signals입니다.',
+      '대시보드상 일정(SPI 1.02), 비용(CPI 0.99), 마일스톤 상태는 모두 정상으로 보입니다. 그러나 AI는 결함 증가 · 재시험률 증가 · 인터페이스 변경 증가, 그리고 과거 실패 프로젝트와의 높은 유사도(81~89%)를 통해 미래 위험 패턴을 감지했습니다.',
+      '현재 지표가 정상인데도 여러 지표의 변화 패턴에서 위험을 앞당겨 읽어내는 것 — PMBOK® Guide 8판의 Early Warning Signals 활용 사례입니다.',
+      '[보기별 해설]\n① Risk Identification & Assessment — 리스크가 등록되어 있지만, AI 경고의 핵심 근거는 새 리스크 평가가 아니라 패턴 분석입니다.\n② Predictive Analytics for Planning — 미래 예측 요소는 있으나, 자원·일정 재계획보다 위험 징후 조기 탐지가 중심입니다.\n③ Real-Time Monitoring — 일정·비용 편차가 허용 범위를 벗어난 증거가 없으며 현재 상태는 정상입니다.\n④ Early Warning Signals(정답) — 현재 지표는 정상이어도 과거 실패 프로젝트와 유사한 패턴을 AI가 감지해 조기 경고를 생성했습니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        'The answer is ④ Early Warning Signals.',
+        'On the dashboard, schedule (SPI 1.02), cost (CPI 0.99) and milestone status all look normal. Yet the AI detected a future risk pattern from rising defects, a rising retest rate, increasing interface changes, and a high similarity to past failed projects (81–89%).',
+        'Reading risk ahead of time from the change patterns across several indicators — even while current indicators are normal — is exactly the Early Warning Signals use case in PMBOK® Guide 8th Edition.',
+        '[Option-by-option]\n① Risk Identification & Assessment — Risks are registered, but the core basis of the AI warning is pattern analysis, not the assessment of new risks.\n② Predictive Analytics for Planning — There is a forecasting element, but the focus is early detection of risk signals rather than resource/schedule replanning.\n③ Real-Time Monitoring — There is no evidence that schedule or cost variance exceeded the allowed range; the current state is normal.\n④ Early Warning Signals (answer) — Even with normal current indicators, the AI detected a pattern resembling past failed projects and generated an early warning.'
       ].join('\n\n')
     }
   }

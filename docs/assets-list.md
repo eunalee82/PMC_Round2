@@ -51,7 +51,7 @@
 | /images/questions/question12-2.webp | Stage 3 · 12번째 사건 #012 단서 2/4 (확보 단서 B) | 있음 · 사용 중 |
 | /images/questions/question12-3.webp | Stage 3 · 12번째 사건 #012 단서 3/4 (확보 단서 C) | 있음 · 사용 중 |
 | /images/questions/question12-4.webp | Stage 3 · 12번째 사건 #012 단서 4/4 (확보 단서 D) | 있음 · 사용 중 |
-| /images/questions/question13.webp | Stage 3 · 13번째 사건 단서 | 있음 · 사건 미제작 |
+| /images/questions/question13.webp | Stage 3 · 13번째 사건 #013 복구된 AI 프로젝트 대시보드 | 있음 · 사용 중 |
 
 > 파일명은 소문자로 통일 — Vercel/Linux 대소문자 구분 대응(§14). 경로 상수는 `src/js/constants/assets.js`의 `ASSETS.questions`가 단일 출처이며, **사건 미제작 파일은 아직 상수에 등록하지 않았다**(사건 데이터를 만들 때 함께 추가한다).
 > ✅ **최적화 완료**: PNG(장당 1.8~2.3MB, 합계 16.1MB) → **WebP(합계 1.5MB, -91%)**. 해상도는 원본 유지. 원본 PNG는 커밋 `2ac781b` 이전 히스토리에 남아 있다(`git show 2ac781b:public/images/questions/question1.png > 파일`로 복구).
@@ -59,6 +59,10 @@
 > **인코딩 규칙 — 그림 종류에 따라 다르게 쓴다.** 새 단서 이미지를 넣을 때 이 기준을 따른다(Pillow 사용).
 > - **사진·일러스트형**(다이어리·현장 사진 등): 손실 `save(out,'WEBP',quality=90,method=6)` → 1/10 이하로 줄고 원본 대비 PSNR 38~45dB로 텍스트 가독성 영향 없음.
 > - **선·표·글자형**(화면 캡처·도표 = `question12-*`): **무손실** `save(out,'WEBP',lossless=True,method=6)`. 이런 그림은 손실 q90이 PSNR 34dB까지 떨어지면서 용량 이득도 30%뿐이지만, 무손실은 **품질 손실 0으로 -56%**(231KB→101KB)다.
+>
+> 판단 기준은 "UI 캡처냐"가 아니라 **그림 자체가 평면(flat)이냐**다. `question13`은 대시보드지만 배경이 그려진 일러스트라 무손실이 821KB인 반면 손실 q90은 158KB이고, 3배 확대 비교에서 SPI 1.02·CPI 0.99 같은 정답 근거 숫자가 원본과 구분되지 않아 손실을 택했다.
+>
+> ℹ️ **영문 단서 미디어**: 문제 이미지·음성의 영문판은 별도 제공 예정이다. 도착하면 파일을 `-en` 접미사로 추가하고 `cases.js`의 `en.evidence` 안 `src`만 교체한다(`localizeCase`가 `c.en.evidence`를 우선한다). 지금은 en도 국문 미디어를 그대로 참조한다.
 
 ### 기타 이미지 폴더 (준비)
 
