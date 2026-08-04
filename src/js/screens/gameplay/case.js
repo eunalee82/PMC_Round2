@@ -20,23 +20,38 @@ import { createEvidenceViewer } from '../../../components/game/evidence-viewer.j
 import { createQuestionChoice } from '../../../components/game/question-choice.js'
 import { createCaptureGuard } from '../../../components/game/capture-guard.js'
 
-// 스테이지 메타 — 브리핑 문구/테마/도메인 + 완료 보상 아이템(SCR-013). 아이템은 완성된 스테이지만 필요.
+// 스테이지 메타 — 브리핑 문구/테마/도메인 + 완료 보상 아이템(SCR-013).
+// 아이템 effectKey = Final Raid에서의 효과(빌런 공격 반사 / 궁극기 / 최종 패턴 무력화).
 const STAGE_META = {
   1: {
     theme: '1', label: 'MISSION 01 · MINDSET', domain: 'Mindset',
     nameKey: 'briefing.stage1.name', missionKey: 'briefing.stage1.mission',
-    item: { icon: 'shield', bg: ASSETS.backgrounds.onePass, rarityKey: 'item.stage1.rarity', nameKey: 'item.stage1.name', descKey: 'item.stage1.desc', congratsKey: 'item.stage1.congrats' }
+    item: { icon: 'shield', bg: ASSETS.backgrounds.onePass, rarityKey: 'item.stage1.rarity', nameKey: 'item.stage1.name', descKey: 'item.stage1.desc', congratsKey: 'item.stage1.congrats', effectKey: 'item.stage1.effect', nextKey: 'item.next' }
   },
-  2: { theme: '2', label: 'MISSION 02 · PERFORMANCE DOMAIN', domain: 'Performance Domain', nameKey: 'briefing.stage2.name', missionKey: 'briefing.stage2.mission' },
-  3: { theme: '3', label: 'MISSION 03 · AI USE CASE', domain: 'AI Use Case', nameKey: 'briefing.stage3.name', missionKey: 'briefing.stage3.mission' }
+  2: {
+    theme: '2', label: 'MISSION 02 · PERFORMANCE DOMAIN', domain: 'Performance Domain',
+    nameKey: 'briefing.stage2.name', missionKey: 'briefing.stage2.mission',
+    item: { icon: 'file', bg: ASSETS.backgrounds.onePass, rarityKey: 'item.stage2.rarity', nameKey: 'item.stage2.name', descKey: 'item.stage2.desc', congratsKey: 'item.stage2.congrats', effectKey: 'item.stage2.effect', nextKey: 'item.nextStage3' }
+  },
+  3: {
+    theme: '3', label: 'MISSION 03 · AI USE CASE', domain: 'AI Use Case',
+    nameKey: 'briefing.stage3.name', missionKey: 'briefing.stage3.mission',
+    item: { icon: 'cpu', bg: ASSETS.backgrounds.allPass, rarityKey: 'item.stage3.rarity', nameKey: 'item.stage3.name', descKey: 'item.stage3.desc', congratsKey: 'item.stage3.congrats', effectKey: 'item.stage3.effect', nextKey: 'item.appoint' }
+  }
 }
 const STAGE_KEYS = { 1: 'mindset', 2: 'domain', 3: 'ai' }
+// 좌측 EVIDENCE 슬롯 아이콘. Stage 3는 'brain' 아이콘이 실제로 전구 모양이라 코어(cpu)를 쓴다.
+const STAGE_ITEM_ICONS = { 1: 'shield', 2: 'file', 3: 'cpu' }
 
 // DEV 전용 스테이지 점프 — 아직 사건이 없는 스테이지(예: Stage 2) 때문에 뒤 스테이지를 정상 흐름으로
 // 열 수 없어서, 제작 중인 스테이지를 바로 확인할 수단을 둔다. 프로덕션 빌드에서는 DEV 메뉴가 제거되어
 // 호출자가 없다(진행 판정 로직 자체는 건드리지 않는다).
 let devStage = null
 export function setDevStage (s) { devStage = s }
+
+// 스테이지에 실제로 제작된 사건 수. Stage score의 max는 계획값(STAGE_TOTALS = 15문항 기준)을 보여주되,
+// 아이템 해제 판정은 이 값을 쓴다 — 진행 판정(stageComplete)과 같은 기준이어야 "다 풀었는데 잠김"이 없다.
+const builtTotal = (s) => CASES.filter((c) => c.stage === s).length || STAGE_TOTALS[s]
 
 // 좌측 사이드바 스냅샷 — 진행 상황(progress) + 랭킹(getRanking).
 // EVIDENCE 아이템 = 해당 스테이지의 모든 사건을 '제출 완료'했을 때 해제(정답 여부 무관).
@@ -53,11 +68,11 @@ function sidebarSnapshot (teamId, teamName, p) {
       { key: 'domain', label: 'Domain', score: p.stage[2] || 0, max: STAGE_TOTALS[2] },
       { key: 'ai', label: 'AI', score: p.stage[3] || 0, max: STAGE_TOTALS[3] }
     ],
-    items: [
-      { label: 'STAGE 1', acquired: (p.submittedStage[1] || 0) >= STAGE_TOTALS[1], icon: 'shield' },
-      { label: 'STAGE 2', acquired: (p.submittedStage[2] || 0) >= STAGE_TOTALS[2] },
-      { label: 'STAGE 3', acquired: (p.submittedStage[3] || 0) >= STAGE_TOTALS[3] }
-    ],
+    items: [1, 2, 3].map((s) => ({
+      label: `STAGE ${s}`,
+      acquired: (p.submittedStage[s] || 0) >= builtTotal(s),
+      icon: STAGE_ITEM_ICONS[s]
+    })),
     version: '1.0.0'
   }
 }
@@ -258,7 +273,7 @@ export function createCaseScreen (ctx) {
     ]))
   }
 
-  // ── SCR-013 Item Acquisition (갑질 미러 방패) ──
+  // ── SCR-013 Item Acquisition (Stage 1 방패 / Stage 2 승인서 / Stage 3 AI Judgment Core) ──
   function showItem (s) {
     setTheme(s)
     refreshSidebar() // 좌측 아이템 슬롯 활성화(제출 완료로 이미 해제됨)
@@ -266,9 +281,10 @@ export function createCaseScreen (ctx) {
     const item = meta.item
     const hasNext = s < 3
     const nextBtn = trackView(createButton({
-      label: s === 1 ? t('item.next') : t('item.equip'),
+      // 다음 단계 라벨은 스테이지 메타가 정한다(Stage 3 = 감독관 임명 — Final Raid는 아직 미구현).
+      label: t((item && item.nextKey) || 'item.equip'),
       variant: 'gold', size: 'lg', icon: 'crosshair', block: true,
-      onClick: () => (hasNext ? showBriefing(s + 1) : showBriefing(s)) // Stage 3 이후(임명)는 이후 단계
+      onClick: () => (hasNext ? showBriefing(s + 1) : showBriefing(s))
     }))
     const hero = item
       ? el('div', { class: 'item-acq__hero', style: item.bg ? { backgroundImage: `linear-gradient(rgba(6,7,11,0.55), rgba(6,7,11,0.82)), url('${item.bg}')` } : null }, [
@@ -279,6 +295,13 @@ export function createCaseScreen (ctx) {
       hero,
       el('span', { class: 'item-acq__rarity caps mono', text: item ? t(item.rarityKey) : t('item.acquire') }),
       el('h1', { class: 'item-acq__name', text: item ? t(item.nameKey) : '' }),
+      // Final Raid 효과 — 아이템이 실제로 무엇을 해주는지 한 줄로 못 박는다(획득 실감).
+      item && item.effectKey
+        ? el('div', { class: 'item-acq__effect' }, [
+          el('span', { class: 'item-acq__effect-key caps mono', text: t('item.effectLabel') }),
+          el('span', { class: 'item-acq__effect-val', text: t(item.effectKey) })
+        ])
+        : null,
       el('p', { class: 'item-acq__desc', text: item ? t(item.descKey) : '' }),
       el('p', { class: 'item-acq__congrats', text: item ? t(item.congratsKey) : '' }),
       nextBtn.el

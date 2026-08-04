@@ -141,6 +141,16 @@
 .item-acq__silhouette { display: grid; place-items: center; color: var(--gold); filter: drop-shadow(0 0 28px rgba(231, 178, 76, 0.55)); animation: itemGlow 2.4s var(--ease) infinite; }
 .item-acq__rarity { color: var(--gold); font-size: var(--text-xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps); }
 .item-acq__name { margin: 0; font-size: var(--text-3xl); font-weight: var(--fw-black); }
+/* Final Raid 효과 배지 — 금색 포인트로 아이템의 쓸모를 강조 (CLAUDE.md §5 획득 아이템 Glow) */
+.item-acq__effect {
+  display: inline-flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-2) var(--s-4); border-radius: var(--r-full);
+  border: 1px solid color-mix(in srgb, var(--gold) 42%, transparent);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+  max-width: 100%;
+}
+.item-acq__effect-key { color: var(--gold); font-size: var(--text-xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps); }
+.item-acq__effect-val { color: var(--text-1); font-weight: var(--fw-semibold); }
 .item-acq__desc { margin: 0; color: var(--text-2); max-width: 460px; line-height: var(--leading); }
 .item-acq__congrats { margin: 0; color: var(--text-1); max-width: 460px; line-height: var(--leading); }
 .item-acq > .btn { max-width: 360px; margin-top: var(--s-4); }
