@@ -14,6 +14,12 @@ import { el } from './js/utils/dom.js'
 import { createFlow } from './js/flow.js'
 import { createDevMenu } from './components/dev/dev-menu.js'
 import { mountAdmin } from './js/screens/admin/admin.js'
+import { setLocale, LOCALES } from './js/lib/i18n.js'
+
+// 로케일 — ?lang=ko|en 로 지정하면 그 언어로 시작(지속). 없으면 저장값(기본 ko).
+const params = new URLSearchParams(location.search)
+const lang = params.get('lang')
+if (lang && LOCALES.includes(lang)) setLocale(lang)
 
 const root = document.querySelector('#app')
 root.replaceChildren()

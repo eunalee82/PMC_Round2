@@ -8,6 +8,7 @@ import { createTeamManager } from './team-manager.js'
 import { createEntryMonitor } from './entry-monitor.js'
 import { startGame, resetGame } from '../../js/lib/game.js'
 import { resetAllProgress } from '../../js/lib/progress.js'
+import { getLocale, setLocale } from '../../js/lib/i18n.js'
 
 const DEV_PASSWORD = '2026'
 const UNLOCK_KEY = 'pmb.dev.unlocked'
@@ -74,6 +75,9 @@ export function createDevMenu ({ flow }) {
 
     const resetCopyBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => resetCopy() } }, ['문구 되돌리기'])
 
+    // 언어 전환 — 현재 로케일의 반대로 토글 후 reload (en 미번역 키는 ko로 폴백).
+    const langBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => setLocale(getLocale() === 'en' ? 'ko' : 'en', { reload: true }) } }, [`언어: ${getLocale() === 'en' ? 'EN → KO' : 'KO → EN'}`])
+
     const teamsBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => teamManager.open() } }, ['팀 관리 (이름·색상)'])
     const entriesBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => entryMonitor.open() } }, ['입장 현황'])
 
@@ -92,8 +96,8 @@ export function createDevMenu ({ flow }) {
       el('span', { class: 'devmenu__label', text: 'TEAMS (팀)' }),
       el('div', { class: 'devmenu__jumps' }, [teamsBtn, entriesBtn]),
       el('div', { class: 'devmenu__divider' }),
-      el('span', { class: 'devmenu__label', text: 'COPY (문구)' }),
-      el('div', { class: 'devmenu__jumps' }, [editBtn, exportBtn, resetCopyBtn]),
+      el('span', { class: 'devmenu__label', text: 'COPY (문구) · LANG' }),
+      el('div', { class: 'devmenu__jumps' }, [editBtn, exportBtn, resetCopyBtn, langBtn]),
       el('div', { class: 'devmenu__divider' }),
       el('button', { class: 'devmenu__reset', type: 'button', on: { click: () => flow.reset() } }, [icon('refresh', { size: 14 }), el('span', { text: '세션 초기화' })])
     )

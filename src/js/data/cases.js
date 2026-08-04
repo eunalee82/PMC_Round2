@@ -2,7 +2,10 @@
 // 정답·해설(SOLUTIONS)은 아래에 분리해 두었고, 서버 연결 시 questions 테이블 + 채점 RPC/Edge Function으로
 // 이관한다 (CLAUDE.md §10, docs/game-flow.md §7.3). 그전까지는 lib/grade.js가 SOLUTIONS로 임시 채점한다.
 // evidence.images = 단서 이미지 배열(1장 또는 다중). choices = 보기(개수 자유). 용어는 화면 출력 시 게임 용어로.
+// ▶ 영문(i18n): 각 사건에 en: { title, brief, prompt, choices } 를, 정답에 SOLUTIONS[id].en = { analysis } 를
+//   추가하면 en 로케일에서 사용된다(없으면 ko 폴백). evidence(이미지/오디오)는 로케일 공용.
 import { ASSETS } from '../constants/assets.js'
+import { getLocale } from '../lib/i18n.js'
 
 export const CASES = [
   {
@@ -134,4 +137,16 @@ export const SOLUTIONS = {
       '[보기가 헷갈리는 이유]\n① 녹취 A — PM이 너무 직접 결정하는 것처럼 보이지만, 개발팀에는 기술적 분석·권고안 제시 권한을 주고 PM은 프로젝트 전체 영향을 통합해 결정합니다. 역할에 따른 권한과 책임이 비교적 명확합니다.\n② 녹취 B — 개발팀에 결정을 넘겼지만 그 범위가 이미 합의된 위험 허용범위 안에 있습니다. 세부 구현은 팀에 맡기되 자원 확보·결과 확인 책임을 유지하므로 적절한 Empowerment에 가깝습니다.\n③ 녹취 C — 상위 회의로 넘겼으나, 승인 권한을 벗어난 사안을 적절한 의사결정 기구로 올리는 것은 책임 회피와 다릅니다. 대안·권고안을 준비하고 결정 전에도 팀이 할 수 있는 조치를 지시하므로 Accountability가 유지됩니다.\n④ 녹취 D — 전문가 존중처럼 들리지만, 서로 충돌하는 판단을 조정하지 않고 두 조직의 합의에 맡깁니다. 결정 기준·시한·에스컬레이션 경로가 없고 PM은 결과를 기록하는 역할에 머뭅니다. 위임과 방임의 경계를 넘은 사례입니다.'
     ].join('\n\n')
   }
+}
+
+// ── i18n 리졸버 — 현재 로케일이 en이고 en 필드가 있으면 그것을, 없으면 ko(기본)를 돌려준다. ──
+// evidence(이미지/오디오)는 로케일 공용이므로 항상 원본을 유지한다.
+export function localizeCase (c) {
+  if (getLocale() === 'en' && c.en) return { ...c, ...c.en, evidence: c.evidence }
+  return c
+}
+export function localizeAnalysis (sol) {
+  if (!sol) return ''
+  if (getLocale() === 'en' && sol.en && sol.en.analysis) return sol.en.analysis
+  return sol.analysis || ''
 }

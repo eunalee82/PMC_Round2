@@ -1,14 +1,16 @@
-// UI copy registry — all editable on-screen strings by key (CLAUDE.md §15 direction).
-// Screens render via lib/copy.js `t(key)` / `copyEl(...)`; DEV edit-mode overrides live in localStorage.
+// UI copy registry — 로케일별 문자열(키 기반). 화면은 lib/copy.js `t(key)` / `copyEl(...)`로 렌더.
+// 구조: COPY[locale][key]. en에 없는 키는 자동으로 ko로 폴백된다(lib/copy.js).
+// ▶ 영문 지원: 아래 en 객체에 ko와 '같은 키'로 영문 값을 채우면 en 로케일에서 사용된다.
+//   지금은 콘텐츠 미제작 단계라 en은 비어 있고 전부 ko로 폴백된다. DEV 편집은 현재 로케일에만 적용.
 // Keep keys stable; edit values freely.
 
-const OATH_TEXT = `본인은 PM보호국 신입 수사관으로서
+const OATH_TEXT_KO = `본인은 PM보호국 신입 수사관으로서
 프로젝트의 Value를 최우선으로 판단하며,
 왜곡된 실행과 잘못된 의사결정을 발견할 경우
 PMBOK® 8th Edition의 원칙에 따라
 사건을 공정하게 조사할 것을 서약합니다.`
 
-export const COPY = {
+const KO = {
   // SCR-001 Entry
   'entry.brandline': 'LG SW PM COMPETITION 2026',
   'entry.eyebrow': 'PROJECT MANAGEMENT PROTECTION BUREAU',
@@ -57,7 +59,7 @@ export const COPY = {
   // SCR-004 Oath
   'oath.step': 'STEP 02 · 기밀 유지 서약',
   'oath.title': 'PM보호국 기밀 유지 서약',
-  'oath.text': OATH_TEXT,
+  'oath.text': OATH_TEXT_KO,
   'oath.agents': '등록 수사관',
   'oath.fieldLabel': '서명',
   'oath.agree': '위 서약 내용에 동의하며, 수사관으로서 성실히 임무를 수행하겠습니다.',
@@ -85,5 +87,54 @@ export const COPY = {
   'case.incorrect': 'ADDITIONAL INVESTIGATION REQUIRED',
   'case.incorrectKo': '추가 조사 필요',
   'case.analysisTitle': '사건 분석 보고서',
-  'case.next': '다음 사건 조사'
+  'case.next': '다음 사건 조사',
+  'case.nextLast': 'Stage 결과 보기',
+  'case.noAnalysis': '분석 보고서가 아직 준비되지 않았습니다.',
+
+  // SCR-007 Stage Briefing
+  'briefing.label': 'MISSION BRIEFING',
+  'briefing.domain': '검증 영역',
+  'briefing.cases': '사건 수',
+  'briefing.reward': '획득 가능 아이템',
+  'briefing.start': 'Mission 시작',
+  'briefing.pending': '사건 준비 중',
+  'briefing.stage1.name': 'MINDSET 인증',
+  'briefing.stage1.mission': '2026년에 맞는 PM의 Mindset을 검증하라.',
+  'briefing.stage2.name': 'PERFORMANCE DOMAIN 검증',
+  'briefing.stage2.mission': '복잡한 프로젝트 환경에서 올바른 판단과 의사결정 역량을 검증하라.',
+  'briefing.stage3.name': 'AI USE CASE 검증',
+  'briefing.stage3.mission': 'AI 시대의 PM 판단력을 검증하라.',
+
+  // SCR-009 Answer Confirmation (제출 확인)
+  'confirm.title': '선택한 판단을 제출하시겠습니까?',
+  'confirm.msg': '제출 후에는 수정할 수 없습니다.',
+  'confirm.cancel': '다시 검토',
+  'confirm.submit': '최종 제출',
+
+  // SCR-012 Stage Result
+  'result.title': 'MISSION COMPLETE',
+  'result.sub': 'Stage 검증이 완료되었습니다.',
+  'result.solved': '해결 사건',
+  'result.score': 'Stage 점수',
+  'result.rate': '정답률',
+  'result.reward': '보상 확인',
+
+  // SCR-013 Item Acquisition
+  'item.acquire': '아이템 획득',
+  'item.equip': '아이템 장착',
+  'item.next': 'Stage 2 진행',
+  'item.stage1.rarity': 'RARE ITEM',
+  'item.stage1.name': '갑질 미러 방패',
+  'item.stage1.desc': '무분별한 내·외부 고객 요구를 올바른 Change Control로 반사하는 방패. Final Raid에서 빌런의 공격을 반사한다.',
+  'item.stage1.congrats': '축하합니다. 프로젝트 중 발생하는 무분별한 내·외부 고객 요구에 대응할 수 있는 ‘갑질 미러 방패’를 획득했습니다.'
 }
+
+// 영문(en) — TODO(i18n): ko와 같은 키로 영문 값을 채우면 en 로케일에서 사용된다.
+// 비어 있는 키는 lib/copy.js가 자동으로 ko로 폴백한다.
+const EN = {
+  // 'entry.title': 'PM Protection Bureau',
+  // 'entry.enter': 'Enter the Bureau',
+  // ...
+}
+
+export const COPY = { ko: KO, en: EN }

@@ -1,32 +1,39 @@
-// SCR — 사건(Case) 화면. 3단 셸(AppShell: 헤더 + 좌측 사이드바) 안에 사건 본문을 렌더한다 (LayOut.png).
-// 다중 사건: 한 스테이지의 사건들을 caseNo 순으로 진행하고 "다음 사건 조사"로 넘어간다. 스테이지의 모든
-// 사건을 제출하면 완료 화면을 보여준다. 재진입 시 첫 '미제출' 사건부터 이어서 시작한다(복구).
-// 채점은 lib/grade.js(MOCK) 결과로만 확정 (CLAUDE.md §7 §11). 진행/점수는 lib/progress.js(MOCK)에 기록.
-// 용어는 게임 용어로 출력 (CLAUDE.md §15): 문제=사건, 제출=판단 제출, 정답=사건 해결 …
+// SCR-007~013 — Stage 게임플레이 컨트롤러. 3단 셸(헤더+좌측 사이드바) 안에서 하위 화면을 전환한다:
+//   Briefing(SCR-007) → Case(SCR-008)+제출확인(SCR-009) → 결과/해설(SCR-010/011)
+//   → 마지막 사건이면 Stage Result(SCR-012) → Item Acquisition(SCR-013) → 다음 Stage Briefing.
+// 데이터 기반: 사건은 data/cases.js, 채점은 lib/grade.js(MOCK), 진행/점수/제출은 lib/progress.js(MOCK).
+// 운영정책(§8.3): 한 스테이지의 모든 사건 제출 = 완료. 점수 무관 다음 스테이지 진입 허용. 문제별 타이머 없음.
+// 새로고침 복구(§2): 진행 상황으로 현재 하위 화면을 판정해 재진입한다. 용어는 게임 용어로 출력(§15).
 import { el } from '../../utils/dom.js'
 import { icon } from '../../utils/icons.js'
 import { t } from '../../lib/copy.js'
-import { CASES } from '../../data/cases.js'
+import { ASSETS } from '../../constants/assets.js'
+import { CASES, localizeCase } from '../../data/cases.js'
 import { gradeCase } from '../../lib/grade.js'
 import { findTeam } from '../../lib/teams.js'
 import { remainingSeconds, ensureStarted } from '../../lib/game.js'
 import { getProgress, recordSubmission, getRanking, STAGE_TOTALS } from '../../lib/progress.js'
 import { createButton } from '../../../components/primitives/button.js'
+import { createModal } from '../../../components/primitives/modal.js'
 import { createAppShell } from '../../../components/shell/app-shell.js'
 import { createEvidenceViewer } from '../../../components/game/evidence-viewer.js'
 import { createQuestionChoice } from '../../../components/game/question-choice.js'
 import { createCaptureGuard } from '../../../components/game/capture-guard.js'
 
-const STAGE_LABELS = {
-  1: 'MISSION 01 · MINDSET',
-  2: 'MISSION 02 · PERFORMANCE DOMAIN',
-  3: 'MISSION 03 · AI USE CASE'
+// 스테이지 메타 — 브리핑 문구/테마/도메인 + 완료 보상 아이템(SCR-013). 아이템은 완성된 스테이지만 필요.
+const STAGE_META = {
+  1: {
+    theme: '1', label: 'MISSION 01 · MINDSET', domain: 'Mindset',
+    nameKey: 'briefing.stage1.name', missionKey: 'briefing.stage1.mission',
+    item: { icon: 'shield', bg: ASSETS.backgrounds.onePass, rarityKey: 'item.stage1.rarity', nameKey: 'item.stage1.name', descKey: 'item.stage1.desc', congratsKey: 'item.stage1.congrats' }
+  },
+  2: { theme: '2', label: 'MISSION 02 · PERFORMANCE DOMAIN', domain: 'Performance Domain', nameKey: 'briefing.stage2.name', missionKey: 'briefing.stage2.mission' },
+  3: { theme: '3', label: 'MISSION 03 · AI USE CASE', domain: 'AI Use Case', nameKey: 'briefing.stage3.name', missionKey: 'briefing.stage3.mission' }
 }
-const DEMO_STAGE = 1 // 데모: Stage 1(Mindset). 이후 game/progress 상태에서 현재 스테이지를 결정.
+const STAGE_KEYS = { 1: 'mindset', 2: 'domain', 3: 'ai' }
 
-// 좌측 사이드바 스냅샷 — 진행 상황(progress) + 랭킹(getRanking)을 반영한다.
-// 점수 = 20점 × 정답 수, Stage Score = 스테이지별 정답 수/총 사건 수.
-// EVIDENCE 아이템 = 해당 스테이지의 모든 사건을 '제출 완료'했을 때 해제 (정답 여부 무관).
+// 좌측 사이드바 스냅샷 — 진행 상황(progress) + 랭킹(getRanking).
+// EVIDENCE 아이템 = 해당 스테이지의 모든 사건을 '제출 완료'했을 때 해제(정답 여부 무관).
 function sidebarSnapshot (teamId, teamName, p) {
   const ranking = getRanking()
   const scored = ranking.filter((r) => r.score > 0)
@@ -36,12 +43,12 @@ function sidebarSnapshot (teamId, teamName, p) {
     team: { name: teamName, rank: '신입 수사관', score: p.score, scoreMax: 300 },
     ranking: teamName !== 'UNASSIGNED' ? rankingRows : [],
     stageScore: [
-      { key: 'mindset', label: 'Mindset', score: p.stage[1] || 0, max: 3 },
-      { key: 'domain', label: 'Domain', score: p.stage[2] || 0, max: 7 },
-      { key: 'ai', label: 'AI', score: p.stage[3] || 0, max: 5 }
+      { key: 'mindset', label: 'Mindset', score: p.stage[1] || 0, max: STAGE_TOTALS[1] },
+      { key: 'domain', label: 'Domain', score: p.stage[2] || 0, max: STAGE_TOTALS[2] },
+      { key: 'ai', label: 'AI', score: p.stage[3] || 0, max: STAGE_TOTALS[3] }
     ],
     items: [
-      { label: 'STAGE 1', acquired: (p.submittedStage[1] || 0) >= STAGE_TOTALS[1] },
+      { label: 'STAGE 1', acquired: (p.submittedStage[1] || 0) >= STAGE_TOTALS[1], icon: 'shield' },
       { label: 'STAGE 2', acquired: (p.submittedStage[2] || 0) >= STAGE_TOTALS[2] },
       { label: 'STAGE 3', acquired: (p.submittedStage[3] || 0) >= STAGE_TOTALS[3] }
     ],
@@ -50,77 +57,110 @@ function sidebarSnapshot (teamId, teamName, p) {
 }
 
 export function createCaseScreen (ctx) {
-  const parts = [] // 화면 수명 컴포넌트 (셸·가드)
+  const parts = [] // 화면 수명 컴포넌트(셸·가드)
   const track = (c) => { parts.push(c); return c }
-  let caseParts = [] // 현재 사건 컴포넌트 (사건 전환 시 정리)
-  const trackCase = (c) => { caseParts.push(c); return c }
-  const clearCaseParts = () => { caseParts.forEach((p) => p && p.destroy && p.destroy()); caseParts = [] }
-
-  const stageCases = CASES.filter((c) => c.stage === DEMO_STAGE).sort((a, b) => a.caseNo - b.caseNo)
-
-  // Stage 테마 — 이 화면이 살아있는 동안만 accent를 Stage 컬러로 교체 (CLAUDE.md §5).
-  const prevStage = document.documentElement.dataset.stage
-  document.documentElement.dataset.stage = String(DEMO_STAGE)
-
-  // 문제 입장 = 미션 타이머 시작 시점 보장 (아직 시작 전이면 지금부터 60분 카운트다운).
-  ensureStarted()
+  let viewParts = [] // 현재 하위 화면 컴포넌트(전환 시 정리)
+  const trackView = (c) => { viewParts.push(c); return c }
+  const clearView = () => { viewParts.forEach((p) => p && p.destroy && p.destroy()); viewParts = [] }
+  let confirmModal = null
+  const closeConfirm = () => { if (confirmModal) { confirmModal.destroy(); confirmModal = null } }
 
   const teamId = ctx && ctx.session ? ctx.session.teamId : null
   const team = findTeam(teamId)
   const teamName = team ? team.name : 'UNASSIGNED'
 
+  ensureStarted() // 문제 입장 = 미션 타이머 시작 보장
+
+  const prevStage = document.documentElement.dataset.stage
   const caseHost = el('div', { class: 'case__inner anim-fade' })
 
   const shell = track(createAppShell({
-    header: {
-      running: true, // 게임플레이 진입 = 미션 타이머 진행 (STANDBY → MISSION TIME)
-      timerSeconds: remainingSeconds(), // 시작 시각 기준 남은 시간 (60분, lib/game.js)
-      onAudio: () => { if (ctx && ctx.audio) ctx.audio.setMuted(!ctx.audio.muted) }
-    },
+    header: { running: true, timerSeconds: remainingSeconds() },
     sidebar: sidebarSnapshot(teamId, teamName, getProgress(teamId))
   }))
   shell.content.append(caseHost)
-
-  // 캡처 억제 — 워터마크 + 전체화면 게이트 + 복사/우클릭 차단 + PrtScn 경고.
   track(createCaptureGuard({ label: team ? team.name : '테스트' }))
 
-  function refreshSidebar () { shell.sidebar.update(sidebarSnapshot(teamId, teamName, getProgress(teamId))) }
+  const setTheme = (s) => { document.documentElement.dataset.stage = String(s) }
+  const refreshSidebar = () => shell.sidebar.update(sidebarSnapshot(teamId, teamName, getProgress(teamId)))
+  const stageCasesFor = (s) => CASES.filter((c) => c.stage === s).sort((a, b) => a.caseNo - b.caseNo)
+  const submittedCount = (s) => { const p = getProgress(teamId); return stageCasesFor(s).filter((c) => p.submitted.includes(c.id)).length }
+  const stageComplete = (s) => { const cs = stageCasesFor(s); return cs.length > 0 && submittedCount(s) >= cs.length }
+  function firstIncompleteStage () { for (let s = 1; s <= 3; s++) { if (!stageComplete(s)) return s } return 3 }
 
-  function showStageComplete () {
-    clearCaseParts()
-    caseHost.replaceChildren(el('div', { class: 'stage-done' }, [
-      el('span', { class: 'stage-done__icon' }, [icon('check', { size: 30 })]),
-      el('span', { class: 'case__mission mono caps', text: STAGE_LABELS[DEMO_STAGE] || '' }),
-      el('h1', { class: 'case__title', text: 'MISSION 완료' }),
-      el('p', { class: 'stage-done__msg', text: '이 스테이지의 모든 사건을 제출했습니다. 다음 스테이지는 준비 중입니다.' })
+  function mountView (node) { clearView(); caseHost.replaceChildren(node); caseHost.scrollTop = 0 }
+
+  // ── SCR-007 Stage Briefing ──
+  function showBriefing (s) {
+    setTheme(s)
+    const meta = STAGE_META[s]
+    const cases = stageCasesFor(s)
+    const ready = cases.length > 0
+    const startBtn = trackView(createButton({
+      label: ready ? t('briefing.start') : t('briefing.pending'),
+      variant: 'primary', size: 'lg', icon: 'crosshair', block: true, disabled: !ready,
+      onClick: () => showCase(s, 0)
+    }))
+    const metaRow = (k, v) => el('div', { class: 'brief__meta-row' }, [
+      el('span', { class: 'brief__meta-key caps mono', text: k }),
+      el('span', { class: 'brief__meta-val', text: v })
+    ])
+    mountView(el('div', { class: 'brief' }, [
+      el('span', { class: 'brief__label caps mono', text: t('briefing.label') }),
+      el('div', { class: 'brief__stageno mono', text: `STAGE ${s}` }),
+      el('h1', { class: 'brief__name', text: t(meta.nameKey) }),
+      el('p', { class: 'brief__mission', text: t(meta.missionKey) }),
+      el('div', { class: 'brief__meta' }, [
+        metaRow(t('briefing.domain'), meta.domain),
+        metaRow(t('briefing.cases'), `${cases.length || STAGE_TOTALS[s]}`),
+        metaRow(t('briefing.reward'), meta.item ? t(meta.item.nameKey) : '—')
+      ]),
+      startBtn.el
     ]))
-    caseHost.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  function showCase (i) {
-    clearCaseParts()
-    if (i >= stageCases.length) { showStageComplete(); return }
-    const caseData = stageCases[i]
+  // ── SCR-008/009/010/011 Case + 제출확인 + 결과 ──
+  function showCase (s, i) {
+    setTheme(s)
+    const cases = stageCasesFor(s)
+    if (i >= cases.length) { showStageResult(s); return }
+    const caseData = localizeCase(cases[i]) // 로케일 반영(en 없으면 ko)
 
-    const evidence = trackCase(createEvidenceViewer({ evidence: caseData.evidence, label: t('case.evidenceLabel') }))
+    const evidence = trackView(createEvidenceViewer({ evidence: caseData.evidence, label: t('case.evidenceLabel') }))
     const resultBox = el('div', { class: 'case-result', hidden: true })
-    const choice = trackCase(createQuestionChoice({
+    const choice = trackView(createQuestionChoice({
       choices: caseData.choices,
       onChange: () => submitBtn.update({ disabled: choice.getSelected() < 0 })
     }))
-    const submitBtn = trackCase(createButton({
+    const submitBtn = trackView(createButton({
       label: t('case.submit'), variant: 'primary', size: 'lg', icon: 'crosshair', block: true, disabled: true,
-      onClick: onSubmit
+      onClick: () => openConfirm()
     }))
 
-    function onSubmit () {
+    // SCR-009 제출 확인 — 실수 제출 방지
+    function openConfirm () {
+      if (choice.getSelected() < 0) return
+      closeConfirm()
+      confirmModal = createModal({
+        title: t('confirm.title'),
+        size: 'sm',
+        content: [el('p', { class: 'auth-hint', text: t('confirm.msg') })],
+        actions: [
+          { label: t('confirm.cancel'), variant: 'ghost' },
+          { label: t('confirm.submit'), variant: 'primary', onClick: () => doSubmit() }
+        ],
+        onClose: () => { confirmModal = null }
+      })
+      confirmModal.open()
+    }
+
+    function doSubmit () {
       const idx = choice.getSelected()
       if (idx < 0) return
       const { isCorrect, correctIndex, analysis } = gradeCase(caseData.id, idx)
       choice.reveal(correctIndex, idx)
       submitBtn.el.hidden = true
-      // 제출 시각 기록 + 정답 시 점수 가산 → 좌측 패널 갱신
-      recordSubmission(teamId, caseData.id, caseData.stage, isCorrect)
+      recordSubmission(teamId, caseData.id, caseData.stage, isCorrect) // 제출 시각 + 정답 시 가산(중복 무시)
       refreshSidebar()
 
       resultBox.hidden = false
@@ -134,24 +174,24 @@ export function createCaseScreen (ctx) {
       ])
       const report = el('div', { class: 'case-report' }, [
         el('span', { class: 'case-report__label caps mono', text: t('case.analysisTitle') }),
-        el('p', { class: 'case-report__body', text: analysis || '분석 보고서가 아직 준비되지 않았습니다.' })
+        el('p', { class: 'case-report__body', text: analysis || t('case.noAnalysis') })
       ])
-      const hasNext = i + 1 < stageCases.length
-      const nextBtn = trackCase(createButton({
-        label: hasNext ? t('case.next') : 'MISSION 결과 보기',
+      const hasNext = i + 1 < cases.length
+      const nextBtn = trackView(createButton({
+        label: hasNext ? t('case.next') : t('case.nextLast'),
         variant: 'stage', icon: 'crosshair',
-        onClick: () => showCase(i + 1)
+        onClick: () => (hasNext ? showCase(s, i + 1) : showStageResult(s))
       }))
       resultBox.replaceChildren(badge, report, nextBtn.el)
       resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
 
-    caseHost.replaceChildren(
+    mountView(el('div', { class: 'case-view' }, [
       el('header', { class: 'case__head' }, [
-        el('span', { class: 'case__mission mono caps', text: STAGE_LABELS[caseData.stage] || '' }),
+        el('span', { class: 'case__mission mono caps', text: STAGE_META[s].label }),
         el('div', { class: 'case__file' }, [
           icon('file', { size: 15 }),
-          el('span', { class: 'mono', text: `${t('case.fileLabel')} ${caseData.fileNo} · ${i + 1}/${stageCases.length}` })
+          el('span', { class: 'mono', text: `${t('case.fileLabel')} ${caseData.fileNo} · ${i + 1}/${cases.length}` })
         ]),
         el('h1', { class: 'case__title', text: caseData.title })
       ]),
@@ -167,24 +207,88 @@ export function createCaseScreen (ctx) {
       choice.el,
       submitBtn.el,
       resultBox
-    )
+    ]))
   }
 
-  // 첫 '미제출' 사건부터 시작 (이미 제출한 사건은 건너뜀 → 재진입 복구). 전부 제출했으면 완료 화면.
-  const submitted = getProgress(teamId).submitted
-  const startIdx = stageCases.findIndex((c) => !submitted.includes(c.id))
-  showCase(startIdx === -1 ? stageCases.length : startIdx)
+  // ── SCR-012 Stage Result ──
+  function showStageResult (s) {
+    setTheme(s)
+    refreshSidebar()
+    const p = getProgress(teamId)
+    const total = stageCasesFor(s).length
+    const solved = p.stage[s] || 0
+    const score = solved * 20
+    const rate = total ? Math.round((solved / total) * 100) : 0
+    const stat = (k, v) => el('div', { class: 'sresult__stat' }, [
+      el('span', { class: 'sresult__stat-val mono', text: v }),
+      el('span', { class: 'sresult__stat-key caps', text: k })
+    ])
+    const rewardBtn = trackView(createButton({
+      label: t('result.reward'), variant: 'primary', size: 'lg', icon: 'award', block: true,
+      onClick: () => showItem(s)
+    }))
+    mountView(el('div', { class: 'sresult' }, [
+      el('span', { class: 'case__mission mono caps', text: STAGE_META[s].label }),
+      el('h1', { class: 'sresult__title mono', text: t('result.title') }),
+      el('p', { class: 'sresult__sub', text: t('result.sub') }),
+      el('div', { class: 'sresult__stats' }, [
+        stat(t('result.solved'), `${solved}/${total}`),
+        stat(t('result.score'), String(score)),
+        stat(t('result.rate'), `${rate}%`)
+      ]),
+      rewardBtn.el
+    ]))
+  }
+
+  // ── SCR-013 Item Acquisition (갑질 미러 방패) ──
+  function showItem (s) {
+    setTheme(s)
+    refreshSidebar() // 좌측 아이템 슬롯 활성화(제출 완료로 이미 해제됨)
+    const meta = STAGE_META[s]
+    const item = meta.item
+    const hasNext = s < 3
+    const nextBtn = trackView(createButton({
+      label: s === 1 ? t('item.next') : t('item.equip'),
+      variant: 'gold', size: 'lg', icon: 'crosshair', block: true,
+      onClick: () => (hasNext ? showBriefing(s + 1) : showBriefing(s)) // Stage 3 이후(임명)는 이후 단계
+    }))
+    const hero = item
+      ? el('div', { class: 'item-acq__hero', style: item.bg ? { backgroundImage: `linear-gradient(rgba(6,7,11,0.55), rgba(6,7,11,0.82)), url('${item.bg}')` } : null }, [
+        el('span', { class: 'item-acq__silhouette' }, [icon(item.icon || 'award', { size: 92 })])
+      ])
+      : null
+    mountView(el('div', { class: 'item-acq' }, [
+      hero,
+      el('span', { class: 'item-acq__rarity caps mono', text: item ? t(item.rarityKey) : t('item.acquire') }),
+      el('h1', { class: 'item-acq__name', text: item ? t(item.nameKey) : '' }),
+      el('p', { class: 'item-acq__desc', text: item ? t(item.descKey) : '' }),
+      el('p', { class: 'item-acq__congrats', text: item ? t(item.congratsKey) : '' }),
+      nextBtn.el
+    ]))
+  }
+
+  // ── 새로고침 복구: 진행 상황으로 현재 하위 화면 판정 ──
+  const stage = firstIncompleteStage()
+  const cases = stageCasesFor(stage)
+  const done = submittedCount(stage)
+  if (cases.length === 0 || done === 0) {
+    showBriefing(stage) // 사건 없는 스테이지(예: Stage 2 준비 중) 또는 스테이지 시작 전 → 브리핑
+  } else if (done < cases.length) {
+    const p = getProgress(teamId)
+    const idx = cases.findIndex((c) => !p.submitted.includes(c.id))
+    showCase(stage, idx < 0 ? 0 : idx) // 진행 중 → 첫 미제출 사건부터
+  } else {
+    showBriefing(stage) // 방어적: 완료 스테이지면 firstIncompleteStage가 다음을 가리킴
+  }
 
   return {
     el: shell.el,
-    mounted () {
-      // 게임플레이 진입 시 BGM 정지 (요구사항: gameplay 들어가면 음악 멈춤).
-      if (ctx && ctx.audio) ctx.audio.stopBgm()
-    },
+    mounted () { if (ctx && ctx.audio) ctx.audio.stopBgm() }, // 게임플레이 진입 시 BGM 정지
     destroy () {
       if (prevStage) document.documentElement.dataset.stage = prevStage
       else delete document.documentElement.dataset.stage
-      clearCaseParts()
+      closeConfirm()
+      clearView()
       parts.forEach((p) => p && p.destroy && p.destroy())
     }
   }
