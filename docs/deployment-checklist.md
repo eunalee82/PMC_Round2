@@ -8,13 +8,14 @@
 
 ## 0. 배포 전 필수 확인 (Go / No-Go)
 
-이 6개가 모두 ✅ 여야 배포한다.
+1·2·3·4·5·6 이 ✅ 여야 배포한다(3b 는 권장).
 
 | # | 항목 | 확인 방법 | 현재 |
 |---|---|---|---|
 | 1 | 마이그레이션 `0001`~`0007` 전부 적용 | §2 쿼리 | ✅ 적용(2026-08-04) · 쿼리 확인 권장 |
 | 2 | 관리자 계정 1개 + `admins` 등록 + 로그인 성공 | §3 | ✅ (`euna.lee@lge.com`) |
-| 3 | Email provider **ON** + 공개 가입 **OFF** | §3 | 🚨 **둘 다 잘못됨 — 관리자 로그인 불가** |
+| 3 | Email provider **ON** (로그인 가능) | §3.1 | ✅ 2026-08-04 |
+| 3b | 공개 가입 **OFF** | §3.1 | ⚠️ 아직 열림 — **차단 아님**(§3.3) |
 | 4 | 번들에 `service_role`·비밀키 없음 | §5 | ✅ |
 | 5 | `npm run build` · `npm run validate` 통과 | §1 | ✅ |
 | 6 | Vercel 환경변수 2개 등록 + **등록 후 재배포** | §4 | ✅ (2026-08-04 등록) |
@@ -115,6 +116,25 @@ disable_signup: True (기대 True)
 - [ ] 관리자 콘솔(`?admin`) 로그인 성공 + 상태 카드 표시까지 확인
 - [ ] 게임 상태 초기화: `select public.admin_reset_game(true);` 는 **관리자 콘솔에서** 실행
       (SQL Editor 는 `auth.uid()` 가 null 이라 `forbidden`)
+
+### 3.3 공개 가입이 열려 있으면 어디까지 위험한가
+
+가입만으로는 **데이터에 닿지 못한다** — 배포본 실측(2026-08-04)으로 확인했다.
+
+- `authenticated` 를 대상으로 한 모든 테이블 정책이 `public.is_admin()` 을 통과해야 한다
+  (`teams_read_admin` · `answers_admin_read` · `tp_admin_read`)
+- `is_admin()` 은 `admins` 테이블에 행이 있어야 true → 임의 가입자는 항상 false
+- 관리자 RPC 3종(`admin_start_game`·`admin_end_game`·`admin_reset_game`)은 본문 첫 줄에서
+  `is_admin()` 을 확인하고 `forbidden`(42501) 을 던진다
+- 관리자 뷰는 `security_invoker=true` → 위 RLS 를 그대로 따르므로 0행
+- `admins_self_read` 는 자기 행만 읽게 하는데, 임의 가입자에겐 그 행이 없다
+
+**따라서 3b 는 배포 차단 사유가 아니다.** 다만 남겨두면 (1) `auth.users` 오염,
+(2) 확인 메일 발송 남용, (3) 나중에 누군가 `to authenticated` 정책을 `is_admin()` 없이 추가하면
+그 순간 구멍이 된다. 행사 전에 끄는 것을 권장한다.
+
+위치: **Authentication → Sign In / Providers** 페이지의 **`User Signups`** 섹션
+(Email 카드와 **다른 곳**이다) → `Allow new users to sign up` **OFF** → Save
 
 ---
 
@@ -223,4 +243,4 @@ npx vercel --prod --yes      # 계정 pingjueuna-3402 · 프로젝트 pmc-round2
 
 | 날짜 | 커밋 | 마이그레이션 | 비고 |
 |---|---|---|---|
-| 2026-08-04 | `4e9b57a` | 0001~0006 적용 · **0007 대기** | 서버 연동 후 첫 배포. `dpl_9bXxqeuMugvrtqoG9fQfUMUZU6Cz`<br>배포 전 환경변수 2개를 새로 등록(그 전엔 0건이었다).<br>배포본 검증: 서버 모드 주입 ✅ · 정답·비밀키 0건 ✅ · `game_state` RPC 응답 ✅ · Realtime 연결 ✅ |
+| 2026-08-04 | `4e9b57a` | 0001~0006 적용 · **0007 대기** | 서버 연동 후 첫 배포. `dpl_9bXxqeuMugvrtqoG9fQfUMUZU6Cz`<br>배포 전 환경변수 2개를 새로 등록(그 전엔 0건이었다).<br>배포본 검증: 서버 모드 주입 ✅ · 정답·비밀키 0건 ✅ · `game_state` RPC ✅ · Realtime 연결 ✅<br>프로덕션 anon 침투 점검 9/9 차단 ✅ · Auth provider ON ✅ |
