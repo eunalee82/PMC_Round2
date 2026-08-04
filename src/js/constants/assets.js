@@ -53,6 +53,10 @@ export const ASSETS = {
     q3_2: '/audio/sfx/question3/question3-2.mp3',
     q3_3: '/audio/sfx/question3/question3-3.mp3',
     q3_4: '/audio/sfx/question3/question3-4.mp3',
-    q11: '/audio/sfx/question11/question11.mp3'
+    q11: '/audio/sfx/question11/question11.mp3',
+    q14_1: '/audio/sfx/question14/question14-1.mp3',
+    q14_2: '/audio/sfx/question14/question14-2.mp3',
+    q14_3: '/audio/sfx/question14/question14-3.mp3',
+    q14_4: '/audio/sfx/question14/question14-4.mp3'
   }
 }

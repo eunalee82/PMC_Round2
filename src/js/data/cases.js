@@ -324,6 +324,64 @@ export const CASES = [
         { label: 'Early Warning Signals', desc: 'Although current indicators look normal, the AI detected that the change patterns across several indicators resemble past troubled projects.' }
       ]
     }
+  },
+  {
+    // id는 fileNo가 아니라 스테이지로 구분한다 — Stage 1의 'case-014'(사건 파일 #014)와 사건 파일
+    // 번호가 겹치기 때문. id는 제출·중복방지·점수의 키라서 반드시 유일해야 한다 (lib/progress.js).
+    id: 'case-s3-014',
+    stage: 3, // Stage 3 · AI Use Case (Risk Identification and Assessment)
+    caseNo: 4,
+    fileNo: '#014',
+    title: '코드네임 D-90',
+    brief: [
+      'PM보호국 상황실에 긴급 구조 요청이 접수되었다.',
+      '차세대 AI 기반 서비스 개발 프로젝트. 출시까지 남은 시간은 90일.',
+      '그러나 최근 프로젝트에서는 심상치 않은 징후가 발견되고 있다.',
+      '· 요구사항 변경 증가\n· 품질 이슈 반복 발생\n· 일정 버퍼 소진\n· 핵심 인력 업무 과부하',
+      '아직 치명적인 문제는 발생하지 않았지만, 경영진은 향후 대형 위기로 이어질 가능성을 우려하고 있다. PM보호국은 즉시 현장에 특별 PM을 투입하기로 결정했다.',
+      '후보는 4명. 모두 AI를 활용해 프로젝트를 관리해 본 경험이 있다고 주장하고 있다. PM보호국 면접관은 후보 PM들에게 다음과 같은 질문을 던졌다.',
+      '"현재 프로젝트는 아직 큰 사고가 발생하지 않았지만 여러 위험 신호가 나타나고 있습니다. 만약 당신이 투입된다면 AI를 활용하여 앞으로 발생할 수 있는 리스크를 어떻게 파악하고 평가하겠습니까?"'
+    ].join('\n'),
+    prompt: '다음 인터뷰 응답 중, PMBOK® Guide 8판의 AI Use Case "Risk Identification and Assessment(리스크 식별 및 평가)"를 가장 충실하게 활용할 것으로 판단되는 PM은 누구인가?',
+    evidence: {
+      caption: 'EVIDENCE · 후보 PM 인터뷰 녹취 4',
+      audios: [
+        { src: ASSETS.questionAudio.q14_1, label: '이 PM 인터뷰' },
+        { src: ASSETS.questionAudio.q14_2, label: '최 PM 인터뷰' },
+        { src: ASSETS.questionAudio.q14_3, label: '한 PM 인터뷰' },
+        { src: ASSETS.questionAudio.q14_4, label: '박 PM 인터뷰' }
+      ]
+    },
+    // 보기 = 후보 PM 4명 (순서 = 녹취 순서 = 화면 번호 1~4)
+    choices: [
+      '이 PM',
+      '최 PM',
+      '한 PM',
+      '박 PM'
+    ],
+    en: {
+      title: 'Codename D-90',
+      brief: [
+        'An emergency rescue request reached the Bureau\'s situation room.',
+        'A next-generation AI-based service development project. Ninety days remain until launch.',
+        'Lately, however, troubling signs have been surfacing on the project.',
+        '· Rising requirement changes\n· Recurring quality issues\n· Schedule buffer exhausted\n· Key personnel overloaded',
+        'No fatal problem has occurred yet, but executives worry this could grow into a major crisis. The Bureau decided to deploy a special PM to the site immediately.',
+        'There are four candidates. All claim experience managing projects with AI. The Bureau\'s interviewer put the following question to them:',
+        '"The project has not yet suffered a major incident, but several risk signals are appearing. If you were deployed, how would you use AI to identify and assess the risks that may arise?"'
+      ].join('\n'),
+      prompt: 'Among the interview responses, which PM appears to make the fullest use of the PMBOK® Guide 8th Edition AI use case "Risk Identification and Assessment"?',
+      evidence: {
+        caption: 'EVIDENCE · 4 candidate PM interview recordings',
+        audios: [
+          { src: ASSETS.questionAudio.q14_1, label: 'PM Lee interview' },
+          { src: ASSETS.questionAudio.q14_2, label: 'PM Choi interview' },
+          { src: ASSETS.questionAudio.q14_3, label: 'PM Han interview' },
+          { src: ASSETS.questionAudio.q14_4, label: 'PM Park interview' }
+        ]
+      },
+      choices: ['PM Lee', 'PM Choi', 'PM Han', 'PM Park']
+    }
   }
 ]
 
@@ -438,6 +496,23 @@ export const SOLUTIONS = {
         'On the dashboard, schedule (SPI 1.02), cost (CPI 0.99) and milestone status all look normal. Yet the AI detected a future risk pattern from rising defects, a rising retest rate, increasing interface changes, and a high similarity to past failed projects (81–89%).',
         'Reading risk ahead of time from the change patterns across several indicators — even while current indicators are normal — is exactly the Early Warning Signals use case in PMBOK® Guide 8th Edition.',
         '[Option-by-option]\n① Risk Identification & Assessment — Risks are registered, but the core basis of the AI warning is pattern analysis, not the assessment of new risks.\n② Predictive Analytics for Planning — There is a forecasting element, but the focus is early detection of risk signals rather than resource/schedule replanning.\n③ Real-Time Monitoring — There is no evidence that schedule or cost variance exceeded the allowed range; the current state is normal.\n④ Early Warning Signals (answer) — Even with normal current indicators, the AI detected a pattern resembling past failed projects and generated an early warning.'
+      ].join('\n\n')
+    }
+  },
+  'case-s3-014': {
+    answerIndex: 1, // 정답: 2번 (최 PM)
+    analysis: [
+      '정답은 ② 최 PM입니다.',
+      'PMBOK® Guide 8판의 Risk Identification and Assessment는 AI로 잠재 리스크를 식별하는 데서 그치지 않고, 발생 가능성·영향도·우선순위를 평가해 선제적으로 대응하는 것까지 포함합니다.',
+      '② 최 PM은 AI로 유사 프로젝트 데이터와 업계 벤치마크를 분석해 리스크를 식별하고, 위험 수준과 우선순위까지 평가해 대응하겠다고 답했습니다. 식별(Identification)과 평가(Assessment)를 모두 갖춘 유일한 응답입니다.',
+      '[보기별 해설]\n① 이 PM — 과거 사례를 활용한 리스크 식별은 수행하지만 위험도 평가가 부족합니다.\n② 최 PM(정답) — AI로 리스크를 식별하고 위험 수준과 우선순위까지 평가해 대응합니다.\n③ 한 PM — 리스크 목록 관리에 초점이 있으며 평가(Assessment) 활동이 나타나지 않습니다.\n④ 박 PM — 유사 실패 사례 분석은 수행하지만 리스크의 가능성과 영향을 체계적으로 평가하지 않습니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        'The answer is ② PM Choi.',
+        'Risk Identification and Assessment in PMBOK® Guide 8th Edition does not stop at using AI to identify potential risks — it also covers assessing probability, impact and priority in order to respond proactively.',
+        '② PM Choi analyzes comparable project data and industry benchmarks with AI to identify risks, and goes on to assess risk level and priority before responding. It is the only answer that covers both identification and assessment.',
+        '[Option-by-option]\n① PM Lee — Identifies risks using past cases, but the risk-level assessment is lacking.\n② PM Choi (answer) — Identifies risks with AI and assesses risk level and priority before responding.\n③ PM Han — Focuses on maintaining a risk list; no assessment activity appears.\n④ PM Park — Analyzes comparable failure cases, but does not systematically assess probability and impact.'
       ].join('\n\n')
     }
   }

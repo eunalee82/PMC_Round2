@@ -111,9 +111,14 @@ EvidenceViewer가 네이티브 컨트롤로 재생하고 헤더 소리 설정(�
 | /audio/sfx/question3/question3-3.mp3 | Stage 1 · 3번째 사건 #021 녹취 C | 있음 · 사용 중 |
 | /audio/sfx/question3/question3-4.mp3 | Stage 1 · 3번째 사건 #021 녹취 D | 있음 · 사용 중 |
 | /audio/sfx/question11/question11.mp3 | Stage 3 · 11번째 사건 #011 참가자 증언 녹취 (증언 4명 1파일) | 있음 · 사용 중 |
-| /audio/sfx/question14/question14-1.mp3 | Stage 3 · 14번째 사건 녹취 1/4 | 있음 · 사건 미제작 |
-| /audio/sfx/question14/question14-2.mp3 | Stage 3 · 14번째 사건 녹취 2/4 | 있음 · 사건 미제작 |
-| /audio/sfx/question14/question14-3.mp3 | Stage 3 · 14번째 사건 녹취 3/4 | 있음 · 사건 미제작 |
-| /audio/sfx/question14/question14-4.mp3 | Stage 3 · 14번째 사건 녹취 4/4 | 있음 · 사건 미제작 |
+| /audio/sfx/question14/question14-1.mp3 | Stage 3 · 14번째 사건 #014 이 PM 인터뷰 녹취 | 있음 · 사용 중 |
+| /audio/sfx/question14/question14-2.mp3 | Stage 3 · 14번째 사건 #014 최 PM 인터뷰 녹취 | 있음 · 사용 중 |
+| /audio/sfx/question14/question14-3.mp3 | Stage 3 · 14번째 사건 #014 한 PM 인터뷰 녹취 | 있음 · 사용 중 |
+| /audio/sfx/question14/question14-4.mp3 | Stage 3 · 14번째 사건 #014 박 PM 인터뷰 녹취 | 있음 · 사용 중 |
 
 > 경로 상수는 `ASSETS.questionAudio`(`src/js/constants/assets.js`). 사건 미제작 파일은 아직 상수에 등록하지 않았다.
+> 재생 길이 확인: `question11.mp3` 2:01 · `question14-1~4.mp3` 각 10~14초 (브라우저 `loadedmetadata` 기준).
+>
+> ⚠️ **사건 파일 번호 중복**: Stage 3의 14번째 사건이 Stage 1의 2번째 사건과 같은 `사건 파일 #014`를 쓴다.
+> 데이터 id는 `case-014`(Stage 1) / `case-s3-014`(Stage 3)로 분리했지만 **화면에는 둘 다 "사건 파일 #014"로 표시**된다.
+> 운영상 혼동이 우려되면 Stage 3쪽 `fileNo`를 다른 번호로 바꾸면 된다(`cases.js`의 `fileNo`만 수정).
