@@ -52,6 +52,10 @@
 | /images/questions/question12-3.webp | Stage 3 · 12번째 사건 #012 단서 3/4 (확보 단서 C) | 있음 · 사용 중 |
 | /images/questions/question12-4.webp | Stage 3 · 12번째 사건 #012 단서 4/4 (확보 단서 D) | 있음 · 사용 중 |
 | /images/questions/question13.webp | Stage 3 · 13번째 사건 #013 복구된 AI 프로젝트 대시보드 | 있음 · 사용 중 |
+| /images/questions/question15-logA.webp | Stage 3 · 15번째 사건 로그 A (무손실 — 평면 텍스트 패널) | 있음 · 사건 미제작 |
+| /images/questions/question15-logB.webp | Stage 3 · 15번째 사건 로그 B | 있음 · 사건 미제작 |
+| /images/questions/question15-logC.webp | Stage 3 · 15번째 사건 로그 C | 있음 · 사건 미제작 |
+| /images/questions/question15-logD.webp | Stage 3 · 15번째 사건 로그 D | 있음 · 사건 미제작 |
 
 > 파일명은 소문자로 통일 — Vercel/Linux 대소문자 구분 대응(§14). 경로 상수는 `src/js/constants/assets.js`의 `ASSETS.questions`가 단일 출처이며, **사건 미제작 파일은 아직 상수에 등록하지 않았다**(사건 데이터를 만들 때 함께 추가한다).
 > ✅ **최적화 완료**: PNG(장당 1.8~2.3MB, 합계 16.1MB) → **WebP(합계 1.5MB, -91%)**. 해상도는 원본 유지. 원본 PNG는 커밋 `2ac781b` 이전 히스토리에 남아 있다(`git show 2ac781b:public/images/questions/question1.png > 파일`로 복구).
