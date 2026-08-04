@@ -38,14 +38,20 @@
 
 | File | Purpose | Status |
 |---|---|---|
-| /images/questions/question1.png | Stage 1 · 사건 #007 단서 5 (Proactive Mindset) | 있음 |
-| /images/questions/question2-1.png | Stage 2 · 단서 1/4 | 있음 |
-| /images/questions/question2-2.png | Stage 2 · 단서 2/4 | 있음 |
-| /images/questions/question2-3.png | Stage 2 · 단서 3/4 | 있음 |
-| /images/questions/question2-4.png | Stage 2 · 단서 4/4 | 있음 |
-| /images/questions/question3.png | Stage 3 · 단서 | 있음 |
+파일명 `questionN`의 N은 **사건 진행 순번**(1~15)이다. Stage 1 = 1~3 · Stage 2 = 4~10 · Stage 3 = 11~15.
 
-> 파일명은 소문자 `.png`로 통일(대문자 `.PNG`에서 변경) — Vercel/Linux 대소문자 구분 대응(§14). 경로 상수는 `src/js/constants/assets.js`의 `ASSETS.questions`가 단일 출처다.
+| File | Purpose | Status |
+|---|---|---|
+| /images/questions/question1.png | Stage 1 · 1번째 사건 #007 단서 5 (Proactive Mindset) | 있음 · 사용 중 |
+| /images/questions/question2-1.png | Stage 1 · 2번째 사건 #014 단서 1/4 (증거물 A) | 있음 · 사용 중 |
+| /images/questions/question2-2.png | Stage 1 · 2번째 사건 #014 단서 2/4 (증거물 B) | 있음 · 사용 중 |
+| /images/questions/question2-3.png | Stage 1 · 2번째 사건 #014 단서 3/4 (증거물 C) | 있음 · 사용 중 |
+| /images/questions/question2-4.png | Stage 1 · 2번째 사건 #014 단서 4/4 (증거물 D) | 있음 · 사용 중 |
+| /images/questions/question3.png | Stage 1 · 3번째 사건 #021 현장 자료 | 있음 · 사용 중 |
+| /images/questions/question4.png | Stage 2 · 4번째 사건 단서 | 있음 · 사건 미제작 |
+| /images/questions/question13.png | Stage 3 · 13번째 사건 단서 | 있음 · 사건 미제작 |
+
+> 파일명은 소문자 `.png`로 통일(대문자 `.PNG`에서 변경) — Vercel/Linux 대소문자 구분 대응(§14). 경로 상수는 `src/js/constants/assets.js`의 `ASSETS.questions`가 단일 출처이며, **사건 미제작 파일은 아직 상수에 등록하지 않았다**(사건 데이터를 만들 때 함께 추가한다).
 > ⚠️ 원본이 각 2MB 내외로 큼 — 배포 전 WebP/적정 해상도로 최적화 권장(`CLAUDE.md §12`).
 
 ### 기타 이미지 폴더 (준비)
@@ -82,3 +88,22 @@
 | /audio/sfx/ceremony.mp3 | 금배지 수여식 | 준비 |
 
 > SFX 파일명은 예시이며, 실제 추가 시 이 표와 `src/js/constants/assets.js`를 함께 갱신한다.
+
+### 사건 단서 오디오(녹취) — `/audio/sfx/questionN/`
+
+듣기 단서. 사건 순번 폴더 아래에 두고, 한 사건에 여러 개면 `-1`~`-4` 접미사를 붙인다.
+EvidenceViewer가 네이티브 컨트롤로 재생하고 헤더 소리 설정(볼륨·음소거)을 따른다(`docs/game-flow.md §19.3`).
+
+| File | Purpose | Status |
+|---|---|---|
+| /audio/sfx/question3/question3-1.mp3 | Stage 1 · 3번째 사건 #021 녹취 A | 있음 · 사용 중 |
+| /audio/sfx/question3/question3-2.mp3 | Stage 1 · 3번째 사건 #021 녹취 B | 있음 · 사용 중 |
+| /audio/sfx/question3/question3-3.mp3 | Stage 1 · 3번째 사건 #021 녹취 C | 있음 · 사용 중 |
+| /audio/sfx/question3/question3-4.mp3 | Stage 1 · 3번째 사건 #021 녹취 D | 있음 · 사용 중 |
+| /audio/sfx/question11/question11.mp3 | Stage 3 · 11번째 사건 녹취 | 있음 · 사건 미제작 |
+| /audio/sfx/question14/question14-1.mp3 | Stage 3 · 14번째 사건 녹취 1/4 | 있음 · 사건 미제작 |
+| /audio/sfx/question14/question14-2.mp3 | Stage 3 · 14번째 사건 녹취 2/4 | 있음 · 사건 미제작 |
+| /audio/sfx/question14/question14-3.mp3 | Stage 3 · 14번째 사건 녹취 3/4 | 있음 · 사건 미제작 |
+| /audio/sfx/question14/question14-4.mp3 | Stage 3 · 14번째 사건 녹취 4/4 | 있음 · 사건 미제작 |
+
+> 경로 상수는 `ASSETS.questionAudio`(`src/js/constants/assets.js`). 사건 미제작 파일은 아직 상수에 등록하지 않았다.
