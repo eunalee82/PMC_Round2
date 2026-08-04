@@ -3,6 +3,32 @@
 import { el } from '../../js/utils/dom.js'
 import { icon } from '../../js/utils/icons.js'
 import { ASSETS } from '../../js/constants/assets.js'
+import { getAudioSettings, setVolume, setMuted, subscribeAudio } from '../../js/lib/audio-settings.js'
+
+// 소리 조절 — 전역 볼륨 슬라이더 + 음소거 (듣기평가/녹취 오디오에 적용). 아이콘은 현재 상태를 반영.
+function createVolumeControl () {
+  const btn = el('button', { class: 'icon-btn', type: 'button', 'aria-label': '소리 조절' })
+  const slider = el('input', { class: 'volpop__slider', type: 'range', min: '0', max: '100', step: '1', 'aria-label': '볼륨' })
+  const muteBtn = el('button', { class: 'volpop__mute', type: 'button' })
+  const pop = el('div', { class: 'volpop', hidden: true }, [muteBtn, slider])
+  const wrap = el('div', { class: 'volctl' }, [btn, pop])
+
+  const iconFor = (s) => (s.muted || s.volume === 0) ? 'volumeOff' : 'volume'
+  function render () {
+    const s = getAudioSettings()
+    btn.replaceChildren(icon(iconFor(s), { size: 20 }))
+    slider.value = String(Math.round(s.volume * 100))
+    muteBtn.replaceChildren(icon(iconFor(s), { size: 16 }), el('span', { text: s.muted ? '음소거 해제' : '음소거' }))
+  }
+  btn.addEventListener('click', (e) => { e.stopPropagation(); pop.hidden = !pop.hidden })
+  slider.addEventListener('input', () => setVolume(Number(slider.value) / 100))
+  muteBtn.addEventListener('click', () => setMuted(!getAudioSettings().muted))
+  const onDoc = (e) => { if (!wrap.contains(e.target)) pop.hidden = true }
+  document.addEventListener('click', onDoc)
+  const unsub = subscribeAudio(render)
+  render()
+  return { el: wrap, destroy () { unsub(); document.removeEventListener('click', onDoc) } }
+}
 
 // Connection status readout (non-interactive). Wired to the store's connection state later.
 const CONNECTION_STATES = {
@@ -85,6 +111,8 @@ export function createAppHeader (props = {}) {
     el('span', { class: 'status__label', text: conn.label })
   ])
 
+  const volume = createVolumeControl()
+
   const node = el('header', { class: 'app-header' }, [
     menuBtn,
     brandEl,
@@ -92,8 +120,8 @@ export function createAppHeader (props = {}) {
     statusEl,
     el('div', { class: 'app-header__spacer' }),
     el('div', { class: 'app-header__actions' }, [
-      // 종(알림)·설정 아이콘은 동작 없는 placeholder라 제거. 음향(mute 토글)만 유지.
-      iconButton('volume', '음향', onAudio)
+      // 종(알림)·설정 아이콘은 동작 없는 placeholder라 제거. 소리 조절만 유지(듣기평가 대응).
+      volume.el
     ])
   ])
 
@@ -101,6 +129,6 @@ export function createAppHeader (props = {}) {
     el: node,
     startTimer, // called on admin game-start (gameplay phase)
     stopTimer,
-    destroy () { stopTimer(); node.remove() }
+    destroy () { stopTimer(); volume.destroy(); node.remove() }
   }
 }

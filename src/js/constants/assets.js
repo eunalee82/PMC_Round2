@@ -38,5 +38,12 @@ export const ASSETS = {
     q2_3: '/images/questions/question2-3.png',
     q2_4: '/images/questions/question2-4.png',
     q3: '/images/questions/question3.png'
+  },
+  // 사건 단서 오디오(녹취) — 사건 #021 (Accountability/Empowered Mindset)
+  questionAudio: {
+    q3_1: '/audio/sfx/question3/question3-1.mp3',
+    q3_2: '/audio/sfx/question3/question3-2.mp3',
+    q3_3: '/audio/sfx/question3/question3-3.mp3',
+    q3_4: '/audio/sfx/question3/question3-4.mp3'
   }
 }
