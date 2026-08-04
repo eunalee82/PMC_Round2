@@ -28,6 +28,8 @@ const KO = {
   'opening.briefing3': '신입 수사관이여, 15개의 사건을 해결하고 프로젝트의 가치를 지켜라.',
   'opening.fallbackRetry': '다시 재생',
   'opening.fallbackProceed': '팀 선택으로',
+  'opening.soundOn': '소리 켜기',
+  'opening.soundOff': '음소거',
 
   // SCR-003 Team Selection
   'team.step': 'STEP 01 · 신입 수사관 등록',
@@ -176,6 +178,8 @@ const EN = {
   'opening.briefing3': 'Rookie agent, resolve the 15 cases and protect the value of the project.',
   'opening.fallbackRetry': 'Replay',
   'opening.fallbackProceed': 'To team selection',
+  'opening.soundOn': 'Sound on',
+  'opening.soundOff': 'Mute',
 
   // SCR-003 Team Selection
   'team.step': 'STEP 01 · Agent Registration',

@@ -5,6 +5,7 @@ import { FLOW, resolveStep } from './constants/flow.js'
 import { createAudioManager } from './lib/audio.js'
 import { clearCopyBindings, t } from './lib/copy.js'
 import { getDeviceId, ownsTeam, releaseTeam, subscribe as subscribeEntries } from './lib/entries.js'
+import { isStarted } from './lib/game.js'
 import { el } from './utils/dom.js'
 import { createModal } from '../components/primitives/modal.js'
 import { createEntryScreen } from './screens/participant/entry.js'
@@ -110,7 +111,7 @@ export function createFlow ({ root }) {
   function navigate (step, { skipGuard = false } = {}) {
     // 이미 팀 선택으로 가는 길이면 굳이 알리지 않는다.
     if (!assertClaim({ notify: step !== FLOW.TEAM }) && !skipGuard) step = FLOW.TEAM
-    const target = skipGuard ? step : resolveStep(step, session)
+    const target = skipGuard ? step : resolveStep(step, session, { gameStarted: isStarted() })
     session.step = target
     persist(session)
     render(target)

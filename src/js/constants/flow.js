@@ -31,9 +31,17 @@ export function isRegistered (session) {
 
 // Access control (screen-list.md §9): don't let a resumed/deep-linked step outrun its prerequisites.
 // Returns the highest step actually reachable for the given session.
-export function resolveStep (step, session) {
-  if (!FLOW_ORDER.includes(step)) return FLOW.ENTRY
+// FLOW.CASE는 FLOW_ORDER 밖이지만 재진입 대상이다 — 사건 화면에서 새로고침하면 사건 화면으로
+// 복구되어야 한다(CLAUDE.md §2). 선행 조건(등록·서약·게임 시작)이 깨졌으면 알맞은 이전 화면으로 돌린다.
+// gameStarted는 flow.js가 lib/game.js에서 읽어 넘긴다(constants는 상태 모듈을 import하지 않는다).
+export function resolveStep (step, session, { gameStarted = false } = {}) {
   const registered = isRegistered(session)
+  if (step === FLOW.CASE) {
+    if (!registered) return FLOW.TEAM
+    if (!session.pledgedAt) return FLOW.OATH
+    return gameStarted ? FLOW.CASE : FLOW.WAITING // 관리자가 대기로 되돌렸으면 대기실로
+  }
+  if (!FLOW_ORDER.includes(step)) return FLOW.ENTRY
   if (step === FLOW.WAITING && !(registered && session.pledgedAt)) {
     return registered ? FLOW.OATH : FLOW.TEAM
   }

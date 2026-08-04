@@ -59,8 +59,14 @@ function sidebarSnapshot (teamId, teamName, p) {
 export function createCaseScreen (ctx) {
   const parts = [] // 화면 수명 컴포넌트(셸·가드)
   const track = (c) => { parts.push(c); return c }
-  let viewParts = [] // 현재 하위 화면 컴포넌트(전환 시 정리)
-  const trackView = (c) => { viewParts.push(c); return c }
+  // 하위 화면 컴포넌트 수명 — 화면 전환 시 '이전 화면'만 정리해야 한다.
+  // 조립 중인 컴포넌트는 nextParts에 모으고 mountView 시점에 viewParts로 승격한다.
+  // (한 배열만 쓰면 clearView가 방금 만든 컴포넌트를 destroy해 — destroy()는 el.remove() —
+  //  단서 뷰어·보기·버튼이 마운트 직전에 DOM에서 사라진다.)
+  let viewParts = [] // 현재 마운트된 하위 화면 컴포넌트
+  let nextParts = [] // 조립 중인 다음 하위 화면 컴포넌트
+  const trackView = (c) => { nextParts.push(c); return c }
+  const trackMounted = (c) => { viewParts.push(c); return c } // 이미 마운트된 화면에 덧붙이는 컴포넌트
   const clearView = () => { viewParts.forEach((p) => p && p.destroy && p.destroy()); viewParts = [] }
   let confirmModal = null
   const closeConfirm = () => { if (confirmModal) { confirmModal.destroy(); confirmModal = null } }
@@ -88,7 +94,13 @@ export function createCaseScreen (ctx) {
   const stageComplete = (s) => { const cs = stageCasesFor(s); return cs.length > 0 && submittedCount(s) >= cs.length }
   function firstIncompleteStage () { for (let s = 1; s <= 3; s++) { if (!stageComplete(s)) return s } return 3 }
 
-  function mountView (node) { clearView(); caseHost.replaceChildren(node); caseHost.scrollTop = 0 }
+  function mountView (node) {
+    clearView() // 이전 화면 컴포넌트만 해제
+    viewParts = nextParts
+    nextParts = []
+    caseHost.replaceChildren(node)
+    caseHost.scrollTop = 0
+  }
 
   // ── SCR-007 Stage Briefing ──
   function showBriefing (s) {
@@ -177,7 +189,7 @@ export function createCaseScreen (ctx) {
         el('p', { class: 'case-report__body', text: analysis || t('case.noAnalysis') })
       ])
       const hasNext = i + 1 < cases.length
-      const nextBtn = trackView(createButton({
+      const nextBtn = trackMounted(createButton({ // 이미 마운트된 사건 화면에 덧붙는다
         label: hasNext ? t('case.next') : t('case.nextLast'),
         variant: 'stage', icon: 'crosshair',
         onClick: () => (hasNext ? showCase(s, i + 1) : showStageResult(s))
