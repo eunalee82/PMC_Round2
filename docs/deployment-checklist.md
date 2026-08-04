@@ -12,9 +12,9 @@
 
 | # | 항목 | 확인 방법 | 현재 |
 |---|---|---|---|
-| 1 | 마이그레이션 `0001`~`0007` 전부 적용 | §2 쿼리 | ⚠️ **0007 미적용** |
+| 1 | 마이그레이션 `0001`~`0007` 전부 적용 | §2 쿼리 | ✅ 적용(2026-08-04) · 쿼리 확인 권장 |
 | 2 | 관리자 계정 1개 + `admins` 등록 + 로그인 성공 | §3 | ✅ (`euna.lee@lge.com`) |
-| 3 | 공개 회원가입(Sign up) 비활성 | §3 | ⚠️ 확인 필요 |
+| 3 | Email provider **ON** + 공개 가입 **OFF** | §3 | 🚨 **둘 다 잘못됨 — 관리자 로그인 불가** |
 | 4 | 번들에 `service_role`·비밀키 없음 | §5 | ✅ |
 | 5 | `npm run build` · `npm run validate` 통과 | §1 | ✅ |
 | 6 | Vercel 환경변수 2개 등록 + **등록 후 재배포** | §4 | ✅ (2026-08-04 등록) |
@@ -83,15 +83,36 @@ where pubname='supabase_realtime' and schemaname='public';
 
 ## 3. Supabase 설정
 
-- [ ] **Authentication → Sign In / Providers → Email**: `Enable Email provider` **ON**
-      (끄면 관리자 로그인이 불가능하다 — 실제로 겪은 사고)
-- [ ] **`Allow new users to sign up` OFF** — 외부인 가입 차단. 로그인에는 영향 없다.
+### 3.1 Auth — 이 두 개는 **서로 다른 스위치**다 (사고 지점)
+
+| 설정 | 있어야 하는 값 | 틀리면 |
+|---|---|---|
+| `Enable Email provider` | **ON** | 관리자가 **로그인 자체를 못 한다** → 게임 시작·종료 불가 |
+| `Allow new users to sign up` | **OFF** | 외부인이 임의로 계정을 만들 수 있다 |
+
+Supabase 대시보드 → **Authentication → Sign In / Providers → Email** 카드 안에 둘이 같이 있다.
+가입만 막으려다 **카드 전체를 꺼서 로그인이 죽는 사고가 두 번 있었다** — 반드시 아래 명령으로 확인한다.
+
+**확인 (값을 화면에 찍지 않는다)**
+```bash
+KEY=$(grep '^VITE_SUPABASE_ANON_KEY=' .env.local | cut -d= -f2-)
+curl -s -H "apikey: $KEY" https://teyngjaladwqolxwykqk.supabase.co/auth/v1/settings   | python -c "import json,sys; d=json.load(sys.stdin); print('email provider:', d['external']['email'], '(기대 True)'); print('disable_signup:', d.get('disable_signup'), '(기대 True)')"
+```
+기대 출력:
+```
+email provider: True (기대 True)
+disable_signup: True (기대 True)
+```
+
+### 3.2 관리자 계정
+
 - [ ] **Authentication → Users**: 관리자 계정 1개, `Auto Confirm User` 상태
-- [ ] `admins` 등록:
+- [ ] `admins` 등록 (등록하지 않으면 로그인은 되지만 모든 RPC 가 `forbidden`):
       ```sql
       insert into public.admins (user_id, note) select id, 'operator ' || email from auth.users
       on conflict (user_id) do nothing;
       ```
+- [ ] 관리자 콘솔(`?admin`) 로그인 성공 + 상태 카드 표시까지 확인
 - [ ] 게임 상태 초기화: `select public.admin_reset_game(true);` 는 **관리자 콘솔에서** 실행
       (SQL Editor 는 `auth.uid()` 가 null 이라 `forbidden`)
 
