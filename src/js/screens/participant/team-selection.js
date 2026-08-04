@@ -7,7 +7,7 @@ import { icon } from '../../utils/icons.js'
 import { FLOW } from '../../constants/flow.js'
 import { getTeams, findTeam } from '../../lib/teams.js'
 import {
-  getDeviceId, getEntry, teamStatus, claimTeam, verifyMember, transferTeam, subscribe, formatTime
+  getDeviceId, getEntry, teamStatus, claimTeam, transferTeam, subscribe, formatTime, refreshEntries
 } from '../../lib/entries.js'
 import { checkEmails, normalizeEmail, maskEmail } from '../../utils/email.js'
 import { t, copyEl, bindCopy } from '../../lib/copy.js'
@@ -118,19 +118,22 @@ export function createTeamScreen (ctx) {
       el('span', { class: 'team-card__check' }, [icon('check', { size: 16 })])
     ])
     card.addEventListener('click', () => {
-      if (team.test) return enterTest(team) // 테스트 계정 — 이메일 모달 없이 즉시 점유
-      return status === 'taken' ? openClaimed(team) : openRegister(team)
+      if (team.test) { enterTest(team); return } // 테스트 계정 — 이메일 모달 없이 즉시 점유
+      if (status === 'taken') openClaimed(team)
+      else openRegister(team)
     })
     return card
   }
 
   // 테스트 계정 — 이메일 등록을 건너뛰고 더미 수사관 3명으로 즉시 점유한다 (게임 테스트용).
   // 이미 다른 기기가 잡고 있으면 그대로 인계받아, 어느 기기에서든 바로 테스트할 수 있게 한다.
-  function enterTest (team) {
+  async function enterTest (team) {
     closeModal()
-    const result = claimTeam({ teamId: team.id, emails: TEST_EMAILS, device })
-    const entry = result.ok ? result.entry : transferTeam(team.id, device)
+    const result = await claimTeam({ teamId: team.id, emails: TEST_EMAILS, device })
+    // 이미 다른 기기가 잡고 있으면 등록 이메일로 인계받아, 어느 기기에서든 바로 테스트할 수 있게 한다.
+    const entry = result.ok ? result.entry : await transferTeam(team.id, device, TEST_EMAILS[0])
     if (entry) commit(entry)
+    else refreshView() // 실패(통신 등) — 현재 점유 상태를 다시 그린다
   }
 
   // 수사관 등록 — 미입장 팀, 또는 내 기기가 점유 중인 팀의 오타 수정
@@ -183,18 +186,26 @@ export function createTeamScreen (ctx) {
       validate()
     }
 
-    function submit () {
+    async function submit () {
       const { emails, blocking } = checkEmails(inputs.map((input) => input.value))
       if (blocking) { validate(); return }
 
-      const result = claimTeam({ teamId: team.id, emails, device })
-      if (!result.ok) {
+      if (submitAction) submitAction.update({ loading: true })
+      const result = await claimTeam({ teamId: team.id, emails, device })
+      if (submitAction) submitAction.update({ loading: false })
+
+      if (result.ok) { commit(result.entry); return }
+      if (result.reason === 'claimed') {
         // 다른 탭/기기가 방금 먼저 점유 — 재입장 흐름으로 넘긴다.
         closeModal()
         openClaimed(team)
         return
       }
-      commit(result.entry)
+      // 통신 실패 등 — 모달을 닫지 않고 사유를 보여준다(입력값 보존).
+      msg.className = 'reg-msg is-error'
+      msg.textContent = result.reason === 'error'
+        ? '서버에 등록하지 못했습니다. 네트워크를 확인한 뒤 다시 시도하십시오.'
+        : t('team.register.errEmpty')
     }
 
     inputs.forEach((input, i) => {
@@ -252,14 +263,21 @@ export function createTeamScreen (ctx) {
     })
     const error = el('p', { class: 'auth-error' })
 
-    function submit () {
-      if (!verifyMember(team.id, input.value)) {
+    let submitAction = null
+    async function submit () {
+      const email = input.value.trim()
+      if (!email) { input.focus(); return }
+      if (submitAction) submitAction.update({ loading: true })
+      // 서버 모드: 증명과 인계가 한 RPC(verify_and_transfer)로 처리된다 → 실패면 null.
+      const entry = await transferTeam(team.id, device, email)
+      if (submitAction) submitAction.update({ loading: false })
+      if (!entry) {
         error.textContent = t('team.claimed.err')
         input.value = ''
         input.focus()
         return
       }
-      commit(transferTeam(team.id, device))
+      commit(entry)
     }
 
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submit() } })
@@ -268,11 +286,14 @@ export function createTeamScreen (ctx) {
       title: `${team.name} · ${t('team.claimed.title')}`,
       size: 'sm',
       content: [
+        // 이메일은 증명 전에는 노출하지 않는다(서버 모드에서는 애초에 받아오지 않는다).
         el('p', { class: 'claimed-meta mono' }, [
           icon('clock', { size: 14 }),
           el('span', { text: `${formatTime(entry.enteredAt)} 입장` }),
-          el('span', { class: 'claimed-meta__sep', text: '·' }),
-          el('span', { text: `${maskEmail(entry.emails[0])} 외 ${Math.max(0, entry.emails.length - 1)}명` })
+          entry.emails.length ? el('span', { class: 'claimed-meta__sep', text: '·' }) : null,
+          entry.emails.length
+            ? el('span', { text: `${maskEmail(entry.emails[0])} 외 ${Math.max(0, entry.emails.length - 1)}명` })
+            : null
         ]),
         copyEl('p', { class: 'auth-hint' }, 'team.claimed.hint'),
         input,
@@ -284,6 +305,7 @@ export function createTeamScreen (ctx) {
       ],
       onClose: () => { modal = null }
     })
+    submitAction = modal.actions[1]
     modal.open()
     setTimeout(() => input.focus(), 60)
   }
@@ -298,6 +320,7 @@ export function createTeamScreen (ctx) {
   })
 
   refreshView()
+  refreshEntries() // 서버 점유 현황 초기 로드 — 완료되면 subscribe 로 다시 그려진다
 
   const node = el('div', { class: 'screen screen--form' }, [
     el('div', { class: 'form-screen__inner' }, [

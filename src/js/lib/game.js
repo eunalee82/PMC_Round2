@@ -16,6 +16,12 @@ export function isEnded () { return impl.isEnded ? impl.isEnded() : false }
 export function remainingSeconds () { return impl.remainingSeconds() }
 export function subscribe (fn) { return impl.subscribe(fn) }
 
+// ── 연결 상태 — 서버 모드만 실제 값을 갖는다. mock 은 항상 'local'(오프라인 진행) ──
+export function getConnection () { return impl.getConnection ? impl.getConnection() : 'local' }
+export function subscribeConnection (fn) {
+  return impl.subscribeConnection ? impl.subscribeConnection(fn) : () => {}
+}
+
 // ── 부팅 (서버 모드에서만 실제 작업이 있다) ──
 export async function initGame () {
   if (impl.initGame) return impl.initGame()

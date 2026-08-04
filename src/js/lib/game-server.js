@@ -22,6 +22,18 @@ const state = {
 const listeners = new Set()
 function emit () { listeners.forEach((fn) => fn(state.status)) }
 
+// ── 연결 상태 — 화면(헤더·대기실·관리자)이 실제 상태를 보여줄 수 있게 노출한다.
+//    'connecting' → 첫 조회 중 · 'realtime' → 구독 성공 · 'polling' → 폴백 중 · 'offline' → 조회 실패
+const conn = { mode: 'connecting' }
+const connListeners = new Set()
+function setConn (mode) {
+  if (conn.mode === mode) return
+  conn.mode = mode
+  connListeners.forEach((fn) => fn(mode))
+}
+export function getConnection () { return conn.mode }
+export function subscribeConnection (fn) { connListeners.add(fn); return () => connListeners.delete(fn) }
+
 const toMs = (iso) => (iso ? Date.parse(iso) : null)
 
 function applyState (row, serverNowIso) {
@@ -40,9 +52,16 @@ function applyState (row, serverNowIso) {
 
 // ── 서버 조회 (폴링도 이걸 쓴다) ──
 export async function loadGameState () {
-  const data = await rpc('game_state')
-  applyState(data, data && data.server_now)
-  return state
+  try {
+    const data = await rpc('game_state')
+    applyState(data, data && data.server_now)
+    // 조회가 되면 최소한 서버와는 통한다 — 구독 중이면 realtime 유지, 아니면 polling.
+    if (conn.mode === 'offline' || conn.mode === 'connecting') setConn(pollId ? 'polling' : 'realtime')
+    return state
+  } catch (err) {
+    setConn('offline')
+    throw err
+  }
 }
 
 // ── 5초 폴링 (Realtime 폴백) ──
@@ -50,6 +69,7 @@ let pollId = null
 function startPolling (reason) {
   if (pollId) return
   console.info('[game] 폴링 시작 (5초) —', reason)
+  setConn('polling')
   pollId = setInterval(() => { loadGameState().catch(() => {}) }, POLL_MS)
 }
 function stopPolling () {
@@ -74,6 +94,7 @@ function startRealtime () {
       if (status === 'SUBSCRIBED') {
         clearTimeout(subscribeTimer)
         stopPolling()
+        setConn('realtime')
         loadGameState().catch(() => {}) // 구독 공백 동안의 변경을 메운다
       } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
         startPolling(`구독 상태 ${status}`)
@@ -97,6 +118,7 @@ export async function initGame () {
 }
 
 export function teardownGame () {
+  setConn('connecting')
   stopPolling()
   clearTimeout(subscribeTimer)
   if (channel && supabase) { supabase.removeChannel(channel); channel = null }

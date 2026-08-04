@@ -36,6 +36,11 @@ export async function rpc (fn, args = {}) {
   const { data, error } = await supabase.rpc(fn, args)
   if (error) {
     const code = (error.message || '').trim().split(/\s+/)[0] || 'rpc_failed'
+    // 토큰이 무효(다른 기기가 인계 / 운영진 해제)면 즉시 알린다 → lib/entries-server.js 가 클레임을 버리고
+    // flow.js 의 구독이 팀 선택 화면으로 되돌린다. (순환 import 없이 느슨하게 연결)
+    if (code === 'not_owner' && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('pmb:not-owner', { detail: { fn } }))
+    }
     throw Object.assign(new Error(error.message || 'rpc_failed'), { code, fn, details: error })
   }
   return data
