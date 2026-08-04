@@ -6,7 +6,7 @@ import { createAudioManager } from './lib/audio.js'
 import { clearCopyBindings, t } from './lib/copy.js'
 import { getDeviceId, ownsTeam, releaseTeam, subscribe as subscribeEntries } from './lib/entries.js'
 import { isStarted } from './lib/game.js'
-import { getFinale } from './lib/progress.js'
+import { getFinale, hydrateProgress, isHydrated, refreshRanking } from './lib/progress.js'
 import { allStagesCleared } from './lib/stage-progress.js'
 import { el } from './utils/dom.js'
 import { createModal } from '../components/primitives/modal.js'
@@ -76,6 +76,20 @@ export function createFlow ({ root }) {
     audio
   }
 
+  // 게임플레이·종반부 화면은 서버 진행 상태가 있어야 올바른 지점을 고른다(가드도 이 값을 본다).
+  // 캐시가 그 팀 것이 아니면 먼저 채운다. 실패해도 화면은 계속 뜬다(빈 진행으로 시작).
+  const NEEDS_PROGRESS = [FLOW.CASE, FLOW.APPOINT, FLOW.RAID, FLOW.ENDING]
+  async function ensureProgress () {
+    if (!session.teamId || !NEEDS_PROGRESS.includes(session.step)) return
+    if (isHydrated(session.teamId)) return
+    try {
+      await hydrateProgress(session.teamId)
+      refreshRanking().catch(() => {})
+    } catch (err) {
+      console.warn('[flow] 진행 상태 로드 실패 — 서버 응답 후 다시 채워진다', err)
+    }
+  }
+
   async function render (step) {
     const factory = SCREENS[step]
     if (!factory) return
@@ -136,9 +150,14 @@ export function createFlow ({ root }) {
     }
   }
 
-  function navigate (step, { skipGuard = false } = {}) {
+  async function navigate (step, { skipGuard = false } = {}) {
     // 이미 팀 선택으로 가는 길이면 굳이 알리지 않는다.
     if (!assertClaim({ notify: step !== FLOW.TEAM }) && !skipGuard) step = FLOW.TEAM
+    // 진행 상태가 필요한 단계로 갈 때는 가드 판정 전에 서버에서 받아온다.
+    if (session.teamId && NEEDS_PROGRESS.includes(step) && !isHydrated(session.teamId)) {
+      session.step = step
+      await ensureProgress()
+    }
     const target = skipGuard ? step : resolveStep(step, session, guardFacts())
     session.step = target
     persist(session)
@@ -146,7 +165,7 @@ export function createFlow ({ root }) {
   }
 
   return {
-    start () { navigate(session.step) }, // resume — guard keeps it honest
+    async start () { await navigate(session.step) }, // resume — guard keeps it honest
     goTo: navigate,
     reset () {
       // DEV 초기화 — 점유한 팀도 함께 비워야 같은 팀으로 다시 테스트할 수 있다.

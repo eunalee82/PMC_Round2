@@ -16,7 +16,8 @@ const pub = join(root, 'public')
 // localStorage가 없는 Node에서 lib/i18n.js가 안전하게 동작하도록 최소 스텁을 둔다.
 globalThis.localStorage = { getItem: () => null, setItem: () => {} }
 
-const { CASES, SOLUTIONS } = await import('../src/js/data/cases.js')
+const { CASES } = await import('../src/js/data/cases.js')
+const { SOLUTIONS } = await import('../src/js/dev/solutions.js') // 정답은 DEV 전용 모듈
 const { COPY } = await import('../src/js/constants/copy.js')
 const { STAGE_TOTALS } = await import('../src/js/lib/progress.js')
 

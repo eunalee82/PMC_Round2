@@ -6,7 +6,7 @@ import { icon } from '../../utils/icons.js'
 import { ASSETS } from '../../constants/assets.js'
 import { FLOW } from '../../constants/flow.js'
 import { findTeam } from '../../lib/teams.js'
-import { subscribe as subscribeGame, isStarted } from '../../lib/game.js'
+import { subscribe as subscribeGame, isStarted, getConnection, subscribeConnection } from '../../lib/game.js'
 import { copyEl } from '../../lib/copy.js'
 
 const MISSIONS = [
@@ -24,9 +24,18 @@ function statusLine (label, valueNode, tone) {
   ])
 }
 
+const CONN_TEXT = {
+  realtime: { text: 'CONNECTED', tone: 'is-ok' },
+  polling: { text: 'SYNC · 5s', tone: 'is-warn' },
+  connecting: { text: 'CONNECTING', tone: 'is-warn' },
+  offline: { text: 'OFFLINE', tone: 'is-warn' },
+  local: { text: 'LOCAL', tone: 'is-warn' }
+}
+
 export function createWaitingScreen (ctx) {
   const team = findTeam(ctx.session.teamId)
   const agents = ctx.session.memberEmails || []
+  const connVal = el('span', { text: '—' })
 
   const node = el('div', { class: 'screen screen--waiting' }, [
     el('div', { class: 'wait__scanline', 'aria-hidden': 'true' }),
@@ -38,7 +47,7 @@ export function createWaitingScreen (ctx) {
       copyEl('p', { class: 'wait__msg' }, 'waiting.msg'),
 
       el('div', { class: 'wait__status card' }, [
-        statusLine('SYSTEM STATUS', el('span', { text: 'CONNECTED' }), 'is-ok'),
+        statusLine('SYSTEM STATUS', connVal, ''),
         statusLine('MISSION STATUS', el('span', { text: 'WAITING' }), 'is-warn'),
         statusLine('AGENTS REGISTERED', el('span', { text: `${agents.length}` }), agents.length === 3 ? 'is-ok' : 'is-warn'),
         statusLine('START TIME', copyEl('span', {}, 'waiting.startTime'), '')
@@ -59,6 +68,15 @@ export function createWaitingScreen (ctx) {
 
   // 관리자 Start 대기 → game.status 'started'가 되면 Stage 1(사건)로 자동 전환한다.
   // MOCK: lib/game.js(localStorage) 구독. 서버 연결 시 Realtime 구독으로 교체 (CLAUDE.md §8).
+  // 서버 연결 상태 — 대기 중에 문제를 알아챌 수 있어야 한다
+  function paintConn (mode) {
+    const c = CONN_TEXT[mode] || CONN_TEXT.connecting
+    connVal.textContent = c.text
+    connVal.className = 'wait__status-val mono ' + c.tone
+  }
+  paintConn(getConnection())
+  const unsubConn = subscribeConnection(paintConn)
+
   let leaving = false
   function goToStage () {
     if (leaving) return
@@ -74,6 +92,6 @@ export function createWaitingScreen (ctx) {
       if (isStarted()) { goToStage(); return } // 이미 시작된 게임에 (재)진입하면 곧장 Stage로
       ctx.audio.playBgm(ASSETS.bgm.opening)
     },
-    destroy () { unsubscribe() }
+    destroy () { unsubscribe(); unsubConn() }
   }
 }

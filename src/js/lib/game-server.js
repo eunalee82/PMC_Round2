@@ -9,6 +9,10 @@ import { supabase, rpc } from './supabase.js'
 
 const POLL_MS = 5000
 const SUBSCRIBE_TIMEOUT_MS = 5000
+// 감시 주기 — Realtime 이 살아 있다고 믿는 동안에도 주기적으로 (a) 소켓 생존을 확인하고
+// (b) 서버 상태를 한 번 맞춘다. 구독 상태 콜백이 오지 않는 방식으로 소켓이 죽는 경우가 있어
+// (실측: 채널이 제거된 뒤 소켓 disconnect → CLOSED 콜백 없음) 콜백만 믿으면 신호를 영구히 놓친다.
+const WATCH_MS = 15000
 
 const state = {
   status: 'scheduled',
@@ -55,8 +59,9 @@ export async function loadGameState () {
   try {
     const data = await rpc('game_state')
     applyState(data, data && data.server_now)
-    // 조회가 되면 최소한 서버와는 통한다 — 구독 중이면 realtime 유지, 아니면 polling.
-    if (conn.mode === 'offline' || conn.mode === 'connecting') setConn(pollId ? 'polling' : 'realtime')
+    // REST 조회 성공이 'Realtime 연결'을 뜻하지는 않는다 — realtime 은 SUBSCRIBED 에서만 세운다.
+    // (offline 이었다면 통신이 살아난 것이므로 폴링/연결중으로 되돌린다)
+    if (conn.mode === 'offline') setConn(pollId ? 'polling' : 'connecting')
     return state
   } catch (err) {
     setConn('offline')
@@ -109,9 +114,30 @@ function onVisible () {
   if (document.visibilityState === 'visible') loadGameState().catch(() => {})
 }
 
+// ── 감시 타이머 — Realtime 의 '조용한 죽음'을 잡는 안전망 ──
+let watchId = null
+function startWatchdog () {
+  if (watchId) return
+  watchId = setInterval(() => {
+    const live = !!(supabase && supabase.realtime && supabase.realtime.isConnected())
+    if (!live && conn.mode === 'realtime') {
+      startPolling('소켓 끊김 감지(구독 콜백 없음)') // 5초 폴링으로 강등
+      return
+    }
+    // Realtime 이 살아 있어도 주기적으로 서버와 한 번 맞춘다(놓친 변경·오프셋 보정).
+    if (conn.mode === 'realtime') loadGameState().catch(() => {})
+  }, WATCH_MS)
+}
+function stopWatchdog () {
+  if (!watchId) return
+  clearInterval(watchId)
+  watchId = null
+}
+
 export async function initGame () {
   await loadGameState() // 실패는 호출자(main.js)가 재시도 화면으로 처리
   startRealtime()
+  startWatchdog()
   document.addEventListener('visibilitychange', onVisible)
   window.addEventListener('focus', onVisible)
   return state
@@ -119,6 +145,7 @@ export async function initGame () {
 
 export function teardownGame () {
   setConn('connecting')
+  stopWatchdog()
   stopPolling()
   clearTimeout(subscribeTimer)
   if (channel && supabase) { supabase.removeChannel(channel); channel = null }

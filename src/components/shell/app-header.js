@@ -31,11 +31,14 @@ function createVolumeControl () {
   return { el: wrap, destroy () { unsub(); document.removeEventListener('click', onDoc) } }
 }
 
-// Connection status readout (non-interactive). Wired to the store's connection state later.
+// 연결 상태 표시 — lib/game.js 의 연결 모드를 화면(screen)이 setConnection() 으로 내려준다.
+// (컴포넌트가 상태 모듈을 직접 참조하지 않는다 — CLAUDE.md §9)
 const CONNECTION_STATES = {
-  online: { label: 'SYSTEM ONLINE', dot: '' },
-  reconnecting: { label: 'RECONNECTING', dot: 'is-reconnecting' },
-  offline: { label: 'OFFLINE', dot: 'is-off' }
+  realtime: { label: 'SYSTEM ONLINE', dot: '' },
+  polling: { label: 'SYNC · 5s', dot: 'is-reconnecting' },
+  connecting: { label: 'CONNECTING', dot: 'is-reconnecting' },
+  offline: { label: 'OFFLINE', dot: 'is-off' },
+  local: { label: 'LOCAL MODE', dot: 'is-off' }
 }
 
 function formatClock (totalSeconds) {
@@ -104,13 +107,23 @@ export function createAppHeader (props = {}) {
   }
   if (running) startTimer()
 
-  const conn = connected ? CONNECTION_STATES.online : CONNECTION_STATES.offline
+  const dotEl = el('span', { class: 'status__dot' })
+  const connLabelEl = el('span', { class: 'status__label' })
   const statusEl = el('div', {
     class: 'app-header__status', role: 'status', 'aria-live': 'polite', title: '서버 연결 상태'
-  }, [
-    el('span', { class: `status__dot ${conn.dot}`.trim() }),
-    el('span', { class: 'status__label', text: conn.label })
-  ])
+  }, [dotEl, connLabelEl])
+
+  function setConnection (mode) {
+    const c = CONNECTION_STATES[mode] || (connected ? CONNECTION_STATES.realtime : CONNECTION_STATES.offline)
+    dotEl.className = `status__dot ${c.dot}`.trim()
+    connLabelEl.textContent = c.label
+    statusEl.title = mode === 'polling'
+      ? '실시간 연결이 없어 5초마다 상태를 확인하는 중입니다 (진행에는 영향 없습니다)'
+      : mode === 'offline' ? '서버와 연결되지 않았습니다 — 복구되면 자동으로 다시 시도합니다'
+        : mode === 'local' ? '오프라인(mock) 모드로 진행 중입니다'
+          : '서버 연결 정상'
+  }
+  setConnection(connected ? 'realtime' : 'offline')
 
   const volume = createVolumeControl()
 
@@ -130,6 +143,7 @@ export function createAppHeader (props = {}) {
     el: node,
     startTimer, // called on admin game-start (gameplay phase)
     stopTimer,
+    setConnection,
     destroy () { stopTimer(); volume.destroy(); node.remove() }
   }
 }

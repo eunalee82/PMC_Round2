@@ -7,14 +7,17 @@
 // see docs/supabase-minimum-design.md §10 §12
 import { createClient } from '@supabase/supabase-js'
 
-const URL = import.meta.env.VITE_SUPABASE_URL
-const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
-const MODE = import.meta.env.VITE_BACKEND || 'supabase'
+// import.meta.env 는 Vite 번들에서만 채워진다. Node 스크립트(scripts/validate.mjs 등)에서
+// 이 모듈이 import 되어도 깨지지 않도록 방어한다 — 그 환경에서는 자동으로 mock 취급된다.
+const ENV = import.meta.env || {}
+const URL = ENV.VITE_SUPABASE_URL
+const ANON_KEY = ENV.VITE_SUPABASE_ANON_KEY
+const MODE = ENV.VITE_BACKEND || 'supabase'
 
 const configured = !!(URL && ANON_KEY)
 const useServer = MODE !== 'mock' && configured
 
-if (MODE !== 'mock' && !configured) {
+if (MODE !== 'mock' && !configured && typeof window !== 'undefined') {
   // 조용히 죽는 대신 이유를 남긴다 — 운영 중 원인 파악이 빨라진다.
   console.warn('[supabase] env 없음 → mock 모드로 진행 (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY 확인)')
 }

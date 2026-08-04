@@ -11,10 +11,10 @@ import { ASSETS } from '../../constants/assets.js'
 import { FLOW } from '../../constants/flow.js'
 import { STAGE_META, STAGE_ITEM_ICONS } from '../../constants/stages.js'
 import { localizeCase } from '../../data/cases.js'
-import { gradeCase } from '../../lib/grade.js'
+import { submitCase } from '../../lib/grade.js'
 import { findTeam } from '../../lib/teams.js'
-import { remainingSeconds } from '../../lib/game.js'
-import { getProgress, recordSubmission, getRanking, STAGE_TOTALS } from '../../lib/progress.js'
+import { remainingSeconds, isEnded, subscribe as subscribeGame, getConnection, subscribeConnection } from '../../lib/game.js'
+import { getProgress, getRanking, STAGE_TOTALS, subscribeProgress } from '../../lib/progress.js'
 import { stageCases, builtTotal, submittedCount, isStageComplete, firstIncompleteStage } from '../../lib/stage-progress.js'
 import { createButton } from '../../../components/primitives/button.js'
 import { createModal } from '../../../components/primitives/modal.js'
@@ -79,12 +79,40 @@ export function createCaseScreen (ctx) {
   shell.content.append(caseHost)
   track(createCaptureGuard({ label: team ? team.name : '테스트' }))
 
+  // 서버 연결 상태를 헤더에 반영 (Realtime / 5초 폴링 / 오프라인)
+  shell.header.setConnection(getConnection())
+  const unsubConn = subscribeConnection((mode) => shell.header.setConnection(mode))
+  // 점수·랭킹 캐시가 갱신되면 사이드바를 다시 그린다(제출 직후 순위가 늦게 반영되던 문제).
+  const unsubProgress = subscribeProgress(() => refreshSidebar())
+  // 게임이 종료되면 제출을 시도하지 않아도 즉시 잠근다 (docs/supabase-minimum-design.md §9.1)
+  let gameEnded = isEnded()
+  let currentCase = null // { submitBtn, resultBox, isSubmitted }
+  function applyEndedState () {
+    if (!gameEnded || !currentCase || currentCase.isSubmitted()) return
+    currentCase.submitBtn.update({ disabled: true })
+    const box = currentCase.resultBox
+    box.hidden = false
+    box.className = 'case-result is-wrong'
+    box.replaceChildren(el('div', { class: 'case-result__badge' }, [
+      icon('alert', { size: 22 }),
+      el('div', {}, [
+        el('strong', { class: 'case-result__title', text: t('submitFail.game_ended') }),
+        el('span', { class: 'case-result__sub', text: t('submitFail.hint') })
+      ])
+    ]))
+  }
+  const unsubGame = subscribeGame((status) => {
+    gameEnded = status === 'ended'
+    if (gameEnded) { shell.header.stopTimer(); applyEndedState() }
+  })
+
   const setTheme = (s) => { document.documentElement.dataset.stage = String(s) }
   const refreshSidebar = () => shell.sidebar.update(sidebarSnapshot(teamId, teamName, getProgress(teamId)))
   // 스테이지 사건 목록·완료 판정은 lib/stage-progress.js가 단일 출처 — 라우터 가드와 같은 기준을 쓴다.
   const stageCasesFor = (s) => stageCases(s)
 
   function mountView (node) {
+    currentCase = null // 사건 화면을 떠나면 종료 잠금 대상이 없다
     clearView() // 이전 화면 컴포넌트만 해제
     viewParts = nextParts
     nextParts = []
@@ -162,20 +190,44 @@ export function createCaseScreen (ctx) {
       confirmModal.open()
     }
 
-    let submitted = false // 같은 사건 이중 제출 가드 (서버 이관 후에도 클라이언트 1차 방어로 유지)
+    let submitted = false // 같은 사건 이중 제출 가드 (서버 유니크 제약과 이중화)
 
-    function doSubmit () {
+    async function doSubmit () {
       if (submitted) return
       const idx = choice.getSelected()
       if (idx < 0) return
       submitted = true
-      const { isCorrect, correctIndex, analysis } = gradeCase(caseData.id, idx)
+      submitBtn.update({ loading: true, disabled: true })
+
+      // 채점·저장은 서버가 한다. 화면은 응답으로만 결과를 확정한다 (CLAUDE.md §2 §7).
+      const res = await submitCase({ teamId, caseId: caseData.id, stage: caseData.stage, choiceIndex: idx })
+      submitBtn.update({ loading: false })
+
+      if (!res.ok) {
+        // 실패 사유를 보여주고 다시 시도할 수 있게 되돌린다(선택은 유지).
+        submitted = false
+        submitBtn.update({ label: t('case.submit'), disabled: false })
+        resultBox.hidden = false
+        resultBox.className = 'case-result is-wrong'
+        resultBox.replaceChildren(el('div', { class: 'case-result__badge' }, [
+          icon('alert', { size: 22 }),
+          el('div', {}, [
+            el('strong', { class: 'case-result__title', text: t(`submitFail.${res.reason}`) || t('submitFail.error') }),
+            el('span', { class: 'case-result__sub', text: t('submitFail.hint') })
+          ])
+        ]))
+        if (res.reason === 'game_ended' || res.reason === 'game_not_started' || res.reason === 'not_owner') {
+          submitBtn.update({ label: t('case.submit'), disabled: true }) // 다시 눌러도 소용없는 상태
+        }
+        return
+      }
+
+      const { isCorrect, correctIndex, analysis } = res
       choice.reveal(correctIndex, idx)
       // 제출이 끝나면 [판단 제출]은 비활성 상태로 남긴다 — 다시 누를 수 없고, 제출이 끝났음이 보인다.
       // (hidden 속성은 .btn의 display 규칙에 덮여 먹지 않으므로 disabled로 확실히 잠근다.)
       submitBtn.update({ label: t('case.submitted'), disabled: true })
-      recordSubmission(teamId, caseData.id, caseData.stage, isCorrect) // 제출 시각 + 정답 시 가산(중복 무시)
-      refreshSidebar()
+      refreshSidebar() // 진행/점수는 서버 응답이 반영된 캐시에서 읽는다
 
       resultBox.hidden = false
       resultBox.className = 'case-result ' + (isCorrect ? 'is-correct' : 'is-wrong')
@@ -226,6 +278,9 @@ export function createCaseScreen (ctx) {
       submitBtn.el,
       resultBox
     ]))
+    // mountView 가 currentCase 를 비우므로 마운트 뒤에 등록한다(종료 잠금 대상 지정).
+    currentCase = { submitBtn, resultBox, isSubmitted: () => submitted }
+    applyEndedState() // 이미 종료된 뒤 들어온 경우
   }
 
   // ── SCR-012 Stage Result ──
@@ -319,6 +374,9 @@ export function createCaseScreen (ctx) {
       if (prevStage) document.documentElement.dataset.stage = prevStage
       else delete document.documentElement.dataset.stage
       if (ctx && ctx.audio) ctx.audio.stopSfx() // Stage 통과 음악이 다음 화면까지 흐르지 않게
+      unsubConn()
+      unsubProgress()
+      unsubGame()
       closeConfirm()
       clearView()
       parts.forEach((p) => p && p.destroy && p.destroy())

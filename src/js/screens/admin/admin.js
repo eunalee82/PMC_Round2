@@ -8,13 +8,22 @@
 import { el } from '../../utils/dom.js'
 import { icon } from '../../utils/icons.js'
 import { supabase, isServerMode } from '../../lib/supabase.js'
-import { getStatus, getStartedAt, remainingSeconds, subscribe, initGame, startGame, endGame, resetGame } from '../../lib/game.js'
+import { getStatus, getStartedAt, remainingSeconds, subscribe, initGame, startGame, endGame, resetGame, getConnection, subscribeConnection } from '../../lib/game.js'
 import { resetAllProgress } from '../../lib/progress.js'
 import { createButton } from '../../../components/primitives/button.js'
 import { createRankingView } from './ranking.js'
 import { createTeamStatusView } from './team-status.js'
 
 const MOCK_PASSWORD = '2026' // mock 모드 전용(서버 모드에서는 쓰이지 않는다)
+
+// 연결 상태 표기 — 운영진이 실시간 전파가 살아 있는지 한눈에 봐야 한다 (operation-checklist.md §6)
+const CONN_TEXT = {
+  realtime: { text: 'REALTIME · 실시간 전파', cls: 'is-on' },
+  polling: { text: 'POLLING · 5초 확인 (Realtime 없음)', cls: 'is-wait' },
+  connecting: { text: 'CONNECTING…', cls: 'is-wait' },
+  offline: { text: 'OFFLINE · 서버 연결 없음', cls: 'is-off' },
+  local: { text: 'LOCAL · mock 모드', cls: 'is-off' }
+}
 
 function pad (n) { return String(n).padStart(2, '0') }
 function fmtStamp (ts) {
@@ -130,6 +139,7 @@ export function mountAdmin (root) {
     const statusVal = el('span', { class: 'admin__status-val mono' })
     const startedVal = el('span', { class: 'admin__meta-val mono' })
     const remainVal = el('span', { class: 'admin__meta-val mono' })
+    const connVal = el('span', { class: 'admin__status-val mono' })
     const err = el('p', { class: 'auth-error' })
 
     const guard = (btn, fn, confirmMsg) => async () => {
@@ -171,6 +181,15 @@ export function mountAdmin (root) {
       startBtn.update({ disabled: s === 'started' })
       endBtn.update({ disabled: s !== 'started' })
     }
+    function paintConn (mode) {
+      const c = CONN_TEXT[mode] || CONN_TEXT.connecting
+      connVal.textContent = c.text
+      connVal.className = 'admin__status-val mono ' + c.cls
+    }
+    paintConn(getConnection())
+    if (box.__unsubConn) box.__unsubConn()
+    box.__unsubConn = subscribeConnection(paintConn)
+
     unsub = subscribe(refresh)
     refresh()
     const tick = setInterval(refresh, 1000) // 남은 시간 표시
@@ -187,6 +206,7 @@ export function mountAdmin (root) {
         el('h1', { class: 'admin__title', text: '게임 제어' })
       ]),
       row('GAME STATUS', statusVal),
+      row('CONNECTION', connVal),
       row('STARTED AT', startedVal),
       row('TIME LEFT', remainVal),
       el('div', { class: 'admin__actions' }, [startBtn.el, endBtn.el, teamsBtn.el, rankBtn.el, resetBtn.el]),
@@ -221,6 +241,7 @@ export function mountAdmin (root) {
     el: box,
     destroy () {
       if (unsub) unsub()
+      if (box.__unsubConn) box.__unsubConn()
       if (box.__tick) clearInterval(box.__tick)
       if (overlay) { overlay.destroy(); overlay = null }
     }

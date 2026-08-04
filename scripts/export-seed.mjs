@@ -17,7 +17,8 @@ mkdirSync(outDir, { recursive: true })
 globalThis.localStorage = { getItem: () => null, setItem: () => {} }
 
 const { BASE_TEAMS } = await import('../src/js/mocks/teams.js')
-const { CASES, SOLUTIONS } = await import('../src/js/data/cases.js')
+const { CASES } = await import('../src/js/data/cases.js')
+const { SOLUTIONS } = await import('../src/js/dev/solutions.js') // 정답은 DEV 전용 모듈
 
 const q = (s) => `'${String(s).replace(/'/g, "''")}'` // SQL 문자열 이스케이프
 

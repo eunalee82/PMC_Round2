@@ -93,6 +93,15 @@ const KO = {
   'case.next': '다음 사건 조사',
   'case.nextLast': 'Stage 결과 보기',
   'case.noAnalysis': '분석 보고서가 아직 준비되지 않았습니다.',
+  // 제출 실패 안내 (서버 판정 — docs/supabase-minimum-design.md §9.1)
+  'submitFail.already_submitted': '이미 제출된 사건입니다',
+  'submitFail.game_ended': '게임이 종료되어 제출할 수 없습니다',
+  'submitFail.game_not_started': '아직 게임이 시작되지 않았습니다',
+  'submitFail.not_owner': '팀 인증이 만료되었습니다',
+  'submitFail.unknown_case': '사건 정보를 찾을 수 없습니다',
+  'submitFail.error': '제출에 실패했습니다',
+  'submitFail.hint': '네트워크를 확인한 뒤 다시 시도하거나, 운영진 안내를 기다려 주십시오.',
+
   // 임시(Mock) 사건 표시 — 데이터에 placeholder: true 인 사건에만 붙는다 (Stage 2 콘텐츠 확정 시 자동 소멸).
   'case.temp': '임시 데이터',
   'case.tempHint': '확정 전 임시 사건입니다. 최종 콘텐츠로 교체될 예정입니다.',
@@ -349,6 +358,14 @@ const EN = {
   'case.next': 'Investigate Next Case',
   'case.nextLast': 'View Stage Result',
   'case.noAnalysis': 'The analysis report is not ready yet.',
+  'submitFail.already_submitted': 'This case was already submitted',
+  'submitFail.game_ended': 'The game has ended — submissions are closed',
+  'submitFail.game_not_started': 'The game has not started yet',
+  'submitFail.not_owner': 'Your team session has expired',
+  'submitFail.unknown_case': 'Case information not found',
+  'submitFail.error': 'Submission failed',
+  'submitFail.hint': 'Check your network and try again, or wait for the staff announcement.',
+
   'case.temp': 'TEMP DATA',
   'case.tempHint': 'A temporary case pending confirmation. It will be replaced with final content.',
 
