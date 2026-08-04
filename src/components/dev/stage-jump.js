@@ -6,7 +6,16 @@
 //    만들어 두는' 방식으로만 동작한다(진행 판정을 우회하지 않는다).
 import { recordSubmission, recordFinale } from '../../js/lib/progress.js'
 import { stageCases } from '../../js/lib/stage-progress.js'
-import { ensureStarted } from '../../js/lib/game.js'
+import { startGame, isStarted } from '../../js/lib/game.js'
+
+// 게임이 시작돼 있어야 사건 화면에 들어갈 수 있다. mock 모드에서는 바로 시작되고,
+// 서버 모드에서는 관리자 로그인이 필요하므로 실패 시 안내만 남긴다(?admin 에서 시작할 것).
+function ensureStartedForDev () {
+  if (isStarted()) return
+  Promise.resolve(startGame()).catch(() => {
+    console.warn('[dev] 게임 시작은 관리자 권한이 필요합니다 — ?admin 에서 로그인 후 [게임 시작]을 누르세요.')
+  })
+}
 
 // 앞 스테이지들을 '전부 정답 제출' 상태로 채운다 → 점수·보상 슬롯까지 정상적으로 해제된다.
 function clearStagesUpTo (teamId, lastStage) {
@@ -17,13 +26,13 @@ function clearStagesUpTo (teamId, lastStage) {
 
 // Stage N 브리핑부터 보기 — 앞 스테이지(1..N-1)를 완료 처리한다.
 export function fastForwardToStage (teamId, stage) {
-  ensureStarted()
+  ensureStartedForDev()
   clearStagesUpTo(teamId, stage - 1)
 }
 
 // 종반부 화면 확인 — 필요한 저장 지점까지 채운다. step: 'appoint' | 'raid' | 'ending'
 export function fastForwardToFinale (teamId, step) {
-  ensureStarted()
+  ensureStartedForDev()
   clearStagesUpTo(teamId, 3)
   if (step === 'appoint') return
   recordFinale(teamId, { appointedAt: Date.now() })

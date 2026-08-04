@@ -13,7 +13,7 @@ import { STAGE_META, STAGE_ITEM_ICONS } from '../../constants/stages.js'
 import { localizeCase } from '../../data/cases.js'
 import { gradeCase } from '../../lib/grade.js'
 import { findTeam } from '../../lib/teams.js'
-import { remainingSeconds, ensureStarted } from '../../lib/game.js'
+import { remainingSeconds } from '../../lib/game.js'
 import { getProgress, recordSubmission, getRanking, STAGE_TOTALS } from '../../lib/progress.js'
 import { stageCases, builtTotal, submittedCount, isStageComplete, firstIncompleteStage } from '../../lib/stage-progress.js'
 import { createButton } from '../../../components/primitives/button.js'
@@ -68,8 +68,6 @@ export function createCaseScreen (ctx) {
   const teamId = ctx && ctx.session ? ctx.session.teamId : null
   const team = findTeam(teamId)
   const teamName = team ? team.name : 'UNASSIGNED'
-
-  ensureStarted() // 문제 입장 = 미션 타이머 시작 보장
 
   const prevStage = document.documentElement.dataset.stage
   const caseHost = el('div', { class: 'case__inner anim-fade' })

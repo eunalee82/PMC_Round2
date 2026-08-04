@@ -52,3 +52,14 @@
   border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
 }
 .admin__warn svg { flex: none; margin-top: 2px; }
+
+/* 관리자 · 팀 현황 표 (screens/admin/team-status.js) — 이메일 열이 넓다 */
+.ranking__table.is-teams .rankrow {
+  grid-template-columns: 44px minmax(110px, 1fr) minmax(240px, 2fr) 66px 56px 62px 130px;
+}
+.rankrow__emails { color: var(--text-2); font-size: var(--text-xs); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rankrow__flags { color: var(--warning); font-size: 0.625rem; letter-spacing: var(--tracking-caps); }
+.rankrow.is-open { opacity: 0.55; }                                    /* 미입장 팀은 흐리게 */
+.rankrow.is-flagged { border-color: color-mix(in srgb, var(--warning) 45%, transparent); }
+.admin__note { margin: 0; color: var(--text-3); font-size: var(--text-xs); }
+.admin__status-val.is-off { color: var(--danger); }                    /* ENDED */

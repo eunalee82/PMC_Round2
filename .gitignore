@@ -25,3 +25,6 @@ dist-ssr
 
 .vercel
 .env*
+
+# 정답 시드 — 저장소에 정답을 남기지 않는다 (생성 → 적용 → 삭제)
+supabase/migrations/0003_seed_answers.sql
