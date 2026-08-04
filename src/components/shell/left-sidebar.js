@@ -4,6 +4,7 @@
 // update(props)로 점수·랭킹·아이템을 다시 그린다 (사건 해결 시 사이드바 갱신). 서버 연결 시 store 구독으로 교체.
 import { el } from '../../js/utils/dom.js'
 import { icon } from '../../js/utils/icons.js'
+import { t } from '../../js/lib/copy.js'
 
 const STAGE_ICONS = { mindset: 'brain', domain: 'cube', ai: 'cpu' }
 
@@ -33,12 +34,12 @@ export function createLeftSidebar (props = {}) {
     const agent = el('div', { class: 'agent framed' }, [
       el('div', { class: 'agent__top' }, [
         el('span', { class: 'agent__team', text: team.name }),
-        el('span', { class: 'agent__rank', text: team.rank || '신입 수사관' })
+        el('span', { class: 'agent__rank', text: team.rank || t('agent.rankRookie') })
       ]),
       el('div', { class: 'agent__label caps', text: 'Investigation Score' }),
       el('div', { class: 'agent__score' }, [
         el('b', { text: String(team.score ?? 0) }),
-        el('span', { text: `/ ${team.scoreMax ?? 300} 점` })
+        el('span', { text: `/ ${team.scoreMax ?? 300} ${t('sidebar.points')}` })
       ]),
       el('div', { class: 'agent__bar' }, [el('div', { class: 'agent__bar-fill', style: { width: `${scorePct}%` } })])
     ])

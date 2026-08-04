@@ -40,7 +40,7 @@ function sidebarSnapshot (teamId, teamName, p) {
   const base = scored.length ? scored : ranking.filter((r) => r.teamId === teamId)
   const rankingRows = base.slice(0, 4).map((r) => ({ rank: r.rank, name: r.name, score: r.score, isMe: r.teamId === teamId }))
   return {
-    team: { name: teamName, rank: '신입 수사관', score: p.score, scoreMax: 300 },
+    team: { name: teamName, rank: t('agent.rankRookie'), score: p.score, scoreMax: 300 },
     ranking: teamName !== 'UNASSIGNED' ? rankingRows : [],
     stageScore: [
       { key: 'mindset', label: 'Mindset', score: p.stage[1] || 0, max: STAGE_TOTALS[1] },

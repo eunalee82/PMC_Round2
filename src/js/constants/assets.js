@@ -22,8 +22,9 @@ export const ASSETS = {
     boss: '/images/characters/boss.png'
   },
   videos: {
-    opening: '/videos/opening.mp4',
-    ending: '/videos/ending.mp4'
+    opening: '/videos/opening.mp4', // 로컬 원본(미사용 — 오프닝은 YouTube 임베드로 대체)
+    ending: '/videos/ending.mp4',
+    openingEmbedId: 'Hm13qr-_0yI' // YouTube 영상 ID (SCR-002 오프닝 임베드)
   },
   bgm: {
     opening: '/audio/bgm/opening.mp3',

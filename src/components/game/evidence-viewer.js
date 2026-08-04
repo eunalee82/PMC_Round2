@@ -4,6 +4,7 @@
 // createEvidenceViewer(props) -> { el, destroy }  (CLAUDE.md §9 컴포넌트 계약)
 import { el } from '../../js/utils/dom.js'
 import { icon } from '../../js/utils/icons.js'
+import { t } from '../../js/lib/copy.js'
 import { createModal } from '../primitives/modal.js'
 import { getAudioSettings, subscribeAudio } from '../../js/lib/audio-settings.js'
 
@@ -19,7 +20,7 @@ export function createEvidenceViewer (props = {}) {
       title,
       size: 'lg',
       content: [big],
-      actions: [{ label: '닫기', variant: 'ghost' }],
+      actions: [{ label: t('evidence.close'), variant: 'ghost' }],
       onClose: () => { modal = null }
     })
     modal.open()
@@ -30,12 +31,12 @@ export function createEvidenceViewer (props = {}) {
     const img = el('img', {
       class: 'evidence__img', src: im.src || '', alt: im.alt || cellLabel, loading: 'lazy', decoding: 'async'
     })
-    const zoomBtn = el('button', { class: 'evidence__zoom', type: 'button', 'aria-label': `${cellLabel} 확대` }, [
+    const zoomBtn = el('button', { class: 'evidence__zoom', type: 'button', 'aria-label': `${cellLabel} ${t('evidence.zoom')}` }, [
       icon('maximize', { size: 16 })
     ])
     const fallback = el('div', { class: 'evidence__fallback' }, [
       icon('file', { size: 28 }),
-      el('p', { class: 'evidence__fallback-title', text: '단서 이미지를 불러오지 못했습니다.' }),
+      el('p', { class: 'evidence__fallback-title', text: t('evidence.loadFail') }),
       el('p', { class: 'evidence__fallback-sub', text: im.alt || cellLabel })
     ])
     const frame = el('div', { class: 'evidence__frame' }, [img, zoomBtn, fallback])
@@ -61,7 +62,7 @@ export function createEvidenceViewer (props = {}) {
       const audioEl = el('audio', { class: 'evidence__audio-el', src: a.src || '', controls: true, preload: 'none', controlsList: 'nodownload' })
       audioEls.push(audioEl)
       return el('div', { class: 'evidence__audio' }, [
-        el('span', { class: 'evidence__audio-label mono caps', text: a.label || `녹취 ${i + 1}` }),
+        el('span', { class: 'evidence__audio-label mono caps', text: a.label || `${t('evidence.recording')} ${i + 1}` }),
         audioEl
       ])
     }))

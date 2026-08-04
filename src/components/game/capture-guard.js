@@ -6,6 +6,7 @@
 // createCaptureGuard(props) -> { destroy }  (CLAUDE.md §9). body에 오버레이를 붙이고 destroy에서 모두 정리.
 import { el } from '../../js/utils/dom.js'
 import { icon } from '../../js/utils/icons.js'
+import { t } from '../../js/lib/copy.js'
 import { createButton } from '../primitives/button.js'
 
 function pad (n) { return String(n).padStart(2, '0') }
@@ -45,7 +46,7 @@ export function createCaptureGuard ({ label = '' } = {}) {
   }
   on(document, 'keyup', (e) => {
     if (e.key !== 'PrintScreen') return
-    warn('화면 캡처가 감지되었습니다 — 캡처·유출은 실격 사유입니다.')
+    warn(t('guard.captureWarn'))
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText('').catch(() => {})
     } catch { /* 권한/포커스 없음 — 무시 */ }
@@ -53,12 +54,12 @@ export function createCaptureGuard ({ label = '' } = {}) {
 
   // 4) 전체화면 게이트 — 전체화면일 때만 사건이 보인다.
   const FS_SUPPORTED = !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen)
-  const enterBtn = createButton({ label: '전체화면으로 조사 시작', variant: 'primary', size: 'lg', icon: 'maximize', onClick: enterFs })
+  const enterBtn = createButton({ label: t('guard.gateEnter'), variant: 'primary', size: 'lg', icon: 'maximize', onClick: enterFs })
   const gate = el('div', { class: 'fs-gate' }, [
     el('div', { class: 'fs-gate__panel' }, [
       icon('maximize', { size: 30 }),
-      el('h2', { class: 'fs-gate__title', text: '전체화면에서 사건을 조사합니다' }),
-      el('p', { class: 'fs-gate__msg', text: '캡처 방지를 위해 전체화면으로 진행됩니다. 전체화면을 벗어나면 사건 내용이 가려집니다.' }),
+      el('h2', { class: 'fs-gate__title', text: t('guard.gateTitle') }),
+      el('p', { class: 'fs-gate__msg', text: t('guard.gateMsg') }),
       enterBtn.el
     ])
   ])
@@ -82,7 +83,7 @@ export function createCaptureGuard ({ label = '' } = {}) {
   if (FS_SUPPORTED) {
     on(document, 'fullscreenchange', () => {
       if (document.fullscreenElement) hideGate()
-      else { showGate(); enterBtn.update({ label: '전체화면으로 돌아가기' }) }
+      else { showGate(); enterBtn.update({ label: t('guard.gateReturn') }) }
     })
   }
   showGate() // 초기: 게이트 표시 — 사용자의 버튼 클릭(제스처)으로 전체화면 진입

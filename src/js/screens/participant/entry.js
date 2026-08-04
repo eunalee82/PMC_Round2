@@ -5,6 +5,7 @@ import { icon } from '../../utils/icons.js'
 import { ASSETS } from '../../constants/assets.js'
 import { FLOW } from '../../constants/flow.js'
 import { t, copyEl, bindCopy } from '../../lib/copy.js'
+import { getLocale, setLocale } from '../../lib/i18n.js'
 import { createButton } from '../../../components/primitives/button.js'
 
 function toggleFullscreen () {
@@ -32,21 +33,36 @@ export function createEntryScreen (ctx) {
 
   const audioBtn = el('button', { class: 'ghost-chip', type: 'button', 'aria-label': '음향 켜기 또는 음소거' }, [
     icon(muted ? 'volumeOff' : 'volume', { size: 18 }),
-    el('span', { text: muted ? '음소거' : '음향' })
+    el('span', { text: muted ? t('entry.muted') : t('entry.sound') })
   ])
   audioBtn.addEventListener('click', () => {
     muted = !muted
     ctx.audio.unlock()
     ctx.audio.setMuted(muted)
     ctx.update({ muted })
-    audioBtn.replaceChildren(icon(muted ? 'volumeOff' : 'volume', { size: 18 }), el('span', { text: muted ? '음소거' : '음향' }))
+    audioBtn.replaceChildren(icon(muted ? 'volumeOff' : 'volume', { size: 18 }), el('span', { text: muted ? t('entry.muted') : t('entry.sound') }))
   })
 
   const fsBtn = el('button', { class: 'ghost-chip', type: 'button', 'aria-label': '전체 화면 전환' }, [
     icon('maximize', { size: 18 }),
-    el('span', { text: '전체 화면' })
+    el('span', { text: t('entry.fullscreen') })
   ])
   fsBtn.addEventListener('click', toggleFullscreen)
+
+  // 언어 선택(국문/영문) — 팀별로 첫 화면에서 한 번 선택. 저장 후 재렌더(선택 언어로 전체 진행).
+  const locale = getLocale()
+  const langOpt = (code, label) => {
+    const b = el('button', {
+      class: code === locale ? 'lang-select__opt is-active' : 'lang-select__opt',
+      type: 'button', 'aria-pressed': code === locale ? 'true' : 'false'
+    }, [label])
+    b.addEventListener('click', () => { if (code !== getLocale()) setLocale(code, { reload: true }) })
+    return b
+  }
+  const langSelect = el('div', { class: 'lang-select' }, [
+    el('span', { class: 'lang-select__label mono caps', text: '언어 · Language' }),
+    el('div', { class: 'lang-select__opts' }, [langOpt('ko', '한국어'), langOpt('en', 'English')])
+  ])
 
   const node = el('div', { class: 'screen screen--entry' }, [
     el('div', { class: 'entry__topbar' }, [
@@ -64,6 +80,7 @@ export function createEntryScreen (ctx) {
         icon('alert', { size: 16 }),
         copyEl('span', {}, 'entry.alert')
       ]),
+      langSelect,
       el('div', { class: 'entry__cta' }, [enterBtn.el])
     ]),
     copyEl('span', { class: 'entry__foot mono' }, 'entry.foot')

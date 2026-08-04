@@ -1,104 +1,53 @@
-// SCR-002 Opening Video — plays the world-intro. Native muted autoplay (attributes set explicitly),
-// a click-to-play overlay shown until playback starts, and a text-briefing fallback on real errors.
+// SCR-002 Opening — 세계관 인트로. 로컬 영상 재생 이슈로 YouTube 임베드로 대체한다.
+// 유튜브 임베드는 종료 자동감지(IFrame API)를 붙이지 않고, 시청 후 [팀 선택으로]로 진행한다.
 // see docs/screen-list.md SCR-002, docs/game-flow.md §6.2 / §19.2.
 import { el } from '../../utils/dom.js'
-import { icon } from '../../utils/icons.js'
 import { ASSETS } from '../../constants/assets.js'
 import { FLOW } from '../../constants/flow.js'
-import { t, copyEl, bindCopy } from '../../lib/copy.js'
+import { t, bindCopy } from '../../lib/copy.js'
 import { createButton } from '../../../components/primitives/button.js'
 
+// 임베드 URL — rel=0(관련영상 최소화), playsinline(모바일 인라인 재생). 소리는 사용자가 재생 시 켜진다.
+const EMBED_SRC = `https://www.youtube.com/embed/${ASSETS.videos.openingEmbedId}?rel=0&modestbranding=1&playsinline=1`
+
 export function createOpeningScreen (ctx) {
-  // Build the video with explicit attributes so muted autoplay is honored across browsers.
-  const video = el('video', { class: 'opening__video' })
-  video.muted = true
-  video.defaultMuted = true
-  video.playsInline = true
-  video.preload = 'auto'
-  video.setAttribute('muted', '')
-  video.setAttribute('playsinline', '')
-  video.setAttribute('autoplay', '')
-  video.src = ASSETS.videos.opening
-
-  const stage = el('div', { class: 'opening__stage' }, [video])
-
   let destroyed = false
-  let fallbackShown = false
   function toTeam () { if (!destroyed) ctx.goTo(FLOW.TEAM) }
 
-  const playOverlay = el('button', { class: 'opening__play', type: 'button', 'aria-label': '영상 재생' }, [icon('play', { size: 40 })])
-  const showOverlay = () => playOverlay.classList.remove('is-hidden')
-  const hideOverlay = () => playOverlay.classList.add('is-hidden')
-
-  function userPlay () {
-    video.muted = ctx.audio.muted
-    if (!video.muted) ctx.audio.unlock()
-    const p = video.play()
-    if (p && typeof p.catch === 'function') p.catch(() => showOverlay())
-  }
-  playOverlay.addEventListener('click', userPlay)
-
-  const playPause = el('button', { class: 'ghost-chip', type: 'button', 'aria-label': '재생/일시정지' }, [icon('pause', { size: 18 })])
-  playPause.addEventListener('click', () => { if (video.paused) video.play().catch(() => {}); else video.pause() })
-
-  const muteBtn = el('button', { class: 'ghost-chip', type: 'button', 'aria-label': '음소거' }, [icon(video.muted ? 'volumeOff' : 'volume', { size: 18 })])
-  muteBtn.addEventListener('click', () => {
-    video.muted = !video.muted
-    ctx.audio.unlock()
-    ctx.audio.setMuted(video.muted)
-    ctx.update({ muted: video.muted })
-    muteBtn.replaceChildren(icon(video.muted ? 'volumeOff' : 'volume', { size: 18 }))
+  const iframe = el('iframe', {
+    class: 'opening__video',
+    src: EMBED_SRC,
+    title: 'PM보호국 오프닝',
+    allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen',
+    referrerpolicy: 'strict-origin-when-cross-origin'
   })
+  iframe.setAttribute('allowfullscreen', '')
+  iframe.setAttribute('frameborder', '0')
+
+  const stage = el('div', { class: 'opening__stage' }, [
+    el('div', { class: 'opening__yt' }, [iframe])
+  ])
 
   const skipBtn = createButton({ label: t('opening.skip'), variant: 'ghost', size: 'sm', icon: 'skipForward', onClick: toTeam })
   bindCopy(skipBtn.el.querySelector('.btn__label'), 'opening.skip')
+  const proceed = createButton({ label: t('opening.fallbackProceed'), variant: 'primary', size: 'sm', icon: 'logIn', onClick: toTeam })
+  bindCopy(proceed.el.querySelector('.btn__label'), 'opening.fallbackProceed')
 
-  const controls = el('div', { class: 'opening__controls' }, [playPause, muteBtn, el('div', { class: 'opening__spacer' }), skipBtn.el])
+  const controls = el('div', { class: 'opening__controls' }, [
+    el('div', { class: 'opening__spacer' }),
+    skipBtn.el,
+    proceed.el
+  ])
 
-  function showFallback () {
-    if (destroyed || fallbackShown) return
-    fallbackShown = true
-    hideOverlay()
-    controls.style.display = 'none'
-
-    const proceed = createButton({ label: t('opening.fallbackProceed'), variant: 'primary', icon: 'logIn', onClick: toTeam })
-    bindCopy(proceed.el.querySelector('.btn__label'), 'opening.fallbackProceed')
-    const retry = createButton({
-      label: t('opening.fallbackRetry'), variant: 'secondary', icon: 'refresh',
-      onClick: () => { fallbackShown = false; controls.style.display = ''; stage.replaceChildren(video); video.currentTime = 0; userPlay() }
-    })
-    bindCopy(retry.el.querySelector('.btn__label'), 'opening.fallbackRetry')
-
-    stage.replaceChildren(el('div', { class: 'opening__fallback' }, [
-      copyEl('span', { class: 'stamp' }, 'opening.briefingStamp'),
-      el('div', { class: 'opening__briefing' }, [
-        copyEl('p', {}, 'opening.briefing1'),
-        copyEl('p', {}, 'opening.briefing2'),
-        copyEl('p', {}, 'opening.briefing3')
-      ]),
-      el('div', { class: 'opening__fallback-cta' }, [retry.el, proceed.el])
-    ]))
-  }
-
-  video.addEventListener('playing', () => { hideOverlay(); playPause.replaceChildren(icon('pause', { size: 18 })) })
-  video.addEventListener('pause', () => { if (!video.ended) { showOverlay(); playPause.replaceChildren(icon('play', { size: 18 })) } })
-  video.addEventListener('ended', toTeam)
-  video.addEventListener('error', showFallback)
-
-  const node = el('div', { class: 'screen screen--opening' }, [stage, playOverlay, controls])
+  const node = el('div', { class: 'screen screen--opening' }, [stage, controls])
 
   return {
     el: node,
-    mounted () {
-      const p = video.play()
-      if (p && typeof p.catch === 'function') p.catch(() => showOverlay()) // autoplay blocked → show play button
-    },
     destroy () {
       destroyed = true
-      video.pause()
-      video.removeAttribute('src')
-      video.load()
+      iframe.removeAttribute('src') // 재생 중지
       skipBtn.destroy()
+      proceed.destroy()
     }
   }
 }

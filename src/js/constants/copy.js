@@ -126,15 +126,174 @@ const KO = {
   'item.stage1.rarity': 'RARE ITEM',
   'item.stage1.name': '갑질 미러 방패',
   'item.stage1.desc': '무분별한 내·외부 고객 요구를 올바른 Change Control로 반사하는 방패. Final Raid에서 빌런의 공격을 반사한다.',
-  'item.stage1.congrats': '축하합니다. 프로젝트 중 발생하는 무분별한 내·외부 고객 요구에 대응할 수 있는 ‘갑질 미러 방패’를 획득했습니다.'
+  'item.stage1.congrats': '축하합니다. 프로젝트 중 발생하는 무분별한 내·외부 고객 요구에 대응할 수 있는 ‘갑질 미러 방패’를 획득했습니다.',
+
+  // 캡처 가드 (게임플레이 오버레이)
+  'guard.gateTitle': '전체화면에서 사건을 조사합니다',
+  'guard.gateMsg': '캡처 방지를 위해 전체화면으로 진행됩니다. 전체화면을 벗어나면 사건 내용이 가려집니다.',
+  'guard.gateEnter': '전체화면으로 조사 시작',
+  'guard.gateReturn': '전체화면으로 돌아가기',
+  'guard.captureWarn': '화면 캡처가 감지되었습니다 — 캡처·유출은 실격 사유입니다.',
+
+  // EvidenceViewer / 사이드바 / 소리
+  'evidence.zoom': '확대',
+  'evidence.close': '닫기',
+  'evidence.recording': '녹취',
+  'evidence.loadFail': '단서 이미지를 불러오지 못했습니다.',
+  'agent.rankRookie': '신입 수사관',
+  'sidebar.points': '점',
+  'audio.control': '소리 조절',
+  'audio.mute': '음소거',
+  'audio.unmute': '음소거 해제',
+  'audio.volume': '볼륨',
+  'entry.sound': '음향',
+  'entry.muted': '음소거',
+  'entry.fullscreen': '전체 화면'
 }
 
-// 영문(en) — TODO(i18n): ko와 같은 키로 영문 값을 채우면 en 로케일에서 사용된다.
-// 비어 있는 키는 lib/copy.js가 자동으로 ko로 폴백한다.
+// 영문(en) — ko와 같은 키. 비어 있는 키는 lib/copy.js가 자동으로 ko로 폴백한다.
+const OATH_TEXT_EN = `As a rookie agent of the PM Protection Bureau,
+I place the project's Value above all in my judgment,
+and upon finding distorted execution or a wrong decision,
+I pledge to investigate the case fairly
+in accordance with the principles of PMBOK® 8th Edition.`
+
 const EN = {
-  // 'entry.title': 'PM Protection Bureau',
-  // 'entry.enter': 'Enter the Bureau',
-  // ...
+  // SCR-001 Entry
+  'entry.brandline': 'LG SW PM COMPETITION 2026',
+  'entry.eyebrow': 'PROJECT MANAGEMENT PROTECTION BUREAU',
+  'entry.title': 'PM Protection Bureau',
+  'entry.subtitle': 'A PMBOK® 8th Edition crime-scene game that verifies PM competency',
+  'entry.alert': 'URGENT CASE INTAKE — Supervisor Qualification Exam · 15 cases',
+  'entry.enter': 'Enter the Bureau',
+  'entry.foot': 'PMB-OS · CLASSIFIED',
+
+  // SCR-002 Opening
+  'opening.skip': 'Skip',
+  'opening.briefingStamp': 'PMB BRIEFING',
+  'opening.briefing1': 'Modern projects fail not from technology, but from wrong judgment.',
+  'opening.briefing2': 'The Bureau calls the force behind that failure the "Villain".',
+  'opening.briefing3': 'Rookie agent, resolve the 15 cases and protect the value of the project.',
+  'opening.fallbackRetry': 'Replay',
+  'opening.fallbackProceed': 'To team selection',
+
+  // SCR-003 Team Selection
+  'team.step': 'STEP 01 · Agent Registration',
+  'team.title': 'Select your team',
+  'team.lead': 'Select your team and register 3 agents to begin case intake.',
+  'team.start': 'Begin Case Intake',
+
+  'team.register.hint': 'Enter all three teammates\' email addresses. Registered emails verify your team on reconnect.',
+  'team.register.submit': 'Enter',
+  'team.register.cancel': 'Cancel',
+  'team.register.errEmpty': 'All three agent emails are required to enter.',
+  'team.register.errDuplicate': 'Duplicate email entered. The three teammates must be different.',
+  'team.register.warnSuspect': 'Please check the email format. You can still enter, but it will be flagged for staff review.',
+  'team.registered': 'Registered Agents',
+  'team.registeredEdit': 'Edit',
+
+  'team.claimed.title': 'This team is already taken',
+  'team.claimed.hint': 'If this is your team, enter one of the registered agent emails.',
+  'team.claimed.placeholder': 'Registered agent email',
+  'team.claimed.submit': 'Continue Entry',
+  'team.claimed.cancel': 'Choose Another Team',
+  'team.claimed.err': 'Unregistered email. Please check your team again.',
+  'team.released.title': 'Entry Released',
+  'team.released.msg': 'Staff released this team\'s entry, or another device took it over. Please select your team again.',
+  'team.released.confirm': 'OK',
+
+  // SCR-004 Oath
+  'oath.step': 'STEP 02 · Confidentiality Oath',
+  'oath.title': 'PM Protection Bureau · Confidentiality Oath',
+  'oath.text': OATH_TEXT_EN,
+  'oath.agents': 'Registered Agents',
+  'oath.fieldLabel': 'Signature',
+  'oath.agree': 'I agree to the oath above and will faithfully carry out my duty as an agent.',
+  'oath.submit': 'Complete Oath',
+
+  // SCR-005 Waiting Room
+  'waiting.eyebrow': 'WAITING ROOM',
+  'waiting.title': 'Agent registration complete',
+  'waiting.msg': 'Await the Bureau\'s deployment order.',
+  'waiting.startTime': 'Awaiting admin start',
+  'waiting.mission1': 'Stage 1 · Mindset',
+  'waiting.mission2': 'Stage 2 · Performance Domain',
+  'waiting.mission3': 'Stage 3 · AI Use Case',
+  'waiting.pulse': 'Awaiting deployment order…',
+
+  // Gameplay · Case
+  'case.fileLabel': 'CASE FILE',
+  'case.briefLabel': 'CASE BRIEF',
+  'case.evidenceLabel': 'Evidence',
+  'case.selectHint': 'Select one clue, then submit your judgment.',
+  'case.submit': 'Submit Judgment',
+  'case.resolved': 'CASE RESOLVED',
+  'case.resolvedKo': 'Case Resolved',
+  'case.incorrect': 'ADDITIONAL INVESTIGATION REQUIRED',
+  'case.incorrectKo': 'Additional Investigation Required',
+  'case.analysisTitle': 'Case Analysis Report',
+  'case.next': 'Investigate Next Case',
+  'case.nextLast': 'View Stage Result',
+  'case.noAnalysis': 'The analysis report is not ready yet.',
+
+  // SCR-007 Stage Briefing
+  'briefing.label': 'MISSION BRIEFING',
+  'briefing.domain': 'Domain',
+  'briefing.cases': 'Cases',
+  'briefing.reward': 'Reward Item',
+  'briefing.start': 'Start Mission',
+  'briefing.pending': 'Cases Coming Soon',
+  'briefing.stage1.name': 'MINDSET Certification',
+  'briefing.stage1.mission': 'Verify the PM Mindset fit for 2026.',
+  'briefing.stage2.name': 'PERFORMANCE DOMAIN Verification',
+  'briefing.stage2.mission': 'Verify sound judgment and decision-making in complex project environments.',
+  'briefing.stage3.name': 'AI USE CASE Verification',
+  'briefing.stage3.mission': 'Verify PM judgment in the age of AI.',
+
+  // SCR-009 Answer Confirmation
+  'confirm.title': 'Submit your selected judgment?',
+  'confirm.msg': 'You cannot change it after submitting.',
+  'confirm.cancel': 'Review Again',
+  'confirm.submit': 'Final Submit',
+
+  // SCR-012 Stage Result
+  'result.title': 'MISSION COMPLETE',
+  'result.sub': 'Stage verification complete.',
+  'result.solved': 'Cases Solved',
+  'result.score': 'Stage Score',
+  'result.rate': 'Accuracy',
+  'result.reward': 'Claim Reward',
+
+  // SCR-013 Item Acquisition
+  'item.acquire': 'Item Acquired',
+  'item.equip': 'Equip Item',
+  'item.next': 'Proceed to Stage 2',
+  'item.stage1.rarity': 'RARE ITEM',
+  'item.stage1.name': 'Gapjil Mirror Shield',
+  'item.stage1.desc': 'A shield that reflects unreasonable internal/external client demands through proper Change Control. It reflects the Villain\'s attacks in the Final Raid.',
+  'item.stage1.congrats': 'Congratulations. You have acquired the "Gapjil Mirror Shield", which lets you counter the unreasonable internal and external client demands that arise during a project.',
+
+  // Capture guard
+  'guard.gateTitle': 'Investigate cases in full screen',
+  'guard.gateMsg': 'The case runs in full screen to prevent capture. If you leave full screen, the case content is hidden.',
+  'guard.gateEnter': 'Start Investigation in Full Screen',
+  'guard.gateReturn': 'Return to Full Screen',
+  'guard.captureWarn': 'Screen capture detected — capturing or leaking is grounds for disqualification.',
+
+  // EvidenceViewer / Sidebar / Audio
+  'evidence.zoom': 'Zoom',
+  'evidence.close': 'Close',
+  'evidence.recording': 'Recording',
+  'evidence.loadFail': 'Failed to load the clue image.',
+  'agent.rankRookie': 'Rookie Agent',
+  'sidebar.points': 'pts',
+  'audio.control': 'Sound',
+  'audio.mute': 'Mute',
+  'audio.unmute': 'Unmute',
+  'audio.volume': 'Volume',
+  'entry.sound': 'Sound',
+  'entry.muted': 'Muted',
+  'entry.fullscreen': 'Full Screen'
 }
 
 export const COPY = { ko: KO, en: EN }
