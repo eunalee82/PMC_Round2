@@ -11,31 +11,31 @@ import { getLocale } from '../lib/i18n.js'
 
 export const CASES = [
   {
-    id: 'case-007',
+    id: 'case-001',
     stage: 1, // Stage 1 · Mindset
     caseNo: 1, // Stage 내 사건 순번
-    fileNo: '#007',
+    fileNo: '#001',
     title: '양산 D-30, 누가 미래를 놓쳤는가?',
     brief: [
       'PM보호국은 양산 30일 전 진행된 프로젝트 회의실을 조사했다.',
       '프로젝트는 당시 모든 일정이 정상으로 보고되었지만, 양산 직전 핵심 기능의 결함이 발견되어 출시가 3주 연기되었다.',
-      '현장에는 PM이 남긴 여러 자료가 있었다. 그런데… 단 하나의 자료만 PMBOK® 8판의 Proactive Mindset과 가장 거리가 멀었다.',
+      '현장에는 PM이 남긴 여러 자료가 있었다.',
+      '그런데… 단 하나의 자료만 PMBOK® 8판의 Proactive Mindset과 가장 거리가 멀었다.',
       '그 증거를 찾아라.'
     ].join('\n'),
-    prompt: '다음 프로젝트 현장에 남아 있는 5가지 단서 중 PMBOK® 8판의 Proactive Mindset과 가장 거리가 먼 단서는 무엇인가?',
+    prompt: '다음 프로젝트 현장에 남아 있는 4가지 단서 중 PMBOK® 8판의 Proactive Mindset과 가장 거리가 먼 단서는 무엇인가?',
     evidence: {
-      caption: 'EVIDENCE · 현장 단서 5',
+      caption: 'EVIDENCE · 현장 단서 4',
       images: [
-        { src: ASSETS.questions.q1, alt: '사건 #007 현장에 남은 5가지 단서' }
+        { src: ASSETS.questions.q1, alt: '사건 #007 현장에 남은 4가지 단서' }
       ]
     },
-    // 보기(단서) — 순서 = 화면 번호 1~5, 이미지의 단서 라벨과 일치.
+    // 보기(단서) — 순서 = 화면 번호 1~4, 이미지의 단서 라벨과 일치.
     choices: [
-      '단서 1: 프로젝트 일정 예측 대시보드',
-      '단서 2: 변경 영향 분석서',
-      '단서 3: 회의 안건',
-      '단서 4: 프로젝트 운영 현황',
-      '단서 5: 발생 시, 프로젝트 영향 분석'
+      '단서 1',
+      '단서 2',
+      '단서 3',
+      '단서 4'
     ],
     en: {
       title: 'Mass Production D-30: Who Missed the Future?',
@@ -45,87 +45,36 @@ export const CASES = [
         'The PM had left several documents at the scene. Yet… only one of them was farthest from the Proactive Mindset of PMBOK® 8th Edition.',
         'Find that piece of evidence.'
       ].join('\n'),
-      prompt: 'Among the five clues left at the project scene, which is farthest from the Proactive Mindset of PMBOK® 8th Edition?',
+      prompt: 'Among the four clues left at the project scene, which is farthest from the Proactive Mindset of PMBOK® 8th Edition?',
       evidence: {
-        caption: 'EVIDENCE · 5 scene clues',
-        images: [{ src: ASSETS.questions.q1, alt: 'Five clues left at the scene of Case #007' }]
+        caption: 'EVIDENCE · 4 scene clues',
+        images: [{ src: ASSETS.questions.q1, alt: 'Four clues left at the scene of Case #007' }]
       },
       choices: [
-        'Clue 1: Project schedule forecast dashboard',
-        'Clue 2: Change impact analysis',
-        'Clue 3: Meeting agenda',
-        'Clue 4: Project operations status',
-        'Clue 5: "If it occurs" project impact analysis'
+        'Clue 1',
+        'Clue 2',
+        'Clue 3',
+        'Clue 4'
       ]
     }
   },
-  {
-    id: 'case-014',
-    stage: 1, // Stage 1 · Mindset (Value-Driven Mindset)
-    caseNo: 2,
-    fileNo: '#014',
-    title: '성공한 프로젝트, 진짜 가치는 어디에 있었나',
-    brief: [
-      'PM보호국은 최근 성공적으로 종료된 스마트홈 제어 플랫폼 프로젝트의 성과를 조사하고 있다. 프로젝트는 다음 결과를 달성했다.',
-      '· 예정된 양산 일정 준수\n· 승인 예산 내 프로젝트 완료\n· 주요 기능 100% 구현\n· 출시 후 고객 불만 35% 감소\n· 서비스 이용률 예상 대비 18% 증가',
-      '성과만 보면 완벽한 프로젝트다. 그러나 종료 직후 길동 책임은 이렇게 말했다. "일정과 범위를 지킨 것이 성공의 전부는 아니다. 우리가 지켜야 했던 것은 기능이 아니라 고객이 얻는 결과였다."',
-      'PM보호국은 길동 책임의 업무용 다이어리에서 네 장의 기록을 확보했다. 네 기록 모두 유능한 PM의 행동처럼 보인다. 하지만 그중 단 한 장만이 PMBOK® 8판의 Value-Driven Mindset을 가장 분명하게 보여준다.'
-    ].join('\n'),
-    prompt: '다음 네 장의 일기 중, 길동 책임이 프로젝트의 산출물보다 가치와 결과를 우선하여 판단한 기록을 찾아라.',
-    evidence: {
-      caption: 'EVIDENCE · 길동 책임 다이어리 4',
-      images: [
-        { src: ASSETS.questions.q2_1, alt: '증거물 A 다이어리 기록', label: '증거물 A' },
-        { src: ASSETS.questions.q2_2, alt: '증거물 B 다이어리 기록', label: '증거물 B' },
-        { src: ASSETS.questions.q2_3, alt: '증거물 C 다이어리 기록', label: '증거물 C' },
-        { src: ASSETS.questions.q2_4, alt: '증거물 D 다이어리 기록', label: '증거물 D' }
-      ]
-    },
-    // 보기 = 증거물 A~D (순서 = 화면 번호 1~4)
-    choices: [
-      '증거물 A',
-      '증거물 B',
-      '증거물 C',
-      '증거물 D'
-    ],
-    en: {
-      title: 'A Successful Project — Where Was the Real Value?',
-      brief: [
-        'The Bureau is examining the outcomes of a recently completed smart-home control platform project. The project achieved the following results.',
-        '· Met the planned mass-production schedule\n· Completed within the approved budget\n· 100% of key features implemented\n· 35% drop in customer complaints after launch\n· 18% higher service usage than expected',
-        'By results alone it looks like a perfect project. Yet right after closure, Lead Gildong said: "Keeping the schedule and scope is not the whole of success. What we had to protect was not features, but the outcome the customer gains."',
-        'The Bureau secured four entries from Lead Gildong\'s work diary. All four look like the acts of a capable PM. But only one most clearly shows the Value-Driven Mindset of PMBOK® 8th Edition.'
-      ].join('\n'),
-      prompt: 'Among the four diary entries, find the record where Lead Gildong prioritized value and outcome over the project\'s outputs.',
-      evidence: {
-        caption: 'EVIDENCE · 4 diary entries',
-        images: [
-          { src: ASSETS.questions.q2_1, alt: 'Evidence A diary entry', label: 'Evidence A' },
-          { src: ASSETS.questions.q2_2, alt: 'Evidence B diary entry', label: 'Evidence B' },
-          { src: ASSETS.questions.q2_3, alt: 'Evidence C diary entry', label: 'Evidence C' },
-          { src: ASSETS.questions.q2_4, alt: 'Evidence D diary entry', label: 'Evidence D' }
-        ]
-      },
-      choices: ['Evidence A', 'Evidence B', 'Evidence C', 'Evidence D']
-    }
-  },
-  {
-    id: 'case-021',
+   {
+    id: 'case-002',
     stage: 1, // Stage 1 · Mindset (Accountability & Empowered Mindset)
-    caseNo: 3,
-    fileNo: '#021',
+    caseNo: 2,
+    fileNo: '#002',
     title: '권한을 준 것인가, 책임을 넘긴 것인가',
     brief: [
-      '양산을 4주 앞둔 스마트 디바이스 프로젝트에서 간헐적인 통신 장애가 발견되었다. 장애 발생률은 약 0.8%로 낮지만, 실제 발생 시 사용자가 기기를 재부팅해야 한다. 개발팀은 두 가지 대응안을 제시했다.',
-      '· 대응안 1: 구조를 수정해 근본 원인을 제거한다. 일정이 최대 1주 지연될 수 있다.\n· 대응안 2: 소프트웨어 재시도 기능으로 발생 가능성을 낮춘 뒤 예정대로 출시한다. 일정 영향은 거의 없지만 잔여 위험이 남는다.',
-      '이 프로젝트에서는 PM이 일정·품질·고객 영향이 결합된 주요 의사결정을 조정하고, 기술 담당자는 자신의 전문영역에서 해결안을 제안하도록 역할이 정해져 있었다. PM보호국 감사관은 홍길동 PM과 개발자 사이에서 오간 네 개의 대화를 확보했다.',
-      '모든 대화는 실무 현장에서 충분히 합리적으로 들린다. 그러나 그중 하나는 팀을 Empower한 것처럼 보이지만, 실제로는 PM이 Accountability를 약화시키고 의사결정 책임까지 팀에 넘긴 대화이다.'
+      '양산을 4주 앞둔 스마트 디바이스 프로젝트에서 간헐적인 통신 장애가 발견되었다. \n 장애 발생률은 약 0.8%로 낮았지만, 실제 발생 시 사용자가 기기를 재부팅해야 하는 문제가 있었다. \n  개발팀은 두 가지 대응안을 제시했다.',
+      '· 대응안 1: 구조를 수정하여 근본 원인을 제거한다. 단, 일정이 최대 1주 지연될 수 있다. \n · 대응안 2: 소프트웨어 재시도 기능을 추가하여 발생 가능성을 낮춘 뒤 예정대로 출시한다. 일정 영향은 거의 없지만 잔여 위험은 남는다.',
+      '이 프로젝트에서는 PM이 일정·품질·고객 영향이 결합된 주요 의사결정을 조정하고, 기술 담당자는 전문 분야의 분석과 대안을 제시하도록 역할이 정의되어 있었다. \n PM보호국 감독관은 홍길동 PM과 개발자 사이에서 오간 네 개의 대화를 확보했다.',
+      '모든 대화는 실무 현장에서 충분히 합리적으로 들린다. \n 그러나 그중 하나는 팀의 자율성을 존중하는 것처럼 보이지만, PMBOK® Guide 8판이 강조하는 Accountable Leader의 역할을 충분히 수행하지 못한 사례였다.'
     ].join('\n'),
-    prompt: '다음 대화(녹취) 중 PMBOK® 8판의 Accountability와 Empowered Mindset 관점에서 가장 문제가 큰 대화를 찾아라.',
+    prompt: '다음 대화 중 팀의 자율성을 지원하는 것처럼 보이지만, PMBOK® Guide 8판 관점에서 가장 부적절한 대화는 무엇인가?',
     evidence: {
       caption: 'EVIDENCE · 현장 자료 + 대화 녹취 4',
       images: [
-        { src: ASSETS.questions.q3, alt: '사건 #021 현장 자료' }
+        { src: ASSETS.questions.q3, alt: '사건 #002 현장 자료' }
       ],
       audios: [
         { src: ASSETS.questionAudio.q3_1, label: '녹취 A' },
@@ -163,6 +112,55 @@ export const CASES = [
       choices: ['Recording A', 'Recording B', 'Recording C', 'Recording D']
     }
   },
+  {
+    id: 'case-003',
+    stage: 1, // Stage 1 · Mindset (Value-Driven Mindset)
+    caseNo: 3,
+    fileNo: '#003',
+    title: '성공한 프로젝트, 진짜 가치는 어디에 있었나',
+    brief: [
+      '다음은 PM보호국 감독관이 사건을 브리핑하는 음성 기록이다.',
+      '음성을 듣고, 제공된 4개의 확보 단서를 분석하여 물음에 답하시오.'
+    ].join('\n'),
+    prompt: '다음 4개의 확보 증거물 중, 홍길동 PM이 PMBOK® Guide 8판의 Value-Driven Mindset에 기반하여 의사결정했음을 보여주는 결정적 단서는 무엇인가?',
+    evidence: {
+      caption: 'EVIDENCE · 길동 책임 다이어리 4',
+      images: [
+        { src: ASSETS.questions.q2_1, alt: '증거물 A 다이어리 기록', label: '증거물 A' },
+        { src: ASSETS.questions.q2_2, alt: '증거물 B 다이어리 기록', label: '증거물 B' },
+        { src: ASSETS.questions.q2_3, alt: '증거물 C 다이어리 기록', label: '증거물 C' },
+        { src: ASSETS.questions.q2_4, alt: '증거물 D 다이어리 기록', label: '증거물 D' }
+      ]
+    },
+    // 보기 = 증거물 A~D (순서 = 화면 번호 1~4)
+    choices: [
+      '증거물 A',
+      '증거물 B',
+      '증거물 C',
+      '증거물 D'
+    ],
+    en: {
+      title: 'A Successful Project — Where Was the Real Value?',
+      brief: [
+        'The Bureau is examining the outcomes of a recently completed smart-home control platform project. The project achieved the following results.',
+        '· Met the planned mass-production schedule\n· Completed within the approved budget\n· 100% of key features implemented\n· 35% drop in customer complaints after launch\n· 18% higher service usage than expected',
+        'By results alone it looks like a perfect project. Yet right after closure, Lead Gildong said: "Keeping the schedule and scope is not the whole of success. What we had to protect was not features, but the outcome the customer gains."',
+        'The Bureau secured four entries from Lead Gildong\'s work diary. All four look like the acts of a capable PM. But only one most clearly shows the Value-Driven Mindset of PMBOK® 8th Edition.'
+      ].join('\n'),
+      prompt: 'Among the four diary entries, find the record where Lead Gildong prioritized value and outcome over the project\'s outputs.',
+      evidence: {
+        caption: 'EVIDENCE · 4 diary entries',
+        images: [
+          { src: ASSETS.questions.q2_1, alt: 'Evidence A diary entry', label: 'Evidence A' },
+          { src: ASSETS.questions.q2_2, alt: 'Evidence B diary entry', label: 'Evidence B' },
+          { src: ASSETS.questions.q2_3, alt: 'Evidence C diary entry', label: 'Evidence C' },
+          { src: ASSETS.questions.q2_4, alt: 'Evidence D diary entry', label: 'Evidence D' }
+        ]
+      },
+      choices: ['Evidence A', 'Evidence B', 'Evidence C', 'Evidence D']
+    }
+  },
+ 
   // ════════════════════════════════════════════════════════════════════════
   // ⏳ STAGE 2 · 임시 데이터 (PLACEHOLDER) — 여기부터 case-s2-10 까지가 교체 대상이다.
   //    Stage 2 콘텐츠(7사건)는 아직 확정되지 않았다. 전체 흐름(Stage 1 → 2 → 3 → Final Raid → 엔딩)을
