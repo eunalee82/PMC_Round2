@@ -6,6 +6,8 @@ import { createAudioManager } from './lib/audio.js'
 import { clearCopyBindings, t } from './lib/copy.js'
 import { getDeviceId, ownsTeam, releaseTeam, subscribe as subscribeEntries } from './lib/entries.js'
 import { isStarted } from './lib/game.js'
+import { getFinale } from './lib/progress.js'
+import { allStagesCleared } from './lib/stage-progress.js'
 import { el } from './utils/dom.js'
 import { createModal } from '../components/primitives/modal.js'
 import { createEntryScreen } from './screens/participant/entry.js'
@@ -14,6 +16,9 @@ import { createTeamScreen } from './screens/participant/team-selection.js'
 import { createOathScreen } from './screens/participant/oath.js'
 import { createWaitingScreen } from './screens/participant/waiting-room.js'
 import { createCaseScreen } from './screens/gameplay/case.js'
+import { createAppointmentScreen } from './screens/finale/appointment.js'
+import { createRaidScreen } from './screens/finale/raid.js'
+import { createEndingScreen } from './screens/finale/ending.js'
 
 const KEY = 'pmb.session.v1'
 
@@ -36,7 +41,12 @@ const SCREENS = {
   [FLOW.TEAM]: createTeamScreen,
   [FLOW.OATH]: createOathScreen,
   [FLOW.WAITING]: createWaitingScreen,
-  [FLOW.CASE]: createCaseScreen
+  [FLOW.CASE]: createCaseScreen,
+  // 종반부 — Stage 3 완료 후 (screen-list.md SCR-015~020 · 023).
+  // 최종 랭킹(SCR-022)은 참가자 흐름이 아니라 관리자 콘솔에 있다 → screens/admin/ranking.js
+  [FLOW.APPOINT]: createAppointmentScreen,
+  [FLOW.RAID]: createRaidScreen,
+  [FLOW.ENDING]: createEndingScreen
 }
 
 function load () {
@@ -52,10 +62,17 @@ export function createFlow ({ root }) {
   let current = null
   const audio = createAudioManager({ muted: session.muted })
 
+  // 화면 스크롤 컨테이너는 flow의 root(#flow-root)다 — 화면/하위 화면이 바뀔 때 맨 위에서 시작해야 한다.
+  // (컨트롤러가 자기 바깥 DOM을 알 필요 없도록 ctx로 내려준다.)
+  function scrollToTop () {
+    try { root.scrollTop = 0 } catch { /* ignore */ }
+  }
+
   const ctx = {
     get session () { return session },
     update (patch) { session = { ...session, ...patch }; persist(session) },
     goTo (step, opts) { navigate(step, opts) },
+    scrollToTop,
     audio
   }
 
@@ -75,6 +92,7 @@ export function createFlow ({ root }) {
     current = screen
     root.replaceChildren(screen.el)
     root.classList.remove('is-leaving')
+    scrollToTop()
     if (screen.mounted) screen.mounted()
   }
 
@@ -108,10 +126,20 @@ export function createFlow ({ root }) {
     if (!assertClaim()) navigate(FLOW.TEAM, { skipGuard: true })
   })
 
+  // 라우터 가드에 넘길 서버(현재는 MOCK) 상태 — constants/flow.js가 상태 모듈을 import하지 않도록
+  // 여기서 읽어 넘긴다. 진행 판정은 lib/stage-progress.js·lib/progress.js가 단일 출처다.
+  function guardFacts () {
+    return {
+      gameStarted: isStarted(),
+      stagesCleared: allStagesCleared(session.teamId),
+      finale: getFinale(session.teamId)
+    }
+  }
+
   function navigate (step, { skipGuard = false } = {}) {
     // 이미 팀 선택으로 가는 길이면 굳이 알리지 않는다.
     if (!assertClaim({ notify: step !== FLOW.TEAM }) && !skipGuard) step = FLOW.TEAM
-    const target = skipGuard ? step : resolveStep(step, session, { gameStarted: isStarted() })
+    const target = skipGuard ? step : resolveStep(step, session, guardFacts())
     session.step = target
     persist(session)
     render(target)
@@ -128,6 +156,7 @@ export function createFlow ({ root }) {
       audio.stopBgm()
       navigate(FLOW.ENTRY, { skipGuard: true })
     },
-    current () { return session.step }
+    current () { return session.step },
+    teamId () { return session.teamId } // DEV 도구가 현재 팀 기준으로 진행을 앞당길 때 사용
   }
 }

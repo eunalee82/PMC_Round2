@@ -8,7 +8,7 @@ import { createTeamManager } from './team-manager.js'
 import { createEntryMonitor } from './entry-monitor.js'
 import { startGame, resetGame } from '../../js/lib/game.js'
 import { resetAllProgress } from '../../js/lib/progress.js'
-import { setDevStage } from '../../js/screens/gameplay/case.js'
+import { fastForwardToStage, fastForwardToFinale } from './stage-jump.js'
 import { getLocale, setLocale } from '../../js/lib/i18n.js'
 
 const DEV_PASSWORD = '2026'
@@ -82,13 +82,25 @@ export function createDevMenu ({ flow }) {
     const teamsBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => teamManager.open() } }, ['팀 관리 (이름·색상)'])
     const entriesBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => entryMonitor.open() } }, ['입장 현황'])
 
-    // 사건 점프 — 제작 중인 스테이지를 바로 열어 확인한다. Stage 2가 비어 있어 정상 흐름으로는
-    // Stage 3에 도달할 수 없으므로 스테이지별 버튼을 둔다 (setDevStage는 DEV 전용).
+    // 사건 점프 — 앞 스테이지를 '완료 처리'해서 그 스테이지부터 정상 흐름으로 진행한다.
+    // (진행 판정을 우회하지 않는다 — stage-jump.js 주석 참고. 운영 빌드에는 이 코드가 없다.)
     const caseBtns = [1, 2, 3].map((s) => el('button', {
       class: 'devmenu__jump',
       type: 'button',
-      on: { click: () => { setDevStage(s); flow.goTo(FLOW.CASE, { skipGuard: true }) } }
+      on: { click: () => { fastForwardToStage(flow.teamId(), s); flow.goTo(FLOW.CASE, { skipGuard: true }) } }
     }, [`사건 · Stage ${s}`]))
+
+    // 종반부 점프 — 감독관 임명 / Final Raid / 금배지·엔딩 / 최종 랭킹.
+    const finaleBtns = [
+      [FLOW.APPOINT, '감독관 임명', 'appoint'],
+      [FLOW.RAID, 'Final Raid', 'raid'],
+      [FLOW.ENDING, '금배지 · 마무리', 'ending']
+      // 최종 랭킹은 참가자 흐름이 아니라 관리자 콘솔(?admin)에 있다.
+    ].map(([step, label, ff]) => el('button', {
+      class: 'devmenu__jump',
+      type: 'button',
+      on: { click: () => { fastForwardToFinale(flow.teamId(), ff); flow.goTo(step, { skipGuard: true }) } }
+    }, [label]))
     // 관리자 Start 흉내 — 대기실이 구독 중이면 자동으로 Stage 1로 전환된다 (lib/game.js).
     const startGameBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => startGame() } }, ['관리자: 게임 시작 ▶'])
     const resetGameBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => { resetGame(); resetAllProgress() } } }, ['대기 상태로 되돌리기'])
@@ -99,6 +111,9 @@ export function createDevMenu ({ flow }) {
       el('div', { class: 'devmenu__divider' }),
       el('span', { class: 'devmenu__label', text: 'GAMEPLAY (게임)' }),
       el('div', { class: 'devmenu__jumps' }, [startGameBtn, resetGameBtn, ...caseBtns]),
+      el('div', { class: 'devmenu__divider' }),
+      el('span', { class: 'devmenu__label', text: 'FINALE (종반부)' }),
+      el('div', { class: 'devmenu__jumps' }, finaleBtns),
       el('div', { class: 'devmenu__divider' }),
       el('span', { class: 'devmenu__label', text: 'TEAMS (팀)' }),
       el('div', { class: 'devmenu__jumps' }, [teamsBtn, entriesBtn]),

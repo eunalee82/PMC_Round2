@@ -22,17 +22,17 @@
 
 | File | Purpose | Status |
 |---|---|---|
-| /images/logos/badge-black.png | 좌측 패널 로고(미획득/기본 배지) | 있음 |
-| /images/logos/badge-gold.png | 서약서·결과·수여식 금배지 | 있음 |
+| /images/logos/badge-black.png | 헤더 로고 · 임명 화면 임시 배지(SCR-015) | 있음 · 사용 중 |
+| /images/logos/badge-gold.png | 입장·서약·대기실 · 금배지 수여식(SCR-020) · 엔딩 · 게임 종료(SCR-023) | 있음 · 사용 중 |
 
 ### Characters — `/images/characters/`
 
 | File | Purpose | Status |
 |---|---|---|
-| /images/characters/all-members.png | 전체 캐릭터(엔딩 대체 연출) | 있음 |
-| /images/characters/billian.png | 빌런왕(등장/공격 대상) | 있음 |
-| /images/characters/billian-dead.png | 빌런왕 피격·격퇴 상태 | 있음 |
-| /images/characters/boss.png | 국장(감독관 임명·엔딩 메시지) | 있음 |
+| /images/characters/all-members.png | 전체 캐릭터(엔딩 대체 연출 SCR-021) | 있음 · 사용 중 |
+| /images/characters/billian.png | 빌런왕(긴급 경보 SCR-016 · 레이드 SCR-018 공격 대상) | 있음 · 사용 중 |
+| /images/characters/billian-dead.png | 빌런왕 격퇴 상태(SCR-019) | 있음 · 사용 중 |
+| /images/characters/boss.png | 국장(감독관 임명 SCR-015 · 엔딩 메시지 SCR-021) | 있음 · 사용 중 |
 
 ### 사건 단서 이미지 — `/images/questions/`
 
@@ -76,10 +76,11 @@
 
 | File | Purpose | Status |
 |---|---|---|
-| /videos/opening.mp4 | 게임 시작 전 오프닝 | 있음 |
+| /videos/opening.mp4 | 게임 시작 전 오프닝 (현재는 YouTube 임베드를 사용) | 있음 · 미사용 |
 | /videos/ending.mp4 | 게임 종료(엔딩) 영상 | 미정 |
 
-> 엔딩 영상이 없을 경우 `all-members.png` + `boss.png` + `badge-gold.png`로 애니메이션 대체(`docs/game-flow.md §14.3`).
+> **엔딩 영상 게이트**: 파일이 없으므로 `src/js/constants/assets.js`의 `ASSETS.videos.endingAvailable = false`로 두어 **요청 자체를 하지 않는다**(404 방지). 이 상태에서 SCR-021은 `all-members.png` + `boss.png`(국장 최종 메시지) + `badge-gold.png` 대체 연출로 진행한다(`docs/game-flow.md §14.3`).
+> 영상이 준비되면 `public/videos/ending.mp4`를 넣고 플래그만 `true`로 바꾼다 — 재생 실패 시에도 `error` 이벤트로 대체 연출로 자동 전환된다.
 
 ## Audio
 
@@ -87,9 +88,9 @@
 
 | File | Purpose | Loop | Status |
 |---|---|---|---|
-| /audio/bgm/opening.mp3 | 오프닝·서약서 서명 음악 | Yes | 있음 |
-| /audio/bgm/quiz-pass.mp3 | Stage(Mission) 클리어 | Yes | 있음 |
-| /audio/bgm/kill-billian.mp3 | Final Raid·빌런왕 처치 | Yes | 있음 |
+| /audio/bgm/opening.mp3 | 오프닝·서약서 서명 음악 | Yes | 있음 · 사용 중 |
+| /audio/bgm/quiz-pass.mp3 | Stage(Mission) 클리어 — Stage 결과 화면(SCR-012)에서 **단발 재생**(AudioManager `playSfx`) | No | 있음 · 사용 중 |
+| /audio/bgm/kill-billian.mp3 | Final Raid·빌런왕 처치 (SCR-016~019 진행 중 BGM) | Yes | 있음 · 사용 중 |
 
 ### SFX — `/audio/sfx/` (준비)
 
@@ -102,6 +103,8 @@
 | /audio/sfx/ceremony.mp3 | 금배지 수여식 | 준비 |
 
 > SFX 파일명은 예시이며, 실제 추가 시 이 표와 `src/js/constants/assets.js`를 함께 갱신한다.
+> 현재 이 5개 SFX는 **모두 미제작**이라 코드에서 참조하지 않는다(없는 경로를 상수에 넣어 404를 만들지 않는다).
+> 제작되면 `ASSETS.sfx`를 추가하고 `ctx.audio.playSfx(...)`로 호출한다 — 호출 지점 후보: 사건 결과(SCR-010/011), 아이템 획득(SCR-013), 감독관 임명 수락(SCR-015), 금배지 수여식(SCR-020). 재생 실패는 조용히 무시되므로 연출이 없어도 진행은 막히지 않는다.
 
 ### 사건 단서 오디오(녹취) — `/audio/sfx/questionN/`
 

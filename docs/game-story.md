@@ -224,7 +224,7 @@ Resource
 
 보상
 
-Legend Item
+Epic Item
 
 📜 리소스 무제한 승인서
 

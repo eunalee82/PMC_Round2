@@ -8,6 +8,7 @@ import './css/layout.css'
 import './css/components.css'
 import './css/screens.css'
 import './css/gameplay.css'
+import './css/finale.css'
 import './css/admin.css'
 
 import { el } from './js/utils/dom.js'

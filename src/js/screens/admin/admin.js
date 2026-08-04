@@ -9,6 +9,7 @@ import { icon } from '../../utils/icons.js'
 import { getStatus, getStartedAt, startGame, resetGame, subscribe } from '../../lib/game.js'
 import { resetAllProgress } from '../../lib/progress.js'
 import { createButton } from '../../../components/primitives/button.js'
+import { createRankingView } from './ranking.js'
 
 const ADMIN_PASSWORD = '2026' // MOCK — 실제 운영은 서버 인증으로 대체
 
@@ -23,6 +24,21 @@ export function mountAdmin (root) {
   const box = el('div', { class: 'admin' })
   root.append(box)
   let unsub = null
+  let rankingView = null // SCR-022 최종 랭킹 — 감독관 발표용(참가자 화면에는 없다)
+
+  function closeRanking () {
+    if (rankingView) { rankingView.destroy(); rankingView = null }
+    box.hidden = false
+    renderConsole()
+  }
+
+  // 최종 랭킹은 발표용이라 콘솔 카드 대신 화면 전체를 쓴다.
+  function openRanking () {
+    if (rankingView) rankingView.destroy()
+    rankingView = createRankingView({ onClose: closeRanking })
+    box.hidden = true
+    root.append(rankingView.el)
+  }
 
   function renderGate () {
     const input = el('input', { class: 'field', type: 'password', inputmode: 'numeric', autocomplete: 'off', maxlength: '12', placeholder: '관리자 비밀번호' })
@@ -54,6 +70,8 @@ export function mountAdmin (root) {
     const statusVal = el('span', { class: 'admin__status-val mono' })
     const startedVal = el('span', { class: 'admin__meta-val mono' })
     const startBtn = createButton({ label: '게임 시작', variant: 'primary', size: 'lg', icon: 'crosshair', block: true, onClick: () => startGame() })
+    // 최종 결과 확인·발표는 감독관만 수행한다(운영 결정 2026-08-04) — 참가자 화면에는 랭킹이 없다.
+    const rankBtn = createButton({ label: '최종 랭킹 발표', variant: 'gold', size: 'lg', icon: 'award', block: true, onClick: () => openRanking() })
     const resetBtn = createButton({ label: '대기 상태로 되돌리기', variant: 'ghost', size: 'md', icon: 'refresh', block: true, onClick: () => { resetGame(); resetAllProgress() } })
 
     function refresh () {
@@ -78,7 +96,7 @@ export function mountAdmin (root) {
       el('div', { class: 'admin__row' }, [
         el('span', { class: 'admin__row-key mono caps', text: 'STARTED AT' }), startedVal
       ]),
-      el('div', { class: 'admin__actions' }, [startBtn.el, resetBtn.el]),
+      el('div', { class: 'admin__actions' }, [startBtn.el, rankBtn.el, resetBtn.el]),
       el('a', { class: 'admin__link', href: '/', target: '_blank', rel: 'noopener' }, [icon('logIn', { size: 14 }), el('span', { text: '참가자 화면 새 탭으로 열기' })]),
       el('p', { class: 'admin__warn' }, [
         icon('alert', { size: 14 }),
@@ -92,5 +110,11 @@ export function mountAdmin (root) {
   if (unlocked) renderConsole()
   else renderGate()
 
-  return { el: box, destroy () { if (unsub) unsub() } }
+  return {
+    el: box,
+    destroy () {
+      if (unsub) unsub()
+      if (rankingView) { rankingView.destroy(); rankingView = null }
+    }
+  }
 }

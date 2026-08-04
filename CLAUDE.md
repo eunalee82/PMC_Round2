@@ -120,9 +120,14 @@ PMC_ROUND2/
 │  │  │  ├─ stages.js       # Stage/컬러/아이템 메타
 │  │  │  └─ terms.js        # 게임 용어 매핑(§15)
 │  │  ├─ screens/           # 화면 단위(SCR-*) 진입 로직
+│  │  │  ├─ participant/    #   SCR-001~005 입장 흐름
+│  │  │  ├─ gameplay/       #   SCR-007~013 Stage 컨트롤러
+│  │  │  ├─ finale/         #   SCR-015~020·023 임명·Raid·금배지·종료 안내
+│  │  │  └─ admin/          #   ?admin 콘솔 + 최종 랭킹(SCR-022, 감독관 전용)
 │  │  ├─ utils/             # dom 헬퍼, 포맷터 등
 │  │  └─ data/              # 샘플 문제 JSON 등(정답 제외)
 │  └─ components/           # 재사용 UI 컴포넌트(docs/screen-list.md §7)
+├─ scripts/                 # 개발용 Node 스크립트 (npm run validate 등, 런타임 코드 아님)
 ├─ public/                  # 웹 루트로 그대로 서빙 (절대경로 참조)
 │  ├─ images/{backgrounds,logos,characters,badges,icons,ui,questions}/
 │  ├─ audio/{bgm,sfx}/
@@ -149,6 +154,10 @@ PMC_ROUND2/
 - **단방향 데이터 흐름**: `사용자 입력 → 서버 액션 → 서버 판정/저장 → (실시간/응답) store 갱신 → View 리렌더`. View가 서버 상태를 직접 낙관적으로 확정하지 않는다(제출 결과는 서버 응답으로 확정).
 - **상태 기계 중심**: 게임 상태(`scheduled|pledge_open|waiting_room|started|final_raid|ended`)와 팀 상태(`team_selected … completed`)를 명시적 enum 상수로 두고, 라우터·화면이 이를 근거로 전환한다.
 - **라우팅**: History API 기반 커스텀 라우터. 경로 구조는 `docs/screen-list.md §8`을 따르되, **진입 시 서버 상태를 검증**하고 불일치하면 허용된 화면으로 리다이렉트한다.
+  - 현재 step enum(`src/js/constants/flow.js`): `entry → opening → team → oath → waiting`(입장 흐름 `FLOW_ORDER`) + `case`(Stage 1~3) + `appoint → raid → ending`(종반부 `FINALE_ORDER`). 참가자 흐름은 금배지 수여(`ending`)의 [예선 2라운드 끝내기]에서 끝난다.
+  - **최종 랭킹(SCR-022)은 참가자 화면이 아니다** — 감독관(운영진)이 관리자 콘솔 `?admin`에서 발표한다(`src/js/screens/admin/ranking.js`). 참가자에게 순위를 노출하는 화면을 새로 만들지 않는다.
+  - `resolveStep(step, session, facts)`는 순수 함수로 유지한다. 판정에 필요한 상태(`gameStarted`·`stagesCleared`·`finale`)는 **호출자(`flow.js`)가 읽어 넘긴다** — `constants/`는 상태 모듈을 import하지 않는다.
+  - 스테이지 완료 판정은 `src/js/lib/stage-progress.js`가 단일 출처다. 라우터 가드와 게임플레이 컨트롤러가 같은 함수를 써야 "다 풀었는데 잠김 / 안 풀었는데 진입"이 생기지 않는다.
 - **의존 방향**: View → State → Data 단방향. 하위 레이어가 상위를 import하지 않는다.
 
 ---
@@ -303,6 +312,15 @@ PMC_ROUND2/
 - Stage 전환/아이템 획득/감독관 임명/긴급 경보 Glitch/Final Raid 타격감/금배지 수여/사운드
 
 각 Step은 "완료 기준(§17)"을 통과해야 다음으로 넘어간다.
+
+---
+
+### 16.1 미확정 콘텐츠 · 테스트 도구 규칙 (확정, 2026-08-04)
+
+- **미확정 콘텐츠는 '임시 데이터'로 명시한다.** 사건 데이터에 `placeholder: true`를 두면 사건 화면에 `임시 데이터` 배지가 붙는다(플래그를 지우면 배지도 사라진다). 임시 블록은 `src/js/data/cases.js` 안에서 주석으로 시작·끝을 표시하고, **데이터만 교체하면 되도록 엔진/구조는 건드리지 않는다.** 사건 수는 `STAGE_TOTALS`와 맞춰 점수 만점(300점 = 20점 × 15사건)을 깨지 않는다.
+- **테스트용 단계 건너뛰기를 운영 코드에 남기지 않는다.** 진행 앞당기기는 DEV 전용 모듈(`src/components/dev/stage-jump.js`)에서 **정상 진행 상태를 미리 만드는 방식**으로만 구현한다(진행 판정 로직에 테스트 분기를 넣지 않는다). DEV 코드는 `import.meta.env.DEV` 가드 덕분에 프로덕션 번들에서 제거된다 — 새 DEV 기능을 추가하면 `dist`에서 문자열 검색으로 제거 여부를 확인한다.
+- **검증은 스크립트로 반복 가능하게.** `npm run validate`(`scripts/validate.mjs`)가 사건 id 유일성·정답 인덱스 범위·보기 수·ko/en 정합·단서 미디어 파일 존재·UI 문구 키 누락을 점검한다. 콘텐츠를 추가·교체하면 `npm run build`와 함께 이 스크립트를 통과시킨다.
+- **없는 에셋은 상수에 넣지 않는다.** 미제작 미디어(엔딩 영상 등)는 경로를 참조하는 대신 가용 플래그(`ASSETS.videos.endingAvailable`)로 게이트하고 대체 연출을 기본값으로 둔다 — 404를 만들지 않고, 파일이 도착하면 플래그만 바꾼다.
 
 ---
 

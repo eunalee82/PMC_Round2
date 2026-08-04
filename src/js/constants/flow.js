@@ -1,5 +1,6 @@
-// Participant entry flow — step machine (game-flow.md §2, screen-list.md SCR-001~005).
-// Entry → Opening → Team → Oath → Waiting. Gameplay (Stage 1+) is out of scope here.
+// Participant flow — step machine (game-flow.md §2, screen-list.md SCR-001~023).
+// 입장 흐름: Entry → Opening → Team → Oath → Waiting (FLOW_ORDER).
+// 게임플레이: Case(Stage 1~3) → Appoint → Raid → Ending → Ranking (FLOW_ORDER 밖, 진행 상태로 가드).
 
 export const FLOW = {
   ENTRY: 'entry',
@@ -7,11 +8,17 @@ export const FLOW = {
   TEAM: 'team',
   OATH: 'oath',
   WAITING: 'waiting',
-  // 게임플레이 — 참가자 선형 흐름(FLOW_ORDER) 밖에 둔다. DEV 점프/이후 Stage 진행 연결용.
-  CASE: 'case'
+  // 게임플레이 — 참가자 선형 흐름(FLOW_ORDER) 밖에 둔다. 진입 자격은 서버(지금은 MOCK progress)가 정한다.
+  CASE: 'case',
+  APPOINT: 'appoint', // SCR-015 감독관 임명
+  RAID: 'raid', // SCR-016 긴급 경보 → SCR-017 준비 → SCR-018 레이드 → SCR-019 격퇴
+  ENDING: 'ending' // SCR-020 금배지 수여(정식 임명) → SCR-023 종료 안내 = 참가자 흐름의 끝
+  // ※ 최종 랭킹(SCR-022)은 참가자 흐름에 없다 — 감독관(운영진)이 관리자 콘솔(?admin)에서 발표한다.
 }
 
 export const FLOW_ORDER = [FLOW.ENTRY, FLOW.OPENING, FLOW.TEAM, FLOW.OATH, FLOW.WAITING]
+// 종반부 순서 — Stage 3까지 마친 팀만 진입하고, 앞 단계를 건너뛸 수 없다(§3.2 순차 진행).
+export const FINALE_ORDER = [FLOW.APPOINT, FLOW.RAID, FLOW.ENDING]
 
 export const FLOW_LABELS = {
   [FLOW.ENTRY]: 'Entry Gate',
@@ -19,7 +26,10 @@ export const FLOW_LABELS = {
   [FLOW.TEAM]: 'Team Selection',
   [FLOW.OATH]: 'Oath',
   [FLOW.WAITING]: 'Waiting Room',
-  [FLOW.CASE]: 'Case · Stage 1'
+  [FLOW.CASE]: 'Case · Stage',
+  [FLOW.APPOINT]: 'Officer Appointment',
+  [FLOW.RAID]: 'Final Raid',
+  [FLOW.ENDING]: 'Badge · Finish'
 }
 
 // 입장 성립 조건 — 팀 선택 + 수사관 3명 등록 (팀별 비번 폐지, SCR-003).
@@ -31,16 +41,31 @@ export function isRegistered (session) {
 
 // Access control (screen-list.md §9): don't let a resumed/deep-linked step outrun its prerequisites.
 // Returns the highest step actually reachable for the given session.
-// FLOW.CASE는 FLOW_ORDER 밖이지만 재진입 대상이다 — 사건 화면에서 새로고침하면 사건 화면으로
-// 복구되어야 한다(CLAUDE.md §2). 선행 조건(등록·서약·게임 시작)이 깨졌으면 알맞은 이전 화면으로 돌린다.
-// gameStarted는 flow.js가 lib/game.js에서 읽어 넘긴다(constants는 상태 모듈을 import하지 않는다).
-export function resolveStep (step, session, { gameStarted = false } = {}) {
+// 게임플레이 단계(CASE·종반부)는 FLOW_ORDER 밖이지만 재진입 대상이다 — 사건/레이드 화면에서 새로고침하면
+// 그 자리로 복구되어야 한다(CLAUDE.md §2). 선행 조건이 깨졌으면 알맞은 이전 화면으로 되돌린다.
+// facts는 flow.js가 상태 모듈(lib/game.js·lib/progress.js)에서 읽어 넘긴다
+// (constants는 상태 모듈을 import하지 않는다).
+//   gameStarted    — 관리자가 게임을 시작했는가
+//   stagesCleared  — Stage 1~3 모든 사건을 제출했는가 (종반부 진입 조건, game-flow.md §11.1)
+//   finale         — { appointedAt, raidEndedAt } 종반부 저장 지점
+export function resolveStep (step, session, facts = {}) {
+  const { gameStarted = false, stagesCleared = false, finale = {} } = facts
   const registered = isRegistered(session)
-  if (step === FLOW.CASE) {
+  const isGameplay = step === FLOW.CASE || FINALE_ORDER.includes(step)
+
+  if (isGameplay) {
     if (!registered) return FLOW.TEAM
     if (!session.pledgedAt) return FLOW.OATH
-    return gameStarted ? FLOW.CASE : FLOW.WAITING // 관리자가 대기로 되돌렸으면 대기실로
+    if (!gameStarted) return FLOW.WAITING // 관리자가 대기로 되돌렸으면 대기실로
+    if (step === FLOW.CASE) return FLOW.CASE
+    if (!stagesCleared) return FLOW.CASE // 아직 사건이 남았으면 종반부 진입 불가
+    if (step === FLOW.APPOINT) return FLOW.APPOINT
+    if (!finale.appointedAt) return FLOW.APPOINT // 임명 전에는 레이드/금배지 불가
+    if (step === FLOW.RAID) return FLOW.RAID
+    if (!finale.raidEndedAt) return FLOW.RAID // 레이드 완료 전에는 금배지 수여 불가
+    return step // ENDING
   }
+
   if (!FLOW_ORDER.includes(step)) return FLOW.ENTRY
   if (step === FLOW.WAITING && !(registered && session.pledgedAt)) {
     return registered ? FLOW.OATH : FLOW.TEAM

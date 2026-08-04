@@ -53,6 +53,9 @@ svg { display: block; }
 ::selection { background: color-mix(in srgb, var(--accent) 40%, transparent); color: #fff; }
 
 /* Utilities */
+/* [hidden]은 UA 스타일(display:none)이 컴포넌트의 display 선언에 쉽게 덮인다
+   (예: .btn{display:inline-flex}, .admin{display:grid}) → 전역에서 확실히 잡아준다. */
+[hidden] { display: none !important; }
 .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .caps {
   text-transform: uppercase;

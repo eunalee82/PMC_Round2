@@ -972,7 +972,7 @@ Rare Item
 ## Stage 2 아이템
 
 ```text
-Legend Item
+Epic Item
 
 리소스 무제한 승인서
 ```

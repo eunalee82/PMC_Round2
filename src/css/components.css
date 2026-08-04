@@ -67,6 +67,8 @@
     border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), opacity var(--dur-1) var(--ease);
 }
 .btn:active { transform: translateY(1px) scale(0.99); }
+/* .btn이 display를 지정하므로 UA의 [hidden]{display:none}이 먹지 않는다 — 명시적으로 잡아준다. */
+.btn[hidden] { display: none; }
 .btn__icon { display: inline-flex; }
 .btn__spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.35); border-top-color: #fff; animation: spin 0.7s linear infinite; }
 

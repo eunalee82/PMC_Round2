@@ -163,6 +163,267 @@ export const CASES = [
       choices: ['Recording A', 'Recording B', 'Recording C', 'Recording D']
     }
   },
+  // ════════════════════════════════════════════════════════════════════════
+  // ⏳ STAGE 2 · 임시 데이터 (PLACEHOLDER) — 여기부터 case-s2-10 까지가 교체 대상이다.
+  //    Stage 2 콘텐츠(7사건)는 아직 확정되지 않았다. 전체 흐름(Stage 1 → 2 → 3 → Final Raid → 엔딩)을
+  //    끊김 없이 테스트·시연하기 위한 최소 Mock이며, 다음 규칙만 지키면 확정 콘텐츠로 그대로 교체된다.
+  //      · 데이터 구조·게임 엔진은 손대지 않는다 — 이 배열 항목과 SOLUTIONS 항목만 바꾼다.
+  //      · placeholder: true 를 지우면 화면의 '임시 데이터' 표시가 사라진다(case.js가 이 필드만 본다).
+  //      · 사건 수 7개 = STAGE_TOTALS[2] (점수 만점 300점 = 20점 × 15사건) 유지.
+  //      · 단서 미디어가 준비되면 evidence(images/audios)를 추가한다 — 지금은 텍스트 단서만 사건 개요에 있다.
+  //    주제는 docs/game-flow.md §9.2의 Q4~Q10(Governance·Financial·Scope·Stakeholders·Risk·Schedule·Resources)을 따른다.
+  //    fileNo(#T04~#T10)는 임시 번호다 — 확정 시 실제 사건 파일 번호로 바꾼다.
+  // ════════════════════════════════════════════════════════════════════════
+  {
+    id: 'case-s2-04',
+    stage: 2,
+    caseNo: 1,
+    fileNo: '#T04',
+    placeholder: true,
+    title: '완료된 프로젝트, 사라진 편익',
+    brief: [
+      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
+      '통합 물류 플랫폼 프로젝트가 일정과 예산을 지켜 종료되었다. 그러나 6개월 후 경영진은 "약속된 물류비 12% 절감이 확인되지 않는다"며 감사를 요청했다.',
+      'PM보호국은 프로젝트 종료 보고서를 확보했다. 보고서에는 산출물 인수 확인과 잔여 예산 반납 내역은 있었지만, 편익이 언제·누구에 의해 측정되는지에 대한 기록은 없었다.'
+    ].join('\n\n'),
+    prompt: 'PMBOK® 8판의 Governance 관점에서, 이 프로젝트가 놓친 가장 핵심적인 활동은 무엇인가?',
+    choices: [
+      '프로젝트 종료 시 산출물 인수 확인 절차를 강화한다',
+      '편익 실현 계획을 수립하고 종료 이후의 측정 책임자와 시점을 정한다',
+      '잔여 예산을 조기에 반납해 재무 성과를 개선한다',
+      '프로젝트 종료 보고서의 승인 단계를 한 단계 추가한다'
+    ],
+    en: {
+      title: 'A Completed Project, a Missing Benefit',
+      brief: [
+        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
+        'An integrated logistics platform project closed on schedule and on budget. Six months later, executives requested an audit: "the promised 12% cut in logistics cost cannot be confirmed."',
+        'The Bureau obtained the closure report. It recorded deliverable acceptance and the return of remaining budget, but nothing about when the benefits would be measured, or by whom.'
+      ].join('\n\n'),
+      prompt: 'From the Governance standpoint of PMBOK® 8th Edition, what is the most essential activity this project missed?',
+      choices: [
+        'Strengthen the deliverable acceptance procedure at project closure',
+        'Establish a benefits realization plan and assign the owner and timing of post-closure measurement',
+        'Return the remaining budget early to improve financial performance',
+        'Add one more approval step to the closure report'
+      ]
+    }
+  },
+  {
+    id: 'case-s2-05',
+    stage: 2,
+    caseNo: 2,
+    fileNo: '#T05',
+    placeholder: true,
+    title: '숫자는 정상이라고 말했다',
+    brief: [
+      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
+      '스마트 홈 허브 프로젝트의 6개월차 성과 지표가 보고되었다.',
+      '· 계획 대비 진척(SPI): 1.03\n· 원가 효율(CPI): 0.82\n· 누적 실제원가: 계획의 128%\n· 남은 기간: 4개월',
+      'PM은 임원회의에서 "일정은 오히려 앞서 있으므로 프로젝트는 정상"이라고 보고했다.'
+    ].join('\n\n'),
+    prompt: '이 지표에 대한 PMBOK® 8판 Financial 관점의 가장 적절한 해석은 무엇인가?',
+    choices: [
+      '일정이 앞서 있으므로 원가는 후속 기간에 자연히 회복된다',
+      '일정을 앞당기기 위해 원가를 초과 투입한 상태이며, 완료 시점 원가 초과가 예상되므로 EAC를 재산정해야 한다',
+      'SPI가 1을 넘었으므로 성과 기준선을 상향 조정해야 한다',
+      'CPI는 회계 마감 시점의 오차이므로 다음 분기까지 판단을 보류한다'
+    ],
+    en: {
+      title: 'The Numbers Said It Was Fine',
+      brief: [
+        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
+        'Month-six performance indicators were reported for a smart-home hub project.',
+        '· Schedule performance (SPI): 1.03\n· Cost performance (CPI): 0.82\n· Cumulative actual cost: 128% of plan\n· Time remaining: 4 months',
+        'At the executive meeting the PM reported that "the schedule is in fact ahead, so the project is normal."'
+      ].join('\n\n'),
+      prompt: 'What is the most appropriate reading of these indicators from the Financial standpoint of PMBOK® 8th Edition?',
+      choices: [
+        'The schedule is ahead, so cost will naturally recover in the remaining periods',
+        'Cost was over-consumed to pull the schedule ahead; an overrun at completion is expected, so the EAC must be recalculated',
+        'SPI exceeded 1, so the performance baseline should be raised',
+        'CPI is an accounting cut-off error, so judgment should be deferred to next quarter'
+      ]
+    }
+  },
+  {
+    id: 'case-s2-06',
+    stage: 2,
+    caseNo: 3,
+    fileNo: '#T06',
+    placeholder: true,
+    title: '작은 요청 열일곱 개',
+    brief: [
+      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
+      '결제 서비스 개편 프로젝트에서 사업부는 3개월간 17건의 "간단한 화면 수정"을 요청했다. 각 요청은 2일 이내 작업으로 판단되어 담당 개발자가 즉시 반영했다.',
+      '변경 요청서는 작성되지 않았고, 일정과 예산 기준선도 그대로 유지되었다. 통합 시험 단계에서 회귀 결함 44건이 발생하며 출시가 3주 지연되었다.'
+    ].join('\n\n'),
+    prompt: 'PMBOK® 8판 Scope 관점에서 이 사건의 근본 원인은 무엇인가?',
+    choices: [
+      '개발자의 작업 속도가 요청량을 따라가지 못했다',
+      '통합 시험 계획에 회귀 시험 범위가 정의되지 않았다',
+      '작은 변경이 통제 절차를 거치지 않고 누적되어 범위가 잠식(Scope Creep)되었다',
+      '사업부가 요청 우선순위를 제시하지 않았다'
+    ],
+    en: {
+      title: 'Seventeen Small Requests',
+      brief: [
+        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
+        'On a payment-service redesign project, the business unit made 17 requests for "simple screen tweaks" over three months. Each was judged to be under two days of work, so the assigned developer applied it immediately.',
+        'No change requests were written and the schedule and cost baselines were left untouched. During integration testing 44 regression defects surfaced and the launch slipped three weeks.'
+      ].join('\n\n'),
+      prompt: 'From the Scope standpoint of PMBOK® 8th Edition, what is the root cause of this case?',
+      choices: [
+        'The developers could not keep pace with the volume of requests',
+        'The integration test plan did not define the regression test scope',
+        'Small changes bypassed the control procedure and accumulated, letting scope creep in',
+        'The business unit did not provide a priority order for its requests'
+      ]
+    }
+  },
+  {
+    id: 'case-s2-07',
+    stage: 2,
+    caseNo: 4,
+    fileNo: '#T07',
+    placeholder: true,
+    title: '세 개의 진행률',
+    brief: [
+      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
+      'PM보호국은 같은 날 작성된 세 개의 보고 자료를 확보했다.',
+      '· 개발팀 주간 보고: 진행률 78%\n· PMO 대시보드: 진행률 64%\n· 고객사 제출 보고서: 진행률 85%',
+      '세 자료는 모두 각 조직이 관리하는 별도 문서에서 산출되었고, 산정 기준도 서로 달랐다. 고객사는 이후 "보고가 신뢰되지 않는다"며 주간 회의 참석을 중단했다.'
+    ].join('\n\n'),
+    prompt: 'PMBOK® 8판 Stakeholders 관점에서 가장 먼저 확보해야 할 것은 무엇인가?',
+    choices: [
+      '보고 주기를 주간에서 격주로 조정해 자료 작성 부담을 줄인다',
+      '고객사 전용 보고 양식을 새로 만들어 별도 관리한다',
+      '진행률의 단일 진실 공급원(Single Source of Truth)과 공통 산정 기준을 정의한다',
+      '조직별 진행률을 평균해 대표값으로 보고한다'
+    ],
+    en: {
+      title: 'Three Different Progress Rates',
+      brief: [
+        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
+        'The Bureau secured three reports written on the same day.',
+        '· Dev team weekly report: 78% complete\n· PMO dashboard: 64% complete\n· Report submitted to the client: 85% complete',
+        'All three came from separate documents maintained by separate organizations, each using a different calculation basis. The client later stopped attending the weekly meeting, saying "the reporting cannot be trusted."'
+      ].join('\n\n'),
+      prompt: 'From the Stakeholders standpoint of PMBOK® 8th Edition, what must be secured first?',
+      choices: [
+        'Change the reporting cycle from weekly to biweekly to reduce the reporting burden',
+        'Create a separate report format dedicated to the client',
+        'Define a single source of truth for progress along with a common calculation basis',
+        'Average the per-organization progress rates and report the result as representative'
+      ]
+    }
+  },
+  {
+    id: 'case-s2-08',
+    stage: 2,
+    caseNo: 5,
+    fileNo: '#T08',
+    placeholder: true,
+    title: '한 사람만 아는 모듈',
+    brief: [
+      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
+      '차량용 제어 소프트웨어 프로젝트의 통신 스택은 입사 9년차 A책임이 혼자 설계·구현했다. 문서는 최신화되지 않았고, 코드 리뷰도 형식적으로만 수행되었다.',
+      '리스크 관리대장에는 "핵심 인력 이탈 가능성"이 프로젝트 착수 시점에 한 번 등록된 뒤 8개월간 갱신되지 않았다. 양산 5주 전, A책임이 4주간 병가에 들어갔다.'
+    ].join('\n\n'),
+    prompt: 'PMBOK® 8판 Risk 관점에서 PM이 사전에 수행해야 했던 조치로 가장 적절한 것은 무엇인가?',
+    choices: [
+      '리스크 관리대장을 상시 갱신하며 단일 실패점(SPOF)에 대해 백업 인력·문서화 등 대응책을 실행한다',
+      '핵심 인력에게 추가 보상을 지급해 이탈 가능성을 낮춘다',
+      '리스크가 실제로 발생한 시점에 신속하게 대체 인력을 투입한다',
+      '통신 스택 개발 일정을 앞당겨 리스크 노출 기간을 줄인다'
+    ],
+    en: {
+      title: 'The Module Only One Person Knows',
+      brief: [
+        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
+        'On an automotive control software project, the communication stack was designed and built single-handedly by Lead A, a nine-year veteran. The documentation was not kept current and code review was performed only as a formality.',
+        'The risk register listed "possible departure of key personnel" once at project start and was not updated for eight months. Five weeks before mass production, Lead A went on four weeks of sick leave.'
+      ].join('\n\n'),
+      prompt: 'From the Risk standpoint of PMBOK® 8th Edition, what should the PM have done in advance?',
+      choices: [
+        'Keep the risk register continuously updated and execute responses for the single point of failure — backup staffing, documentation',
+        'Pay the key person extra compensation to lower the chance of departure',
+        'Bring in a replacement quickly at the moment the risk actually materializes',
+        'Pull the communication stack schedule forward to shorten the risk exposure window'
+      ]
+    }
+  },
+  {
+    id: 'case-s2-09',
+    stage: 2,
+    caseNo: 6,
+    fileNo: '#T09',
+    placeholder: true,
+    title: '90%에서 멈춘 일정',
+    brief: [
+      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
+      '가전 진단 서비스 프로젝트의 주요 기능들이 7주 연속 "진행률 90%"로 보고되었다. 담당자들은 "코드는 다 됐고 마무리만 남았다"고 설명했다.',
+      '실제로는 어느 기능도 통합 시험을 통과하지 못한 상태였다. 출시 4주 전, 완료로 보고된 기능 중 실제 인수 가능한 것은 절반에 미치지 못했다.'
+    ].join('\n\n'),
+    prompt: 'PMBOK® 8판 Schedule 관점에서 이런 진척률 과장을 막는 가장 효과적인 방법은 무엇인가?',
+    choices: [
+      '주간 보고 횟수를 늘려 진행 상황을 더 자주 확인한다',
+      '완료 정의(DoD)를 인수 가능한 가치 단위로 정하고, 검증된 산출물 기준으로만 진척을 인정한다',
+      '진행률 보고를 담당자 대신 PM이 직접 산정한다',
+      '90%를 초과한 항목은 자동으로 100%로 처리해 보고를 단순화한다'
+    ],
+    en: {
+      title: 'A Schedule Stuck at 90%',
+      brief: [
+        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
+        'Key features of an appliance diagnostics project were reported at "90% complete" for seven consecutive weeks. The owners explained that "the code is done, only wrap-up remains."',
+        'In reality not one feature had passed integration testing. Four weeks before launch, fewer than half of the features reported as complete were actually acceptable.'
+      ].join('\n\n'),
+      prompt: 'From the Schedule standpoint of PMBOK® 8th Edition, what most effectively prevents this kind of inflated progress?',
+      choices: [
+        'Increase the frequency of weekly reporting to check progress more often',
+        'Define done (DoD) as an acceptable unit of value and credit progress only against verified deliverables',
+        'Have the PM calculate the progress rate personally instead of the owners',
+        'Automatically round anything above 90% to 100% to simplify reporting'
+      ]
+    }
+  },
+  {
+    id: 'case-s2-10',
+    stage: 2,
+    caseNo: 7,
+    fileNo: '#T10',
+    placeholder: true,
+    title: '한 곳에 걸린 공급망',
+    brief: [
+      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
+      '웨어러블 신제품 프로젝트는 핵심 센서를 단일 공급사에서만 조달했다. 단가가 가장 낮고 기존 검증 이력이 있다는 이유였다.',
+      '동시에 개발팀 6명 중 3명은 다른 두 프로젝트에 60%씩 겸직 배정되어 실제 가용 공수가 계획의 70% 수준이었다. 양산 3주 전 공급사 화재로 센서 납기가 6주 지연되었고, 대체 검증을 수행할 인력도 남아 있지 않았다.'
+    ].join('\n\n'),
+    prompt: 'PMBOK® 8판 Resources 관점에서 이 프로젝트가 사전에 확보해야 했던 것은 무엇인가?',
+    choices: [
+      '센서 단가를 더 낮춰 예산 여유를 확보한다',
+      '공급사 계약에 지연 배상 조항을 강화한다',
+      '이원화 공급 등 대체 조달 경로와, 과부하 없는 실가용 공수 기준의 자원 계획을 확보한다',
+      '개발팀 인원을 6명에서 8명으로 늘려 총 공수를 키운다'
+    ],
+    en: {
+      title: 'A Supply Chain Hanging on One Hook',
+      brief: [
+        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
+        'A new wearable project sourced its core sensor from a single supplier — lowest unit price, and an existing qualification history.',
+        'At the same time, three of the six developers were assigned 60% each to two other projects, leaving actual available effort at about 70% of plan. Three weeks before mass production a fire at the supplier delayed sensor delivery by six weeks, and no one was left to qualify an alternative.'
+      ].join('\n\n'),
+      prompt: 'From the Resources standpoint of PMBOK® 8th Edition, what should this project have secured in advance?',
+      choices: [
+        'A lower sensor unit price to create budget headroom',
+        'Stronger delay-penalty clauses in the supplier contract',
+        'An alternative sourcing route such as dual supply, plus a resource plan based on realistic available effort without overload',
+        'Two more developers, growing the team from six to eight to increase total effort'
+      ]
+    }
+  },
+  // ══════════════ STAGE 2 임시 데이터 끝 ══════════════
   {
     id: 'case-011',
     stage: 3, // Stage 3 · AI Use Case (Strategies for AI Adoption — PMBOK 8판 Appendix X3.1.1)
@@ -503,6 +764,127 @@ export const SOLUTIONS = {
       ].join('\n\n')
     }
   },
+  // ── ⏳ STAGE 2 임시 정답·해설 (PLACEHOLDER) — 위 CASES의 임시 블록과 함께 교체한다 ──
+  'case-s2-04': {
+    answerIndex: 1, // 정답: 2번
+    analysis: [
+      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
+      '정답은 ② 편익 실현 계획입니다.',
+      'PMBOK® 8판의 Governance는 프로젝트를 "산출물을 인수하고 끝내는 활동"이 아니라 "약속한 편익이 실제로 실현되는지까지 책임지는 체계"로 봅니다. 종료 보고서에 인수 확인과 예산 반납만 있다면, 편익은 측정 책임자도 시점도 없는 상태로 방치됩니다.',
+      '①③④는 모두 종료 절차를 다듬는 활동이며, 편익이 실현되는지에는 답하지 못합니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
+        'The answer is ② the benefits realization plan.',
+        'Governance in PMBOK® 8th Edition treats a project not as "accept the deliverable and finish" but as a system accountable for whether the promised benefits actually materialize. If the closure report holds only acceptance and budget return, the benefit is left with no measurement owner and no measurement date.',
+        '①, ③ and ④ all polish the closure procedure and none of them answers whether the benefit is realized.'
+      ].join('\n\n')
+    }
+  },
+  'case-s2-05': {
+    answerIndex: 1, // 정답: 2번
+    analysis: [
+      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
+      '정답은 ② EAC 재산정입니다.',
+      'SPI 1.03은 일정이 약간 앞섰다는 뜻이지만, CPI 0.82는 1원의 가치를 얻기 위해 1.2원 이상을 쓰고 있다는 뜻입니다. 누적 실제원가가 계획의 128%인 상태에서 남은 기간이 4개월이라면, 현재 효율이 유지될 때 완료 시점 원가는 계획을 크게 초과합니다.',
+      '따라서 "일정이 정상이므로 프로젝트가 정상"이라는 보고는 성립하지 않습니다. 완료시점예측(EAC)을 다시 산정하고 원가 초과 원인을 분리해 대응해야 합니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
+        'The answer is ② recalculate the EAC.',
+        'SPI 1.03 means the schedule is slightly ahead, but CPI 0.82 means more than 1.2 won is being spent to earn 1 won of value. With cumulative actual cost at 128% of plan and four months remaining, holding the current efficiency puts the cost at completion far above plan.',
+        'So "the schedule is fine, therefore the project is fine" does not hold. The estimate at completion (EAC) must be recalculated and the cost overrun causes isolated and addressed.'
+      ].join('\n\n')
+    }
+  },
+  'case-s2-06': {
+    answerIndex: 2, // 정답: 3번
+    analysis: [
+      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
+      '정답은 ③ 통제 절차를 거치지 않은 변경 누적(Scope Creep)입니다.',
+      '개별 요청이 작다는 사실이 변경 통제를 면제해 주지는 않습니다. 17건이 기준선 갱신 없이 반영되면 범위·일정·원가 기준선과 실제 산출물이 어긋나고, 영향 분석과 회귀 시험 범위도 산정되지 않습니다.',
+      '②는 결과로 드러난 증상이며, ①④는 근본 원인이 아닙니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
+        'The answer is ③ changes accumulating outside the control procedure (scope creep).',
+        'A request being small does not exempt it from change control. When 17 of them land without a baseline update, the scope, schedule and cost baselines drift away from the actual deliverable, and neither impact analysis nor regression test scope is ever sized.',
+        '② is a symptom that surfaced as a result; ① and ④ are not the root cause.'
+      ].join('\n\n')
+    }
+  },
+  'case-s2-07': {
+    answerIndex: 2, // 정답: 3번
+    analysis: [
+      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
+      '정답은 ③ 단일 진실 공급원(Single Source of Truth)입니다.',
+      '이해관계자 신뢰는 보고 빈도나 양식이 아니라 "같은 숫자를 본다"는 사실에서 만들어집니다. 조직별로 다른 문서와 다른 산정 기준이 있으면 어떤 보고서를 고쳐도 숫자는 계속 어긋납니다.',
+      '①②는 문제를 늦추거나 분산시킬 뿐이고, ④ 평균값은 근거 없는 숫자를 하나 더 만드는 선택입니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
+        'The answer is ③ a single source of truth.',
+        'Stakeholder trust is built not on reporting frequency or format but on everyone seeing the same number. While each organization keeps its own document and its own calculation basis, fixing any single report leaves the numbers in conflict.',
+        '① and ② only delay or spread the problem, and ④ simply manufactures one more number with no basis.'
+      ].join('\n\n')
+    }
+  },
+  'case-s2-08': {
+    answerIndex: 0, // 정답: 1번
+    analysis: [
+      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
+      '정답은 ① 리스크 관리대장 상시 갱신과 SPOF 대응입니다.',
+      '리스크는 한 번 등록하는 문서 작업이 아니라 상시 관리 활동입니다. "핵심 인력 이탈"이 8개월간 갱신되지 않았다는 사실 자체가 관리 실패이며, 단일 실패점(SPOF)에는 백업 인력·지식 문서화·리뷰 실질화 같은 사전 대응이 필요합니다.',
+      '②는 부분적 완화이고, ③은 사후 대응, ④는 노출 기간만 줄이며 SPOF 자체를 남겨 둡니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
+        'The answer is ① continuous risk register updates and a response to the SPOF.',
+        'Risk management is a standing activity, not a one-time document entry. That "possible departure of key personnel" went eight months without an update is itself the management failure; a single point of failure calls for advance responses — backup staffing, knowledge documentation, review that is real rather than formal.',
+        '② is a partial mitigation, ③ is reactive, and ④ only shortens exposure while leaving the SPOF in place.'
+      ].join('\n\n')
+    }
+  },
+  'case-s2-09': {
+    answerIndex: 1, // 정답: 2번
+    analysis: [
+      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
+      '정답은 ② 가치 단위의 완료 정의와 검증된 산출물 기준 진척 인정입니다.',
+      '"코드는 다 됐다"는 진술은 검증되지 않은 자기 보고입니다. 인수 가능한 가치 단위로 완료를 정의하고 시험 통과 같은 객관적 증거로만 진척을 인정하면, 90%에서 멈추는 보고가 구조적으로 불가능해집니다.',
+      '①③은 같은 기준으로 더 자주·다른 사람이 세는 것이고, ④는 과장을 제도화합니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
+        'The answer is ② define done as a unit of value and credit progress only against verified deliverables.',
+        '"The code is done" is unverified self-reporting. Define completion as an acceptable unit of value and credit progress only on objective evidence such as passing a test, and a report that parks at 90% becomes structurally impossible.',
+        '① and ③ just count the same basis more often or by a different person, and ④ institutionalizes the exaggeration.'
+      ].join('\n\n')
+    }
+  },
+  'case-s2-10': {
+    answerIndex: 2, // 정답: 3번
+    analysis: [
+      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
+      '정답은 ③ 대체 조달 경로 + 실가용 공수 기준의 자원 계획입니다.',
+      '이 사건에는 두 개의 자원 리스크가 겹쳐 있습니다. 단일 공급사 의존(대체 경로 없음)과 겸직 과부하(계획 공수와 실가용 공수의 괴리)입니다. 하나만 해결하면 화재가 나도 대응 인력이 없거나, 인력이 있어도 부품이 없습니다.',
+      '①은 오히려 단일 공급 의존을 강화하고, ②는 지연 자체를 막지 못하며, ④는 인원 수만 늘려 실가용 공수 문제를 그대로 둡니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
+        'The answer is ③ an alternative sourcing route plus a resource plan based on realistic available effort.',
+        'Two resource risks overlap here: dependence on a single supplier (no alternative route) and overload from split assignments (planned effort diverging from available effort). Fix only one and either there is no one to respond when the fire happens, or there are people but no part.',
+        '① actually deepens the single-supply dependence, ② does not prevent the delay itself, and ④ adds headcount while leaving the available-effort problem untouched.'
+      ].join('\n\n')
+    }
+  },
+  // ── STAGE 2 임시 정답·해설 끝 ──
   'case-011': {
     answerIndex: 3, // 정답: 4번 (품질 담당자 증언)
     analysis: [

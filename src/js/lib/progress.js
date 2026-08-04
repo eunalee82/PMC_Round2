@@ -13,7 +13,12 @@ function readAll () {
 function writeAll (all) { try { localStorage.setItem(KEY, JSON.stringify(all)) } catch { /* storage off */ } }
 // stage = 스테이지별 '정답' 수 (점수용), submittedStage = 스테이지별 '제출' 수 (EVIDENCE 해제용).
 function blank () {
-  return { solved: [], score: 0, stage: { 1: 0, 2: 0, 3: 0 }, submitted: [], submittedStage: { 1: 0, 2: 0, 3: 0 }, lastSubmitAt: null }
+  return { solved: [], score: 0, stage: { 1: 0, 2: 0, 3: 0 }, submitted: [], submittedStage: { 1: 0, 2: 0, 3: 0 }, lastSubmitAt: null, finale: blankFinale() }
+}
+// 종반부 진행(감독관 임명 → Final Raid → 금배지 → 게임 종료) 저장 지점 — docs/game-flow.md §18.
+// 새로고침 복구가 이 값들로 현재 화면을 판정한다 (CLAUDE.md §2).
+function blankFinale () {
+  return { appointedAt: null, raidStartedAt: null, raidEndedAt: null, raidHits: 0, raidDamage: 0, badgeAt: null, endedAt: null }
 }
 function keyOf (teamId) { return teamId || 'preview' }
 
@@ -26,8 +31,30 @@ export function getProgress (teamId) {
     stage: { 1: 0, 2: 0, 3: 0, ...(p.stage || {}) },
     submitted: [...(p.submitted || [])],
     submittedStage: { 1: 0, 2: 0, 3: 0, ...(p.submittedStage || {}) },
-    lastSubmitAt: p.lastSubmitAt || null
+    lastSubmitAt: p.lastSubmitAt || null,
+    finale: { ...blankFinale(), ...(p.finale || {}) }
   }
+}
+
+// ── 종반부 진행 기록/조회 ──
+export function getFinale (teamId) { return getProgress(teamId).finale }
+
+// 종반부 저장 — 이미 기록된 시각은 덮어쓰지 않고(첫 도달 시각 보존), 누적치는 최대값을 유지한다.
+// (Raid를 다시 들어와도 기여도가 깎이지 않게 — 행사 중 새로고침 대비)
+export function recordFinale (teamId, patch = {}) {
+  const all = readAll()
+  const k = keyOf(teamId)
+  const p = all[k] || blank()
+  const finale = { ...blankFinale(), ...(p.finale || {}) }
+  for (const [key, value] of Object.entries(patch)) {
+    if (value == null) continue
+    if (key === 'raidHits' || key === 'raidDamage') finale[key] = Math.max(finale[key] || 0, value)
+    else if (!finale[key]) finale[key] = value // 시각은 최초 1회만
+  }
+  p.finale = finale
+  all[k] = p
+  writeAll(all)
+  return finale
 }
 
 // 사건 제출 기록 — 마지막 제출 시각(종료 시간 판정·랭킹 동점 처리용)을 남기고,
@@ -55,20 +82,33 @@ export function recordSubmission (teamId, caseId, stage, isCorrect) {
   return getProgress(teamId)
 }
 
-// 랭킹 — 점수 내림차순, 동점이면 마지막 제출 시각이 빠른 순(먼저 끝낸 팀이 상위).
-// 미제출(시각 없음)은 동점 그룹에서 최하위. 서버 연동 시 rankings 뷰로 교체.
+// 랭킹 — 순위 기준은 docs/game-flow.md §15.1: 총점 → 정답 수 → 제출 완료 시각 → Final Raid 기여도.
+// (총점 = 20 × 정답 수라 실질 동점 판정은 제출 시각부터 갈린다. 미제출=시각 없음은 동점 그룹 최하위.)
+// 최종 랭킹 화면(SCR-022)이 Stage별 점수·정답 수·완료 시각·Raid 공격 수·획득 장비를 함께 쓴다.
+// 서버 연동 시 rankings 뷰로 교체.
 export function getRanking () {
   const all = readAll()
   const rows = getTeams().map((team) => {
     const p = all[team.id]
+    const finale = { ...blankFinale(), ...((p && p.finale) || {}) }
     return {
       teamId: team.id,
       name: team.name,
-      score: p ? (p.score || 0) : 0,
-      lastSubmitAt: p ? (p.lastSubmitAt || null) : null
+      score: (p && p.score) || 0,
+      stage: { 1: 0, 2: 0, 3: 0, ...((p && p.stage) || {}) },
+      submittedStage: { 1: 0, 2: 0, 3: 0, ...((p && p.submittedStage) || {}) },
+      solved: (p && p.solved) ? p.solved.length : 0,
+      lastSubmitAt: (p && p.lastSubmitAt) || null,
+      raidHits: finale.raidHits || 0,
+      raidDamage: finale.raidDamage || 0
     }
   })
-  rows.sort((a, b) => (b.score - a.score) || ((a.lastSubmitAt ?? Infinity) - (b.lastSubmitAt ?? Infinity)))
+  rows.sort((a, b) =>
+    (b.score - a.score) ||
+    (b.solved - a.solved) ||
+    ((a.lastSubmitAt ?? Infinity) - (b.lastSubmitAt ?? Infinity)) ||
+    (b.raidHits - a.raidHits)
+  )
   return rows.map((r, i) => ({ ...r, rank: i + 1 }))
 }
 

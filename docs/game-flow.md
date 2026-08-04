@@ -835,9 +835,12 @@ Q10. Resources
 ### 아이템
 
 ```text
-Legend Item
+Epic Item
 리소스 무제한 승인서
 ```
+
+> 희귀도는 **Epic**으로 확정(2026-08-04). 보상 등급을 Stage 1 Rare → Stage 2 Epic → Stage 3 Legend Skill로
+> 올려 진행감을 만든다. 코드 표기: `item.stage2.rarity = 'EPIC ITEM'` (`src/js/constants/copy.js`).
 
 ### 연출
 
@@ -851,7 +854,7 @@ Legend Item
 ```text
 축하합니다.
 
-전설 아이템 ‘리소스 무제한 승인서’를 획득했습니다.
+에픽 아이템 ‘리소스 무제한 승인서’를 획득했습니다.
 
 프로젝트 수행에 필요한 일정, 비용, 인원의
 제약이 모두 해제되었습니다.

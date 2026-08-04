@@ -24,6 +24,9 @@ export const ASSETS = {
   videos: {
     opening: '/videos/opening.mp4', // 로컬 원본(미사용 — 오프닝은 YouTube 임베드로 대체)
     ending: '/videos/ending.mp4',
+    // 엔딩 영상은 아직 '미정'(docs/assets-list.md) — 파일이 없으므로 404를 만들지 않도록 요청하지 않는다.
+    // 영상이 준비되면 이 값만 true로 바꾼다 → SCR-021이 <video>로 재생하고, 실패 시에도 대체 연출로 넘어간다.
+    endingAvailable: false,
     openingEmbedId: 'Hm13qr-_0yI' // YouTube 영상 ID (SCR-002 오프닝 임베드)
   },
   bgm: {

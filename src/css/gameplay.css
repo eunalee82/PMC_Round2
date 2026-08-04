@@ -28,6 +28,13 @@
   color: var(--text-2); font-size: var(--text-sm);
 }
 .case__file svg { color: var(--accent); }
+/* 임시(Mock) 사건 표시 — 데이터에 placeholder: true 인 사건에만 붙는다 (Stage 2 콘텐츠 확정 시 사라짐) */
+.case__temp {
+  display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--r-full);
+  color: var(--warning); font-size: 0.625rem; font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps);
+  background: color-mix(in srgb, var(--warning) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent);
+}
 .case__title {
   margin: 0; color: var(--text-1);
   font-size: var(--text-3xl); font-weight: var(--fw-black);

@@ -84,6 +84,7 @@ const KO = {
   'case.evidenceLabel': '현장 단서',
   'case.selectHint': '단서 하나를 선택한 뒤 판단을 제출하십시오.',
   'case.submit': '판단 제출',
+  'case.submitted': '판단 제출 완료', // 제출 후 비활성 상태 라벨
   'case.resolved': 'CASE RESOLVED',
   'case.resolvedKo': '사건 해결',
   'case.incorrect': 'ADDITIONAL INVESTIGATION REQUIRED',
@@ -92,6 +93,9 @@ const KO = {
   'case.next': '다음 사건 조사',
   'case.nextLast': 'Stage 결과 보기',
   'case.noAnalysis': '분석 보고서가 아직 준비되지 않았습니다.',
+  // 임시(Mock) 사건 표시 — 데이터에 placeholder: true 인 사건에만 붙는다 (Stage 2 콘텐츠 확정 시 자동 소멸).
+  'case.temp': '임시 데이터',
+  'case.tempHint': '확정 전 임시 사건입니다. 최종 콘텐츠로 교체될 예정입니다.',
 
   // SCR-007 Stage Briefing
   'briefing.label': 'MISSION BRIEFING',
@@ -125,6 +129,7 @@ const KO = {
   'item.acquire': '아이템 획득',
   'item.equip': '아이템 장착',
   'item.next': 'Stage 2 진행',
+  'item.nextStage3': 'Stage 3 진행',
   'item.stage1.rarity': 'RARE ITEM',
   'item.stage1.name': '갑질 미러 방패',
   'item.stage1.desc': '무분별한 내·외부 고객 요구를 올바른 Change Control로 반사하는 방패. Final Raid에서 빌런의 공격을 반사한다.',
@@ -135,13 +140,104 @@ const KO = {
   'item.stage2.desc': '필요한 자원을 제약 없이 투입할 수 있도록 승인된 문서. Final Raid에서 궁극기를 사용할 수 있게 한다.',
   'item.stage2.congrats': '축하합니다. 성과 영역을 통합 관리해 필요한 자원을 확보하는 ‘리소스 무제한 승인서’를 획득했습니다.',
   'item.stage2.effect': '궁극기 사용 가능',
-  'item.stage3.rarity': 'LEGENDARY ITEM',
-  'item.stage3.name': 'AI Judgment Core',
-  'item.stage3.desc': 'AI의 출력을 비판적으로 검증하는 판단 코어. AI가 만들어내는 환상을 간파하고 빌런왕의 최종 패턴을 무력화한다.',
-  'item.stage3.congrats': '축하합니다. AI 시대의 판단력을 증명하는 ‘AI Judgment Core’를 획득했습니다.',
-  'item.stage3.effect': 'AI 환상 간파 · 빌런왕 최종 패턴 무력화',
+  // Stage 3 보상은 아이템이 아니라 스킬이다 — docs/game-flow.md §10.3 / screen-list.md SCR-013.
+  'item.stage3.rarity': 'LEGEND SKILL',
+  'item.stage3.name': '배째 마스터',
+  'item.stage3.desc': 'AI의 출력을 비판적으로 검증하고 불필요한 요구를 과감하게 되돌려보내는 최고 수준의 PM 스킬. Final Raid에서 빌런왕에게 최종 강력 스킬로 발동한다.',
+  'item.stage3.congrats': '축하합니다. 프로젝트 중 발생하는 불필요한 요구에 과감하게 대응할 수 있는 최고 수준의 PM 스킬 ‘배째 마스터’를 획득했습니다.',
+  'item.stage3.effect': '최종 강력 스킬 발동',
   'item.effectLabel': '효과',
   'item.appoint': '감독관 임명으로',
+
+  // SCR-015 Officer Appointment (감독관 임명)
+  'appoint.eyebrow': 'PM보호국 인사명령 · APPOINTMENT',
+  'appoint.title': 'PM보호국 감독관 임명',
+  'appoint.bossLabel': 'PM보호국 국장',
+  'appoint.message': '수사관 여러분,\n\n모든 자격 검증 Mission을 통과했습니다.\n\n지금부터 여러분을\nPM보호국 정식 감독관으로 임명합니다.',
+  'appoint.stagesLabel': '자격 검증 결과',
+  'appoint.itemsLabel': '확보 장비',
+  'appoint.rankFrom': '신입 수사관',
+  'appoint.rankTo': '정식 감독관',
+  'appoint.badgeCaption': '임시 배지 — 금배지는 최종 임무 완수 후 수여됩니다.',
+  'appoint.accept': '임명 수락',
+
+  // SCR-016 Emergency Alert (긴급 경보)
+  'alert.tag': 'PM보호국 긴급 알림',
+  'alert.title': '빌런왕이 출현했습니다',
+  'alert.sub': '모든 패널이 비상 모드로 전환되었습니다. 획득한 장비가 자동 장착됩니다.',
+  'alert.locationKey': '위치',
+  'alert.locationVal': 'Final Release Gate',
+  'alert.dangerKey': '위험도',
+  'alert.dangerVal': 'FINAL',
+  'alert.survivalKey': '생존율',
+  'alert.survivalVal': '20%',
+  'alert.confirm': '긴급 상황 확인',
+
+  // SCR-017 Final Raid Ready (레이드 준비)
+  'raid.readyEyebrow': 'FINAL RAID · 출동 준비',
+  'raid.readyTitle': '모든 장비가 활성화되었습니다',
+  'raid.readyMsg': '20초 동안 빌런왕을 공격하십시오.',
+  'raid.rulesLabel': '레이드 규칙',
+  'raid.rule1': '빌런왕을 반복해서 클릭하거나 터치하면 공격이 발동됩니다.',
+  'raid.rule2': '획득한 세 장비가 공격 중 순서대로 자동 발동됩니다.',
+  'raid.rule3': '제한 시간 20초가 지나면 최종 공격으로 빌런왕이 격퇴됩니다.',
+  'raid.equipped': '장착 장비',
+  'raid.start': '레이드 준비 완료',
+  'raid.countdownLabel': '출동까지',
+
+  // SCR-018 Final Raid Battle (빌런왕 레이드)
+  'raid.villain': '빌런왕',
+  'raid.villainSub': 'FINAL RELEASE GATE · BOSS',
+  'raid.hp': '빌런왕 체력',
+  'raid.time': '남은 시간',
+  'raid.hits': '누적 공격',
+  'raid.progress': '레이드 진행률',
+  'raid.attack': '공격',
+  'raid.attackHint': '빌런왕을 연타하십시오',
+  'raid.skillFired': '발동',
+
+  // SCR-019 Villain Defeated (빌런왕 격퇴)
+  'defeat.tag': 'FINAL MISSION COMPLETE',
+  'defeat.title': '빌런왕 격퇴 성공',
+  'defeat.sub': '프로젝트의 가치를 위협하던 최종 빌런이 무력화되었습니다.',
+  'defeat.damage': '누적 데미지',
+  'defeat.hits': '총 공격 횟수',
+  'defeat.contribution': '팀 기여도',
+  'defeat.next': '최종 임명 절차',
+
+  // SCR-020 Gold Badge Ceremony (금배지 수여식)
+  'badge.tag': 'MISSION COMPLETE',
+  'badge.bureau': 'PM Protection Bureau',
+  'badge.appointed': '공식 감독관 임명 완료',
+  'badge.rank': '정식 감독관',
+  // 참가자 흐름의 마지막 버튼 — 여기서 예선 2라운드를 마친다(최종 결과 발표는 감독관 몫).
+  'badge.finish': '예선 2라운드 끝내기',
+
+  // 국장 최종 메시지 (docs/game-flow.md §14.2) — 종료 안내 화면에 표시
+  'ending.bossLabel': 'PM보호국 국장 최종 메시지',
+  'ending.bossMessage': '수고하셨습니다.\n\n여러분은 모든 사건을 해결하고\n프로젝트의 가치를 지켜냈습니다.\n\n오늘부터 여러분은\nPM보호국 정식 감독관입니다.',
+
+  // SCR-022 Final Ranking — 관리자 콘솔(?admin) 전용 발표 화면
+  'rank.eyebrow': 'FINAL RANKING',
+  'rank.title': '최종 랭킹',
+  'rank.sub': '전체 팀의 Investigation Score와 최종 순위입니다.',
+  'rank.colRank': '순위',
+  'rank.colTeam': '팀',
+  'rank.colScore': '총점',
+  'rank.colStages': 'STAGE 1 · 2 · 3',
+  'rank.colSolved': '해결',
+  'rank.colTime': '완료',
+  'rank.colRaid': 'RAID',
+  'rank.itemsLabel': '획득 장비',
+  'rank.empty': '아직 집계된 팀이 없습니다.',
+
+  // SCR-023 종료 안내 — 순위는 감독관이 발표하므로 참가자 화면에는 표시하지 않는다.
+  'end.tag': 'ROUND 2 COMPLETE',
+  'end.title': '예선 2라운드를 마쳤습니다',
+  'end.msg': '여러분은 프로젝트의 Value를 지켜냈습니다.\n\nPM보호국 정식 감독관 임명을 축하합니다.',
+  'end.rankLabel': '최종 계급',
+  'end.scoreLabel': 'Investigation Score',
+  'end.wait': '최종 결과는 감독관의 발표를 기다려 주십시오.',
 
   // 캡처 가드 (게임플레이 오버레이)
   'guard.gateTitle': '전체화면에서 사건을 조사합니다',
@@ -244,6 +340,7 @@ const EN = {
   'case.evidenceLabel': 'Evidence',
   'case.selectHint': 'Select one clue, then submit your judgment.',
   'case.submit': 'Submit Judgment',
+  'case.submitted': 'Judgment Submitted',
   'case.resolved': 'CASE RESOLVED',
   'case.resolvedKo': 'Case Resolved',
   'case.incorrect': 'ADDITIONAL INVESTIGATION REQUIRED',
@@ -252,6 +349,8 @@ const EN = {
   'case.next': 'Investigate Next Case',
   'case.nextLast': 'View Stage Result',
   'case.noAnalysis': 'The analysis report is not ready yet.',
+  'case.temp': 'TEMP DATA',
+  'case.tempHint': 'A temporary case pending confirmation. It will be replaced with final content.',
 
   // SCR-007 Stage Briefing
   'briefing.label': 'MISSION BRIEFING',
@@ -285,6 +384,7 @@ const EN = {
   'item.acquire': 'Item Acquired',
   'item.equip': 'Equip Item',
   'item.next': 'Proceed to Stage 2',
+  'item.nextStage3': 'Proceed to Stage 3',
   'item.stage1.rarity': 'RARE ITEM',
   'item.stage1.name': 'Gapjil Mirror Shield',
   'item.stage1.desc': 'A shield that reflects unreasonable internal/external client demands through proper Change Control. It reflects the Villain\'s attacks in the Final Raid.',
@@ -295,13 +395,103 @@ const EN = {
   'item.stage2.desc': 'A document approving the resources you need without constraint. It unlocks your ultimate move in the Final Raid.',
   'item.stage2.congrats': 'Congratulations. You have acquired the "Unlimited Resource Approval", earned by managing the performance domains as one.',
   'item.stage2.effect': 'Ultimate move unlocked',
-  'item.stage3.rarity': 'LEGENDARY ITEM',
-  'item.stage3.name': 'AI Judgment Core',
-  'item.stage3.desc': 'A judgment core that critically verifies AI output. It sees through the illusions the AI creates and neutralizes the Villain King\'s final pattern.',
-  'item.stage3.congrats': 'Congratulations. You have acquired the "AI Judgment Core", proof of judgment in the age of AI.',
-  'item.stage3.effect': 'Sees through AI illusions · neutralizes the Villain King\'s final pattern',
+  // Stage 3's reward is a skill, not an item — docs/game-flow.md §10.3 / screen-list.md SCR-013.
+  'item.stage3.rarity': 'LEGEND SKILL',
+  'item.stage3.name': 'Baejjae Master',
+  'item.stage3.desc': 'The top-tier PM skill: verify AI output critically and turn down unnecessary demands without flinching. It fires as the final power skill against the Villain King in the Final Raid.',
+  'item.stage3.congrats': 'Congratulations. You have acquired "Baejjae Master", the top-tier PM skill for standing firm against the unnecessary demands that arise during a project.',
+  'item.stage3.effect': 'Fires the final power skill',
   'item.effectLabel': 'EFFECT',
   'item.appoint': 'To the appointment',
+
+  // SCR-015 Officer Appointment
+  'appoint.eyebrow': 'BUREAU ORDER · APPOINTMENT',
+  'appoint.title': 'Bureau Supervisor Appointment',
+  'appoint.bossLabel': 'Director, PM Protection Bureau',
+  'appoint.message': 'Agents,\n\nYou have passed every qualification Mission.\n\nFrom this moment you are appointed\nofficial Supervisors of the PM Protection Bureau.',
+  'appoint.stagesLabel': 'Qualification Results',
+  'appoint.itemsLabel': 'Secured Equipment',
+  'appoint.rankFrom': 'Rookie Agent',
+  'appoint.rankTo': 'Official Supervisor',
+  'appoint.badgeCaption': 'Provisional badge — the gold badge is awarded after the final mission.',
+  'appoint.accept': 'Accept Appointment',
+
+  // SCR-016 Emergency Alert
+  'alert.tag': 'BUREAU EMERGENCY ALERT',
+  'alert.title': 'The Villain King has appeared',
+  'alert.sub': 'All panels have switched to emergency mode. Your equipment is being auto-equipped.',
+  'alert.locationKey': 'Location',
+  'alert.locationVal': 'Final Release Gate',
+  'alert.dangerKey': 'Threat',
+  'alert.dangerVal': 'FINAL',
+  'alert.survivalKey': 'Survival',
+  'alert.survivalVal': '20%',
+  'alert.confirm': 'Acknowledge Emergency',
+
+  // SCR-017 Final Raid Ready
+  'raid.readyEyebrow': 'FINAL RAID · DEPLOYMENT',
+  'raid.readyTitle': 'All equipment is active',
+  'raid.readyMsg': 'Attack the Villain King for 20 seconds.',
+  'raid.rulesLabel': 'Raid Rules',
+  'raid.rule1': 'Click or tap the Villain King repeatedly to attack.',
+  'raid.rule2': 'Your three pieces of equipment fire automatically, in order, as you attack.',
+  'raid.rule3': 'When the 20-second limit ends, a final strike defeats the Villain King.',
+  'raid.equipped': 'Equipped',
+  'raid.start': 'Raid Ready',
+  'raid.countdownLabel': 'Deploying in',
+
+  // SCR-018 Final Raid Battle
+  'raid.villain': 'Villain King',
+  'raid.villainSub': 'FINAL RELEASE GATE · BOSS',
+  'raid.hp': 'Villain King HP',
+  'raid.time': 'Time Left',
+  'raid.hits': 'Attacks',
+  'raid.progress': 'Raid Progress',
+  'raid.attack': 'ATTACK',
+  'raid.attackHint': 'Hit the Villain King rapidly',
+  'raid.skillFired': 'FIRED',
+
+  // SCR-019 Villain Defeated
+  'defeat.tag': 'FINAL MISSION COMPLETE',
+  'defeat.title': 'The Villain King is defeated',
+  'defeat.sub': 'The final villain threatening the project\'s value has been neutralized.',
+  'defeat.damage': 'Total Damage',
+  'defeat.hits': 'Total Attacks',
+  'defeat.contribution': 'Team Contribution',
+  'defeat.next': 'Final Appointment',
+
+  // SCR-020 Gold Badge Ceremony
+  'badge.tag': 'MISSION COMPLETE',
+  'badge.bureau': 'PM Protection Bureau',
+  'badge.appointed': 'Official Supervisor appointment complete',
+  'badge.rank': 'Official Supervisor',
+  'badge.finish': 'Finish Round 2 Qualifier',
+
+  // Director's final message (docs/game-flow.md §14.2) — shown on the closing screen
+  'ending.bossLabel': 'Final message from the Director',
+  'ending.bossMessage': 'Well done.\n\nYou resolved every case\nand protected the value of the project.\n\nFrom today you are\nofficial Supervisors of the PM Protection Bureau.',
+
+  // SCR-022 Final Ranking — admin console only
+  'rank.eyebrow': 'FINAL RANKING',
+  'rank.title': 'Final Ranking',
+  'rank.sub': 'Investigation Score and final standing for every team.',
+  'rank.colRank': 'Rank',
+  'rank.colTeam': 'Team',
+  'rank.colScore': 'Score',
+  'rank.colStages': 'STAGE 1 · 2 · 3',
+  'rank.colSolved': 'Solved',
+  'rank.colTime': 'Finished',
+  'rank.colRaid': 'RAID',
+  'rank.itemsLabel': 'Equipment',
+  'rank.empty': 'No teams have been scored yet.',
+
+  // SCR-023 Closing notice — the standing is announced by the supervisor, so it is not shown here.
+  'end.tag': 'ROUND 2 COMPLETE',
+  'end.title': 'Round 2 qualifier complete',
+  'end.msg': 'You protected the Value of the project.\n\nCongratulations on your appointment as an official Supervisor of the PM Protection Bureau.',
+  'end.rankLabel': 'Final Rank',
+  'end.scoreLabel': 'Investigation Score',
+  'end.wait': 'Please wait for the supervisor to announce the final results.',
 
   // Capture guard
   'guard.gateTitle': 'Investigate cases in full screen',

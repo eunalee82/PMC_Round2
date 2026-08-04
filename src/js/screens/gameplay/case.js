@@ -8,11 +8,14 @@ import { el } from '../../utils/dom.js'
 import { icon } from '../../utils/icons.js'
 import { t } from '../../lib/copy.js'
 import { ASSETS } from '../../constants/assets.js'
-import { CASES, localizeCase } from '../../data/cases.js'
+import { FLOW } from '../../constants/flow.js'
+import { STAGE_META, STAGE_ITEM_ICONS } from '../../constants/stages.js'
+import { localizeCase } from '../../data/cases.js'
 import { gradeCase } from '../../lib/grade.js'
 import { findTeam } from '../../lib/teams.js'
 import { remainingSeconds, ensureStarted } from '../../lib/game.js'
 import { getProgress, recordSubmission, getRanking, STAGE_TOTALS } from '../../lib/progress.js'
+import { stageCases, builtTotal, submittedCount, isStageComplete, firstIncompleteStage } from '../../lib/stage-progress.js'
 import { createButton } from '../../../components/primitives/button.js'
 import { createModal } from '../../../components/primitives/modal.js'
 import { createAppShell } from '../../../components/shell/app-shell.js'
@@ -20,38 +23,7 @@ import { createEvidenceViewer } from '../../../components/game/evidence-viewer.j
 import { createQuestionChoice } from '../../../components/game/question-choice.js'
 import { createCaptureGuard } from '../../../components/game/capture-guard.js'
 
-// 스테이지 메타 — 브리핑 문구/테마/도메인 + 완료 보상 아이템(SCR-013).
-// 아이템 effectKey = Final Raid에서의 효과(빌런 공격 반사 / 궁극기 / 최종 패턴 무력화).
-const STAGE_META = {
-  1: {
-    theme: '1', label: 'MISSION 01 · MINDSET', domain: 'Mindset',
-    nameKey: 'briefing.stage1.name', missionKey: 'briefing.stage1.mission',
-    item: { icon: 'shield', bg: ASSETS.backgrounds.onePass, rarityKey: 'item.stage1.rarity', nameKey: 'item.stage1.name', descKey: 'item.stage1.desc', congratsKey: 'item.stage1.congrats', effectKey: 'item.stage1.effect', nextKey: 'item.next' }
-  },
-  2: {
-    theme: '2', label: 'MISSION 02 · PERFORMANCE DOMAIN', domain: 'Performance Domain',
-    nameKey: 'briefing.stage2.name', missionKey: 'briefing.stage2.mission',
-    item: { icon: 'file', bg: ASSETS.backgrounds.onePass, rarityKey: 'item.stage2.rarity', nameKey: 'item.stage2.name', descKey: 'item.stage2.desc', congratsKey: 'item.stage2.congrats', effectKey: 'item.stage2.effect', nextKey: 'item.nextStage3' }
-  },
-  3: {
-    theme: '3', label: 'MISSION 03 · AI USE CASE', domain: 'AI Use Case',
-    nameKey: 'briefing.stage3.name', missionKey: 'briefing.stage3.mission',
-    item: { icon: 'cpu', bg: ASSETS.backgrounds.allPass, rarityKey: 'item.stage3.rarity', nameKey: 'item.stage3.name', descKey: 'item.stage3.desc', congratsKey: 'item.stage3.congrats', effectKey: 'item.stage3.effect', nextKey: 'item.appoint' }
-  }
-}
-const STAGE_KEYS = { 1: 'mindset', 2: 'domain', 3: 'ai' }
-// 좌측 EVIDENCE 슬롯 아이콘. Stage 3는 'brain' 아이콘이 실제로 전구 모양이라 코어(cpu)를 쓴다.
-const STAGE_ITEM_ICONS = { 1: 'shield', 2: 'file', 3: 'cpu' }
-
-// DEV 전용 스테이지 점프 — 아직 사건이 없는 스테이지(예: Stage 2) 때문에 뒤 스테이지를 정상 흐름으로
-// 열 수 없어서, 제작 중인 스테이지를 바로 확인할 수단을 둔다. 프로덕션 빌드에서는 DEV 메뉴가 제거되어
-// 호출자가 없다(진행 판정 로직 자체는 건드리지 않는다).
-let devStage = null
-export function setDevStage (s) { devStage = s }
-
-// 스테이지에 실제로 제작된 사건 수. Stage score의 max는 계획값(STAGE_TOTALS = 15문항 기준)을 보여주되,
-// 아이템 해제 판정은 이 값을 쓴다 — 진행 판정(stageComplete)과 같은 기준이어야 "다 풀었는데 잠김"이 없다.
-const builtTotal = (s) => CASES.filter((c) => c.stage === s).length || STAGE_TOTALS[s]
+// Stage 메타·보상 아이템 표는 constants/stages.js가 단일 출처 (임명·레이드·랭킹 화면도 같은 표를 쓴다).
 
 // 좌측 사이드바 스냅샷 — 진행 상황(progress) + 랭킹(getRanking).
 // EVIDENCE 아이템 = 해당 스테이지의 모든 사건을 '제출 완료'했을 때 해제(정답 여부 무관).
@@ -70,6 +42,7 @@ function sidebarSnapshot (teamId, teamName, p) {
     ],
     items: [1, 2, 3].map((s) => ({
       label: `STAGE ${s}`,
+      name: t(STAGE_META[s].item.nameKey), // 슬롯 tooltip — 장비 이름을 확인할 수 있게
       acquired: (p.submittedStage[s] || 0) >= builtTotal(s),
       icon: STAGE_ITEM_ICONS[s]
     })),
@@ -110,17 +83,18 @@ export function createCaseScreen (ctx) {
 
   const setTheme = (s) => { document.documentElement.dataset.stage = String(s) }
   const refreshSidebar = () => shell.sidebar.update(sidebarSnapshot(teamId, teamName, getProgress(teamId)))
-  const stageCasesFor = (s) => CASES.filter((c) => c.stage === s).sort((a, b) => a.caseNo - b.caseNo)
-  const submittedCount = (s) => { const p = getProgress(teamId); return stageCasesFor(s).filter((c) => p.submitted.includes(c.id)).length }
-  const stageComplete = (s) => { const cs = stageCasesFor(s); return cs.length > 0 && submittedCount(s) >= cs.length }
-  function firstIncompleteStage () { for (let s = 1; s <= 3; s++) { if (!stageComplete(s)) return s } return 3 }
+  // 스테이지 사건 목록·완료 판정은 lib/stage-progress.js가 단일 출처 — 라우터 가드와 같은 기준을 쓴다.
+  const stageCasesFor = (s) => stageCases(s)
 
   function mountView (node) {
     clearView() // 이전 화면 컴포넌트만 해제
     viewParts = nextParts
     nextParts = []
     caseHost.replaceChildren(node)
+    // 하위 화면 전환 시 맨 위에서 시작 — 셸의 스크롤러(.app-main)와 flow root 둘 다 되돌린다.
     caseHost.scrollTop = 0
+    if (shell.content.parentElement) shell.content.parentElement.scrollTop = 0
+    if (ctx && ctx.scrollToTop) ctx.scrollToTop()
   }
 
   // ── SCR-007 Stage Briefing ──
@@ -155,6 +129,9 @@ export function createCaseScreen (ctx) {
   // ── SCR-008/009/010/011 Case + 제출확인 + 결과 ──
   function showCase (s, i) {
     setTheme(s)
+    // 사건 조사 중에는 무음 — Stage 통과 음악(quiz-pass)이 다음 사건까지 흐르지 않게 끊는다
+    // (docs/game-flow.md §22: Stage 진행 = 무음 또는 낮은 볼륨).
+    if (ctx && ctx.audio) ctx.audio.stopSfx()
     const cases = stageCasesFor(s)
     if (i >= cases.length) { showStageResult(s); return }
     const caseData = localizeCase(cases[i]) // 로케일 반영(en 없으면 ko)
@@ -187,12 +164,18 @@ export function createCaseScreen (ctx) {
       confirmModal.open()
     }
 
+    let submitted = false // 같은 사건 이중 제출 가드 (서버 이관 후에도 클라이언트 1차 방어로 유지)
+
     function doSubmit () {
+      if (submitted) return
       const idx = choice.getSelected()
       if (idx < 0) return
+      submitted = true
       const { isCorrect, correctIndex, analysis } = gradeCase(caseData.id, idx)
       choice.reveal(correctIndex, idx)
-      submitBtn.el.hidden = true
+      // 제출이 끝나면 [판단 제출]은 비활성 상태로 남긴다 — 다시 누를 수 없고, 제출이 끝났음이 보인다.
+      // (hidden 속성은 .btn의 display 규칙에 덮여 먹지 않으므로 disabled로 확실히 잠근다.)
+      submitBtn.update({ label: t('case.submitted'), disabled: true })
       recordSubmission(teamId, caseData.id, caseData.stage, isCorrect) // 제출 시각 + 정답 시 가산(중복 무시)
       refreshSidebar()
 
@@ -224,7 +207,11 @@ export function createCaseScreen (ctx) {
         el('span', { class: 'case__mission mono caps', text: STAGE_META[s].label }),
         el('div', { class: 'case__file' }, [
           icon('file', { size: 15 }),
-          el('span', { class: 'mono', text: `${t('case.fileLabel')} ${caseData.fileNo} · ${i + 1}/${cases.length}` })
+          el('span', { class: 'mono', text: `${t('case.fileLabel')} ${caseData.fileNo} · ${i + 1}/${cases.length}` }),
+          // 임시(Mock) 사건 표시 — 데이터의 placeholder 플래그만 본다. 확정 콘텐츠로 교체하면 자동으로 사라진다.
+          caseData.placeholder
+            ? el('span', { class: 'case__temp mono caps', text: t('case.temp'), title: t('case.tempHint') })
+            : null
         ]),
         el('h1', { class: 'case__title', text: caseData.title })
       ]),
@@ -247,6 +234,8 @@ export function createCaseScreen (ctx) {
   function showStageResult (s) {
     setTheme(s)
     refreshSidebar()
+    // Stage 통과 사운드 (docs/game-flow.md §22). 실패해도 조용히 넘어간다 — 연출은 진행을 막지 않는다.
+    if (ctx && ctx.audio) ctx.audio.playSfx(ASSETS.bgm.quizPass, { volume: 0.7 })
     const p = getProgress(teamId)
     const total = stageCasesFor(s).length
     const solved = p.stage[s] || 0
@@ -273,7 +262,7 @@ export function createCaseScreen (ctx) {
     ]))
   }
 
-  // ── SCR-013 Item Acquisition (Stage 1 방패 / Stage 2 승인서 / Stage 3 AI Judgment Core) ──
+  // ── SCR-013 Item Acquisition (Stage 1 방패 / Stage 2 승인서 / Stage 3 배째 마스터) ──
   function showItem (s) {
     setTheme(s)
     refreshSidebar() // 좌측 아이템 슬롯 활성화(제출 완료로 이미 해제됨)
@@ -281,10 +270,10 @@ export function createCaseScreen (ctx) {
     const item = meta.item
     const hasNext = s < 3
     const nextBtn = trackView(createButton({
-      // 다음 단계 라벨은 스테이지 메타가 정한다(Stage 3 = 감독관 임명 — Final Raid는 아직 미구현).
+      // 다음 단계 라벨은 스테이지 메타가 정한다. Stage 3 = 감독관 임명(SCR-015)으로 넘어간다.
       label: t((item && item.nextKey) || 'item.equip'),
       variant: 'gold', size: 'lg', icon: 'crosshair', block: true,
-      onClick: () => (hasNext ? showBriefing(s + 1) : showBriefing(s))
+      onClick: () => (hasNext ? showBriefing(s + 1) : ctx.goTo(FLOW.APPOINT))
     }))
     const hero = item
       ? el('div', { class: 'item-acq__hero', style: item.bg ? { backgroundImage: `linear-gradient(rgba(6,7,11,0.55), rgba(6,7,11,0.82)), url('${item.bg}')` } : null }, [
@@ -308,18 +297,21 @@ export function createCaseScreen (ctx) {
     ]))
   }
 
-  // ── 새로고침 복구: 진행 상황으로 현재 하위 화면 판정 (DEV 점프가 있으면 그 스테이지) ──
-  const stage = devStage || firstIncompleteStage()
+  // ── 새로고침 복구: 진행 상황으로 현재 하위 화면 판정 (CLAUDE.md §2) ──
+  // 판정 순서: (1) 미완료 스테이지가 있으면 그 스테이지의 브리핑/첫 미제출 사건,
+  //           (2) 세 스테이지를 모두 마쳤으면 Stage 3 결과 화면 — 결과→보상→감독관 임명으로 이어진다.
+  //           (마지막 사건 제출 직후 새로고침해도 아이템 획득 연출을 건너뛰지 않는다.)
+  const stage = firstIncompleteStage(teamId)
   const cases = stageCasesFor(stage)
-  const done = submittedCount(stage)
-  if (cases.length === 0 || done === 0) {
-    showBriefing(stage) // 사건 없는 스테이지(예: Stage 2 준비 중) 또는 스테이지 시작 전 → 브리핑
-  } else if (done < cases.length) {
+  const done = submittedCount(teamId, stage)
+  if (isStageComplete(teamId, stage)) {
+    showStageResult(stage) // = Stage 3 완료 상태(firstIncompleteStage가 3을 반환)
+  } else if (cases.length === 0 || done === 0) {
+    showBriefing(stage) // 사건 없는 스테이지 또는 스테이지 시작 전 → 브리핑
+  } else {
     const p = getProgress(teamId)
     const idx = cases.findIndex((c) => !p.submitted.includes(c.id))
     showCase(stage, idx < 0 ? 0 : idx) // 진행 중 → 첫 미제출 사건부터
-  } else {
-    showBriefing(stage) // 방어적: 완료 스테이지면 firstIncompleteStage가 다음을 가리킴
   }
 
   return {
@@ -328,6 +320,7 @@ export function createCaseScreen (ctx) {
     destroy () {
       if (prevStage) document.documentElement.dataset.stage = prevStage
       else delete document.documentElement.dataset.stage
+      if (ctx && ctx.audio) ctx.audio.stopSfx() // Stage 통과 음악이 다음 화면까지 흐르지 않게
       closeConfirm()
       clearView()
       parts.forEach((p) => p && p.destroy && p.destroy())
