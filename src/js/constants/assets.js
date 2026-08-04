@@ -39,7 +39,12 @@ export const ASSETS = {
     q2_2: '/images/questions/question2-2.webp',
     q2_3: '/images/questions/question2-3.webp',
     q2_4: '/images/questions/question2-4.webp',
-    q3: '/images/questions/question3.webp'
+    q3: '/images/questions/question3.webp',
+    // 사건 #012 — 화면 캡처형이라 무손실 WebP (docs/assets-list.md 인코딩 규칙)
+    q12_1: '/images/questions/question12-1.webp',
+    q12_2: '/images/questions/question12-2.webp',
+    q12_3: '/images/questions/question12-3.webp',
+    q12_4: '/images/questions/question12-4.webp'
   },
   // 사건 단서 오디오(녹취) — #021(Accountability/Empowered Mindset) · #011(AI Adoption)
   questionAudio: {

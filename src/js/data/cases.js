@@ -213,6 +213,62 @@ export const CASES = [
         'The quality lead\'s testimony'
       ]
     }
+  },
+  {
+    id: 'case-012',
+    stage: 3, // Stage 3 · AI Use Case (AI 기반 기능 도입의 장기적 영향·실행 가능성)
+    caseNo: 2,
+    fileNo: '#012',
+    title: 'AI가 알아서 해줄 겁니다',
+    brief: [
+      '스마트 가전 SW 개발 프로젝트는 출시를 4개월 앞두고 있었다. 주요 기능 개발은 대부분 완료된 상태였으며, 시스템 통합 시험 단계 진입을 준비하고 있었다.',
+      '이때 사업부에서 새로운 요구사항이 접수되었다.',
+      '"AI를 활용한 테스트 자동화 기능을 추가하여 테스트 생산성을 향상시킨다."',
+      '프로젝트 PM은 긴급 검토회의를 개최하였고, 검토 결과를 바탕으로 해당 요구사항을 프로젝트 범위에 반영하기로 결정하였다.',
+      '그러나 프로젝트가 시범 운영 단계에 진입한 이후 다양한 문제가 발생하였다.',
+      '· AI 사용 비용 급증\n· 생성된 테스트 케이스의 품질 편차 발생\n· 모델 성능 저하 발생 시 원인 분석 지연\n· 운영 조직의 인수 거부\n· 추가 투자 계획 수립 요구',
+      'PM보호국은 프로젝트 실패의 원인이 특정 의사결정에서 시작되었다고 판단하고, 긴급 검토회의에서 네 개의 단서를 확보하였다.'
+    ].join('\n'),
+    prompt: '다음 확보 단서 중, PMBOK® Guide 8판이 강조하는 "AI 기반 기능 도입의 장기적 영향과 실행 가능성"을 충분히 검토하지 않은 의사결정을 찾아라.',
+    evidence: {
+      caption: 'EVIDENCE · 확보 단서 4',
+      images: [
+        { src: ASSETS.questions.q12_1, alt: '확보 단서 A', label: '확보 단서 A' },
+        { src: ASSETS.questions.q12_2, alt: '확보 단서 B', label: '확보 단서 B' },
+        { src: ASSETS.questions.q12_3, alt: '확보 단서 C', label: '확보 단서 C' },
+        { src: ASSETS.questions.q12_4, alt: '확보 단서 D', label: '확보 단서 D' }
+      ]
+    },
+    // 보기 = 확보 단서 A~D (순서 = 화면 번호 1~4, 이미지 라벨과 일치)
+    choices: [
+      '확보 단서 A',
+      '확보 단서 B',
+      '확보 단서 C',
+      '확보 단서 D'
+    ],
+    en: {
+      title: '"The AI Will Take Care of It"',
+      brief: [
+        'A smart-appliance software project was four months from launch. Most core feature development was complete and the team was preparing to enter system integration testing.',
+        'At that point the business unit submitted a new requirement.',
+        '"Add an AI-based test automation capability to improve testing productivity."',
+        'The PM convened an emergency review meeting and, based on its outcome, decided to take the requirement into the project scope.',
+        'After the project entered pilot operation, however, a range of problems surfaced.',
+        '· AI usage costs spiked\n· Quality of generated test cases varied widely\n· Root-cause analysis lagged when model performance degraded\n· The operations organization refused handover\n· Additional investment planning was demanded',
+        'The Bureau concluded that the project\'s failure began with one specific decision, and secured four pieces of evidence from the emergency review meeting.'
+      ].join('\n'),
+      prompt: 'Among the secured clues, find the decision that failed to adequately examine the "long-term impact and feasibility of adopting an AI-based capability" emphasized by PMBOK® Guide 8th Edition.',
+      evidence: {
+        caption: 'EVIDENCE · 4 secured clues',
+        images: [
+          { src: ASSETS.questions.q12_1, alt: 'Clue A', label: 'Clue A' },
+          { src: ASSETS.questions.q12_2, alt: 'Clue B', label: 'Clue B' },
+          { src: ASSETS.questions.q12_3, alt: 'Clue C', label: 'Clue C' },
+          { src: ASSETS.questions.q12_4, alt: 'Clue D', label: 'Clue D' }
+        ]
+      },
+      choices: ['Clue A', 'Clue B', 'Clue C', 'Clue D']
+    }
   }
 ]
 
@@ -293,6 +349,23 @@ export const SOLUTIONS = {
         'The AI adoption strategy in PMBOK® Guide 8th Edition (Appendix X3.1.1) stresses not trusting AI, but critically verifying what AI produces while keeping human judgment in the loop.',
         '④ carries the premise that "if the AI referenced enough data, it can be trusted." It grounds verification in the volume of data the AI saw, so the single most important consideration — verifying the AI output itself — is missing.',
         '[Option-by-option]\n① The developer\'s testimony — The owner checks and supplements what the AI wrote, so human verification is preserved.\n② The schedule lead\'s testimony — An AI draft is used, but leaders review dependencies and resource allocation: appropriate use.\n③ The product planner\'s testimony — AI is used to explore alternatives while the team makes the final call: desirable.\n④ The quality lead\'s testimony (answer) — It presumes the AI result is trustworthy, so the importance of critically verifying the AI output itself is not sufficiently reflected.'
+      ].join('\n\n')
+    }
+  },
+  'case-012': {
+    answerIndex: 1, // 정답: 2번 (확보 단서 B)
+    analysis: [
+      '정답은 ② 확보 단서 B입니다.',
+      'PMBOK® Guide 8판은 AI 도입 시 기능 구현 효과뿐 아니라 운영 비용·유지 가능성·확장성 등 장기적 영향과 실행 가능성을 함께 검토할 것을 강조합니다.',
+      '② 확보 단서 B는 운영 비용 증가 가능성이 제기되었음에도 이를 검토하지 않은 채 의사결정을 내렸습니다. 시범 운영 이후 드러난 문제(AI 사용 비용 급증 · 운영 조직의 인수 거부 · 추가 투자 계획 요구)와 가장 직접적으로 연결되는 단서입니다.',
+      '[보기별 해설]\n① 확보 단서 A — AI 결과의 품질 검증 절차에 관한 문제로, 장기적 영향보다는 품질 관리 이슈에 가깝습니다.\n② 확보 단서 B(정답) — 미래 운영 비용 증가 가능성을 인지하고도 검토를 미루어 지속가능성과 실행 가능성을 고려하지 않았습니다.\n③ 확보 단서 C — 운영 역량 확보도 중요한 문제지만 핵심은 인력·역량 관리이며, 장기적 비용 영향과 직접 연결되는 단서는 아닙니다.\n④ 확보 단서 D — AI 기능 추가를 승인한 사실만으로는 잘못된 의사결정이라고 볼 수 없습니다. 프로젝트 변경 자체는 정상적인 관리 활동입니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        'The answer is ② Clue B.',
+        'PMBOK® Guide 8th Edition stresses that adopting AI requires examining not only the delivered capability but also long-term impact and feasibility — operating cost, maintainability, scalability.',
+        '② Clue B made the decision without examining a raised possibility of increased operating cost. It connects most directly to the problems that surfaced after pilot operation: the spike in AI usage costs, the operations organization refusing handover, and the demand for additional investment planning.',
+        '[Option-by-option]\n① Clue A — Concerns the verification procedure for AI output; closer to a quality-management issue than to long-term impact.\n② Clue B (answer) — Aware of a possible rise in future operating cost, it deferred the review and so did not consider sustainability and feasibility.\n③ Clue C — Securing operational capability matters too, but its core is staffing and capability management, not a direct link to long-term cost impact.\n④ Clue D — Approving the AI capability alone cannot be judged a wrong decision; changing project scope is a normal management activity in itself.'
       ].join('\n\n')
     }
   }

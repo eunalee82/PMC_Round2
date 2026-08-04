@@ -36,8 +36,6 @@
 
 ### 사건 단서 이미지 — `/images/questions/`
 
-| File | Purpose | Status |
-|---|---|---|
 파일명 `questionN`의 N은 **사건 진행 순번**(1~15)이다. Stage 1 = 1~3 · Stage 2 = 4~10 · Stage 3 = 11~15.
 
 | File | Purpose | Status |
@@ -49,10 +47,10 @@
 | /images/questions/question2-4.webp | Stage 1 · 2번째 사건 #014 단서 4/4 (증거물 D) | 있음 · 사용 중 |
 | /images/questions/question3.webp | Stage 1 · 3번째 사건 #021 현장 자료 | 있음 · 사용 중 |
 | /images/questions/question4.webp | Stage 2 · 4번째 사건 단서 | 있음 · 사건 미제작 |
-| /images/questions/question12-1.webp | Stage 3 · 12번째 사건 단서 1/4 | 있음 · 사건 미제작 |
-| /images/questions/question12-2.webp | Stage 3 · 12번째 사건 단서 2/4 | 있음 · 사건 미제작 |
-| /images/questions/question12-3.webp | Stage 3 · 12번째 사건 단서 3/4 | 있음 · 사건 미제작 |
-| /images/questions/question12-4.webp | Stage 3 · 12번째 사건 단서 4/4 | 있음 · 사건 미제작 |
+| /images/questions/question12-1.webp | Stage 3 · 12번째 사건 #012 단서 1/4 (확보 단서 A) | 있음 · 사용 중 |
+| /images/questions/question12-2.webp | Stage 3 · 12번째 사건 #012 단서 2/4 (확보 단서 B) | 있음 · 사용 중 |
+| /images/questions/question12-3.webp | Stage 3 · 12번째 사건 #012 단서 3/4 (확보 단서 C) | 있음 · 사용 중 |
+| /images/questions/question12-4.webp | Stage 3 · 12번째 사건 #012 단서 4/4 (확보 단서 D) | 있음 · 사용 중 |
 | /images/questions/question13.webp | Stage 3 · 13번째 사건 단서 | 있음 · 사건 미제작 |
 
 > 파일명은 소문자로 통일 — Vercel/Linux 대소문자 구분 대응(§14). 경로 상수는 `src/js/constants/assets.js`의 `ASSETS.questions`가 단일 출처이며, **사건 미제작 파일은 아직 상수에 등록하지 않았다**(사건 데이터를 만들 때 함께 추가한다).
