@@ -45,7 +45,12 @@ export const ASSETS = {
     q12_2: '/images/questions/question12-2.webp',
     q12_3: '/images/questions/question12-3.webp',
     q12_4: '/images/questions/question12-4.webp',
-    q13: '/images/questions/question13.webp'
+    q13: '/images/questions/question13.webp',
+    // 사건 #015 복구 로그 — 평면 텍스트 패널이라 무손실 WebP (docs/assets-list.md 인코딩 규칙)
+    q15_a: '/images/questions/question15-logA.webp',
+    q15_b: '/images/questions/question15-logB.webp',
+    q15_c: '/images/questions/question15-logC.webp',
+    q15_d: '/images/questions/question15-logD.webp'
   },
   // 사건 단서 오디오(녹취) — #021(Accountability/Empowered Mindset) · #011(AI Adoption)
   questionAudio: {

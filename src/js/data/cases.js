@@ -382,6 +382,61 @@ export const CASES = [
       },
       choices: ['PM Lee', 'PM Choi', 'PM Han', 'PM Park']
     }
+  },
+  {
+    id: 'case-015',
+    stage: 3, // Stage 3 · AI Use Case (Multi-Criteria Decision Analysis)
+    caseNo: 5,
+    fileNo: '#015',
+    title: '사라진 우선순위표',
+    brief: [
+      'PM보호국 긴급상황실. 디지털 전환 전략을 담당하는 A사업부에서 구조 요청이 접수되었다.',
+      '사업부는 올해 안에 4개 프로젝트를 추진해야 하지만, 예상치 못한 인력 부족으로 모든 프로젝트를 동시에 수행할 수 없는 상황에 처했다. 심지어 프로젝트마다 기대 효과도 다르고, 리스크 수준도 다르며, 전략적 중요도 역시 제각각이다.',
+      '긴급 투입된 PM은 AI를 활용하여 우선순위를 결정한 후 경영진에 보고했지만, 보고서가 손상되어 일부 로그만 남게 되었다.',
+      'PM보호국은 남은 단서를 통해 PM이 활용한 AI Use Case를 확인하려고 한다.'
+    ].join('\n'),
+    prompt: '위 프로젝트 상황에 가장 적합한 PMBOK® Guide 8판의 AI Use Case는 무엇인가?',
+    evidence: {
+      caption: 'EVIDENCE · 복구된 로그 4 (일부 손상)',
+      images: [
+        { src: ASSETS.questions.q15_a, alt: '복구된 로그 A', label: '로그 A' },
+        { src: ASSETS.questions.q15_b, alt: '복구된 로그 B', label: '로그 B' },
+        { src: ASSETS.questions.q15_c, alt: '복구된 로그 C', label: '로그 C' },
+        { src: ASSETS.questions.q15_d, alt: '복구된 로그 D', label: '로그 D' }
+      ]
+    },
+    // 보기 = AI Use Case 4종 (순서 = 화면 번호 1~4)
+    choices: [
+      '데이터 기반 의사결정',
+      '다기준 의사결정 분석',
+      '리스크 식별 및 평가',
+      '조기 경고 신호'
+    ],
+    en: {
+      title: 'The Missing Priority List',
+      brief: [
+        'The Bureau\'s emergency room. A rescue request arrived from Business Unit A, which owns the digital transformation strategy.',
+        'The unit must launch four projects this year, but an unexpected staffing shortfall means it cannot run them all at once. Worse, each project has a different expected benefit, a different risk level, and a different strategic weight.',
+        'The PM deployed to the site used AI to decide the priorities and reported to the executives, but the report was damaged and only fragments of the log remain.',
+        'The Bureau intends to identify the AI use case the PM applied from what is left.'
+      ].join('\n'),
+      prompt: 'Which AI use case from PMBOK® Guide 8th Edition best fits this project situation?',
+      evidence: {
+        caption: 'EVIDENCE · 4 recovered logs (partially damaged)',
+        images: [
+          { src: ASSETS.questions.q15_a, alt: 'Recovered log A', label: 'Log A' },
+          { src: ASSETS.questions.q15_b, alt: 'Recovered log B', label: 'Log B' },
+          { src: ASSETS.questions.q15_c, alt: 'Recovered log C', label: 'Log C' },
+          { src: ASSETS.questions.q15_d, alt: 'Recovered log D', label: 'Log D' }
+        ]
+      },
+      choices: [
+        'Data-driven decision making',
+        'Multi-criteria decision analysis',
+        'Risk identification and assessment',
+        'Early warning signals'
+      ]
+    }
   }
 ]
 
@@ -513,6 +568,23 @@ export const SOLUTIONS = {
         'Risk Identification and Assessment in PMBOK® Guide 8th Edition does not stop at using AI to identify potential risks — it also covers assessing probability, impact and priority in order to respond proactively.',
         '② PM Choi analyzes comparable project data and industry benchmarks with AI to identify risks, and goes on to assess risk level and priority before responding. It is the only answer that covers both identification and assessment.',
         '[Option-by-option]\n① PM Lee — Identifies risks using past cases, but the risk-level assessment is lacking.\n② PM Choi (answer) — Identifies risks with AI and assesses risk level and priority before responding.\n③ PM Han — Focuses on maintaining a risk list; no assessment activity appears.\n④ PM Park — Analyzes comparable failure cases, but does not systematically assess probability and impact.'
+      ].join('\n\n')
+    }
+  },
+  'case-015': {
+    answerIndex: 1, // 정답: 2번 (다기준 의사결정 분석)
+    analysis: [
+      '정답은 ② 다기준 의사결정 분석입니다.',
+      '복구된 로그에는 전략 적합성 · 예상 사업 가치 · 실행 가능성 · 위험 수준 등 여러 기준을 함께 평가해 종합 점수를 산정하고 우선순위를 결정하는 과정이 나타납니다. 이는 PMBOK® Guide 8판의 다기준 의사결정 분석(Multi-Criteria Decision Analysis)에 해당합니다.',
+      '자원이 부족해 4개 프로젝트를 동시에 할 수 없고, 기대 효과·리스크·전략적 중요도가 제각각인 상황 — 즉 서로 다른 축을 하나의 우선순위로 모아야 하는 문제입니다.',
+      '[보기별 해설]\n① 데이터 기반 의사결정 — 데이터 활용은 포함되지만, 여러 평가 기준을 종합해 우선순위를 결정하는 것이 이 사건의 핵심입니다.\n② 다기준 의사결정 분석(정답) — 가치·전략 적합성·위험·실행 가능성 등 다양한 기준을 함께 평가해 최적의 우선순위를 도출합니다.\n③ 리스크 식별 및 평가 — 위험 수준은 평가 요소 중 하나일 뿐이고, 문제의 목적은 프로젝트 우선순위 결정입니다.\n④ 조기 경고 신호 — 프로젝트 이상 징후를 조기에 탐지하는 활용 사례이며 우선순위 선정과는 관련이 없습니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        'The answer is ② Multi-criteria decision analysis.',
+        'The recovered logs show several criteria being evaluated together — strategic fit, expected business value, feasibility, risk level — to compute a composite score and set priorities. That is Multi-Criteria Decision Analysis in PMBOK® Guide 8th Edition.',
+        'Resources are short, the four projects cannot run at once, and each differs in expected benefit, risk and strategic weight — the problem is exactly one of folding different axes into a single priority order.',
+        '[Option-by-option]\n① Data-driven decision making — Data is involved, but the core of this case is combining multiple evaluation criteria to set priorities.\n② Multi-criteria decision analysis (answer) — Evaluates value, strategic fit, risk and feasibility together to derive the optimal priority order.\n③ Risk identification and assessment — Risk level is only one of the criteria; the goal here is prioritizing projects.\n④ Early warning signals — A use case for early detection of project anomalies, unrelated to prioritization.'
       ].join('\n\n')
     }
   }
