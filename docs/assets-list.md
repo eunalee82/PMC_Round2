@@ -42,17 +42,25 @@
 
 | File | Purpose | Status |
 |---|---|---|
-| /images/questions/question1.png | Stage 1 · 1번째 사건 #007 단서 5 (Proactive Mindset) | 있음 · 사용 중 |
-| /images/questions/question2-1.png | Stage 1 · 2번째 사건 #014 단서 1/4 (증거물 A) | 있음 · 사용 중 |
-| /images/questions/question2-2.png | Stage 1 · 2번째 사건 #014 단서 2/4 (증거물 B) | 있음 · 사용 중 |
-| /images/questions/question2-3.png | Stage 1 · 2번째 사건 #014 단서 3/4 (증거물 C) | 있음 · 사용 중 |
-| /images/questions/question2-4.png | Stage 1 · 2번째 사건 #014 단서 4/4 (증거물 D) | 있음 · 사용 중 |
-| /images/questions/question3.png | Stage 1 · 3번째 사건 #021 현장 자료 | 있음 · 사용 중 |
-| /images/questions/question4.png | Stage 2 · 4번째 사건 단서 | 있음 · 사건 미제작 |
-| /images/questions/question13.png | Stage 3 · 13번째 사건 단서 | 있음 · 사건 미제작 |
+| /images/questions/question1.webp | Stage 1 · 1번째 사건 #007 단서 5 (Proactive Mindset) | 있음 · 사용 중 |
+| /images/questions/question2-1.webp | Stage 1 · 2번째 사건 #014 단서 1/4 (증거물 A) | 있음 · 사용 중 |
+| /images/questions/question2-2.webp | Stage 1 · 2번째 사건 #014 단서 2/4 (증거물 B) | 있음 · 사용 중 |
+| /images/questions/question2-3.webp | Stage 1 · 2번째 사건 #014 단서 3/4 (증거물 C) | 있음 · 사용 중 |
+| /images/questions/question2-4.webp | Stage 1 · 2번째 사건 #014 단서 4/4 (증거물 D) | 있음 · 사용 중 |
+| /images/questions/question3.webp | Stage 1 · 3번째 사건 #021 현장 자료 | 있음 · 사용 중 |
+| /images/questions/question4.webp | Stage 2 · 4번째 사건 단서 | 있음 · 사건 미제작 |
+| /images/questions/question12-1.webp | Stage 3 · 12번째 사건 단서 1/4 | 있음 · 사건 미제작 |
+| /images/questions/question12-2.webp | Stage 3 · 12번째 사건 단서 2/4 | 있음 · 사건 미제작 |
+| /images/questions/question12-3.webp | Stage 3 · 12번째 사건 단서 3/4 | 있음 · 사건 미제작 |
+| /images/questions/question12-4.webp | Stage 3 · 12번째 사건 단서 4/4 | 있음 · 사건 미제작 |
+| /images/questions/question13.webp | Stage 3 · 13번째 사건 단서 | 있음 · 사건 미제작 |
 
-> 파일명은 소문자 `.png`로 통일(대문자 `.PNG`에서 변경) — Vercel/Linux 대소문자 구분 대응(§14). 경로 상수는 `src/js/constants/assets.js`의 `ASSETS.questions`가 단일 출처이며, **사건 미제작 파일은 아직 상수에 등록하지 않았다**(사건 데이터를 만들 때 함께 추가한다).
-> ⚠️ 원본이 각 2MB 내외로 큼 — 배포 전 WebP/적정 해상도로 최적화 권장(`CLAUDE.md §12`).
+> 파일명은 소문자로 통일 — Vercel/Linux 대소문자 구분 대응(§14). 경로 상수는 `src/js/constants/assets.js`의 `ASSETS.questions`가 단일 출처이며, **사건 미제작 파일은 아직 상수에 등록하지 않았다**(사건 데이터를 만들 때 함께 추가한다).
+> ✅ **최적화 완료**: PNG(장당 1.8~2.3MB, 합계 16.1MB) → **WebP(합계 1.5MB, -91%)**. 해상도는 원본 유지. 원본 PNG는 커밋 `2ac781b` 이전 히스토리에 남아 있다(`git show 2ac781b:public/images/questions/question1.png > 파일`로 복구).
+>
+> **인코딩 규칙 — 그림 종류에 따라 다르게 쓴다.** 새 단서 이미지를 넣을 때 이 기준을 따른다(Pillow 사용).
+> - **사진·일러스트형**(다이어리·현장 사진 등): 손실 `save(out,'WEBP',quality=90,method=6)` → 1/10 이하로 줄고 원본 대비 PSNR 38~45dB로 텍스트 가독성 영향 없음.
+> - **선·표·글자형**(화면 캡처·도표 = `question12-*`): **무손실** `save(out,'WEBP',lossless=True,method=6)`. 이런 그림은 손실 q90이 PSNR 34dB까지 떨어지면서 용량 이득도 30%뿐이지만, 무손실은 **품질 손실 0으로 -56%**(231KB→101KB)다.
 
 ### 기타 이미지 폴더 (준비)
 
@@ -100,7 +108,7 @@ EvidenceViewer가 네이티브 컨트롤로 재생하고 헤더 소리 설정(�
 | /audio/sfx/question3/question3-2.mp3 | Stage 1 · 3번째 사건 #021 녹취 B | 있음 · 사용 중 |
 | /audio/sfx/question3/question3-3.mp3 | Stage 1 · 3번째 사건 #021 녹취 C | 있음 · 사용 중 |
 | /audio/sfx/question3/question3-4.mp3 | Stage 1 · 3번째 사건 #021 녹취 D | 있음 · 사용 중 |
-| /audio/sfx/question11/question11.mp3 | Stage 3 · 11번째 사건 녹취 | 있음 · 사건 미제작 |
+| /audio/sfx/question11/question11.mp3 | Stage 3 · 11번째 사건 #011 참가자 증언 녹취 (증언 4명 1파일) | 있음 · 사용 중 |
 | /audio/sfx/question14/question14-1.mp3 | Stage 3 · 14번째 사건 녹취 1/4 | 있음 · 사건 미제작 |
 | /audio/sfx/question14/question14-2.mp3 | Stage 3 · 14번째 사건 녹취 2/4 | 있음 · 사건 미제작 |
 | /audio/sfx/question14/question14-3.mp3 | Stage 3 · 14번째 사건 녹취 3/4 | 있음 · 사건 미제작 |

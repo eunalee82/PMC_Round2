@@ -31,20 +31,22 @@ export const ASSETS = {
     quizPass: '/audio/bgm/quiz-pass.mp3',
     killBillian: '/audio/bgm/kill-billian.mp3'
   },
-  // 사건 단서 이미지 (파일명은 소문자 .png — Vercel/Linux는 대소문자 구분, CLAUDE.md §14).
+  // 사건 단서 이미지 — WebP(q90). 원본 PNG는 장당 2MB급이라 32팀 동시 접속에 부담이어서 교체했다
+  // (CLAUDE.md §12). 파일명은 소문자 — Vercel/Linux는 대소문자 구분(§14).
   questions: {
-    q1: '/images/questions/question1.png',
-    q2_1: '/images/questions/question2-1.png',
-    q2_2: '/images/questions/question2-2.png',
-    q2_3: '/images/questions/question2-3.png',
-    q2_4: '/images/questions/question2-4.png',
-    q3: '/images/questions/question3.png'
+    q1: '/images/questions/question1.webp',
+    q2_1: '/images/questions/question2-1.webp',
+    q2_2: '/images/questions/question2-2.webp',
+    q2_3: '/images/questions/question2-3.webp',
+    q2_4: '/images/questions/question2-4.webp',
+    q3: '/images/questions/question3.webp'
   },
-  // 사건 단서 오디오(녹취) — 사건 #021 (Accountability/Empowered Mindset)
+  // 사건 단서 오디오(녹취) — #021(Accountability/Empowered Mindset) · #011(AI Adoption)
   questionAudio: {
     q3_1: '/audio/sfx/question3/question3-1.mp3',
     q3_2: '/audio/sfx/question3/question3-2.mp3',
     q3_3: '/audio/sfx/question3/question3-3.mp3',
-    q3_4: '/audio/sfx/question3/question3-4.mp3'
+    q3_4: '/audio/sfx/question3/question3-4.mp3',
+    q11: '/audio/sfx/question11/question11.mp3'
   }
 }

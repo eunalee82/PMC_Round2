@@ -8,6 +8,7 @@ import { createTeamManager } from './team-manager.js'
 import { createEntryMonitor } from './entry-monitor.js'
 import { startGame, resetGame } from '../../js/lib/game.js'
 import { resetAllProgress } from '../../js/lib/progress.js'
+import { setDevStage } from '../../js/screens/gameplay/case.js'
 import { getLocale, setLocale } from '../../js/lib/i18n.js'
 
 const DEV_PASSWORD = '2026'
@@ -81,7 +82,13 @@ export function createDevMenu ({ flow }) {
     const teamsBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => teamManager.open() } }, ['팀 관리 (이름·색상)'])
     const entriesBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => entryMonitor.open() } }, ['입장 현황'])
 
-    const caseBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => flow.goTo(FLOW.CASE, { skipGuard: true }) } }, ['사건 · Stage 1 Q1'])
+    // 사건 점프 — 제작 중인 스테이지를 바로 열어 확인한다. Stage 2가 비어 있어 정상 흐름으로는
+    // Stage 3에 도달할 수 없으므로 스테이지별 버튼을 둔다 (setDevStage는 DEV 전용).
+    const caseBtns = [1, 2, 3].map((s) => el('button', {
+      class: 'devmenu__jump',
+      type: 'button',
+      on: { click: () => { setDevStage(s); flow.goTo(FLOW.CASE, { skipGuard: true }) } }
+    }, [`사건 · Stage ${s}`]))
     // 관리자 Start 흉내 — 대기실이 구독 중이면 자동으로 Stage 1로 전환된다 (lib/game.js).
     const startGameBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => startGame() } }, ['관리자: 게임 시작 ▶'])
     const resetGameBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => { resetGame(); resetAllProgress() } } }, ['대기 상태로 되돌리기'])
@@ -91,7 +98,7 @@ export function createDevMenu ({ flow }) {
       el('div', { class: 'devmenu__jumps' }, jumpButtons),
       el('div', { class: 'devmenu__divider' }),
       el('span', { class: 'devmenu__label', text: 'GAMEPLAY (게임)' }),
-      el('div', { class: 'devmenu__jumps' }, [startGameBtn, resetGameBtn, caseBtn]),
+      el('div', { class: 'devmenu__jumps' }, [startGameBtn, resetGameBtn, ...caseBtns]),
       el('div', { class: 'devmenu__divider' }),
       el('span', { class: 'devmenu__label', text: 'TEAMS (팀)' }),
       el('div', { class: 'devmenu__jumps' }, [teamsBtn, entriesBtn]),

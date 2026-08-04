@@ -32,6 +32,12 @@ const STAGE_META = {
 }
 const STAGE_KEYS = { 1: 'mindset', 2: 'domain', 3: 'ai' }
 
+// DEV 전용 스테이지 점프 — 아직 사건이 없는 스테이지(예: Stage 2) 때문에 뒤 스테이지를 정상 흐름으로
+// 열 수 없어서, 제작 중인 스테이지를 바로 확인할 수단을 둔다. 프로덕션 빌드에서는 DEV 메뉴가 제거되어
+// 호출자가 없다(진행 판정 로직 자체는 건드리지 않는다).
+let devStage = null
+export function setDevStage (s) { devStage = s }
+
 // 좌측 사이드바 스냅샷 — 진행 상황(progress) + 랭킹(getRanking).
 // EVIDENCE 아이템 = 해당 스테이지의 모든 사건을 '제출 완료'했을 때 해제(정답 여부 무관).
 function sidebarSnapshot (teamId, teamName, p) {
@@ -279,8 +285,8 @@ export function createCaseScreen (ctx) {
     ]))
   }
 
-  // ── 새로고침 복구: 진행 상황으로 현재 하위 화면 판정 ──
-  const stage = firstIncompleteStage()
+  // ── 새로고침 복구: 진행 상황으로 현재 하위 화면 판정 (DEV 점프가 있으면 그 스테이지) ──
+  const stage = devStage || firstIncompleteStage()
   const cases = stageCasesFor(stage)
   const done = submittedCount(stage)
   if (cases.length === 0 || done === 0) {

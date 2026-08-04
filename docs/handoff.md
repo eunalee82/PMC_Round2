@@ -27,7 +27,9 @@
 ### 구현된 기능 요약
 - **팀**: `src/js/mocks/teams.js` — 테스트 팀 1 + 32개 실팀. 입장 = 팀 선택 + 수사관 3명 이메일 등록(비번 없음). 테스트 팀(`test:true`)은 이메일 없이 즉시 입장.
 - **문제 엔진**: `src/js/screens/gameplay/case.js` — Stage 컨트롤러. Briefing(SCR-007) → Case(SCR-008)+제출확인(SCR-009) → 결과/해설(SCR-010/011) → 마지막이면 Stage Result(SCR-012) → Item Acquisition(SCR-013, 갑질 미러 방패) → 다음 Stage Briefing. 데이터 기반(사건별 전용 로직 없음), 새로고침 복구(첫 미제출 사건/브리핑), 중복 제출 방지.
-- **사건 데이터**: `src/js/data/cases.js` — CASES(본문, 정답 없음) + SOLUTIONS(정답·해설, `answerIndex` 0-기준) + `localizeCase`/`localizeAnalysis`(en 리졸버). Stage 1 = #007(이미지1·보기5·정답4) / #014(이미지4·보기4·정답3) / #021(이미지1+녹취4·보기4·정답4).
+- **사건 데이터**: `src/js/data/cases.js` — CASES(본문, 정답 없음) + SOLUTIONS(정답·해설, `answerIndex` 0-기준) + `localizeCase`/`localizeAnalysis`(en 리졸버). Stage 1 = #007(이미지1·보기5·정답4) / #014(이미지4·보기4·정답3) / #021(이미지1+녹취4·보기4·정답4). Stage 3 = #011(녹취1·보기4·정답4, AI Adoption).
+  - **사건 점프(DEV)**: Stage 2에 사건이 없어 정상 흐름으로는 Stage 3에 못 간다 → DEV 메뉴 `사건 · Stage 1/2/3` 버튼(`setDevStage()`, `case.js`)으로 직접 연다. 프로덕션 빌드에는 DEV 메뉴가 없다.
+  - ⚠️ **Stage 3 완료 이후 흐름 미구현**: `STAGE_META[3]`에 보상 아이템이 없어 Stage Result → `보상 확인`을 누르면 빈 아이템 화면이 나온다. 감독관 임명 → Final Raid → 금배지가 아직 없어서다(다음 작업 후보).
 - **채점**: `src/js/lib/grade.js` (MOCK, 서버 이관 대상).
 - **진행/점수**: `src/js/lib/progress.js` (MOCK, localStorage). 정답수·제출수(스테이지별)·점수·마지막 제출 시각. 랭킹: 점수 내림차순, 동점 시 제출 빠른 순. EVIDENCE 아이템 = 스테이지 전체 제출 시 해제.
 - **게임 상태**: `src/js/lib/game.js` (MOCK, localStorage). `scheduled|started` + `startedAt`. `startGame/resetGame/ensureStarted`, `remainingSeconds`(60분). 대기실이 구독 → started면 자동 전환.
