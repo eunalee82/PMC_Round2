@@ -8,7 +8,7 @@
 
 ## 0. 배포 전 필수 확인 (Go / No-Go)
 
-이 5개가 모두 ✅ 여야 배포한다.
+이 6개가 모두 ✅ 여야 배포한다.
 
 | # | 항목 | 확인 방법 | 현재 |
 |---|---|---|---|
@@ -17,6 +17,7 @@
 | 3 | 공개 회원가입(Sign up) 비활성 | §3 | ⚠️ 확인 필요 |
 | 4 | 번들에 `service_role`·비밀키 없음 | §5 | ✅ |
 | 5 | `npm run build` · `npm run validate` 통과 | §1 | ✅ |
+| 6 | Vercel 환경변수 2개 등록 + **등록 후 재배포** | §4 | ✅ (2026-08-04 등록) |
 
 > 정답 비노출은 §6 에서 해소됐다(번들에 정답 0건).
 
@@ -100,12 +101,22 @@ where pubname='supabase_realtime' and schemaname='public';
 
 | 변수 | Vercel(Production) | `.env.local` | 값 |
 |---|---|---|---|
-| `VITE_SUPABASE_URL` | ✅ 등록 | ✅ | `https://teyngjaladwqolxwykqk.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | ✅ 등록 | ✅ | `sb_publishable_…` (공개 안전) |
+| `VITE_SUPABASE_URL` | ✅ Production·Preview | ✅ | `https://teyngjaladwqolxwykqk.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | ✅ Production·Preview | ✅ | `sb_publishable_…` (공개 안전) |
 | `VITE_BACKEND` | 미설정(기본 supabase) | 미설정 | 비상 시에만 `mock` |
 | `SUPABASE_SERVICE_ROLE_KEY` | ❌ **절대 등록 금지** | ❌ | 시드는 SQL Editor 로 처리 |
 
 - [ ] Vercel 환경변수 등록 후 **재배포**해야 반영된다(빌드 타임에 주입).
+      **미등록 상태로 배포하면 mock 모드로 빌드되고, 프로덕션 mock 은 정답이 없어 채점이 아예 안 된다**
+      (실제로 첫 배포 직전에 미등록 상태였다). 등록 여부는 반드시 명령으로 확인한다:
+      ```bash
+      npx vercel env ls production     # VITE_SUPABASE_URL · VITE_SUPABASE_ANON_KEY 2건
+      ```
+      배포본이 서버 모드인지는 번들에 프로젝트 URL 이 박혔는지로 확인한다:
+      ```bash
+      JS=$(curl -s https://pmc-round2.vercel.app/ | grep -oE '/assets/index-[A-Za-z0-9_-]+\.js')
+      curl -s "https://pmc-round2.vercel.app$JS" | grep -c 'teyngjaladwqolxwykqk.supabase.co'   # 1
+      ```
 - [ ] `.env*` 는 `.gitignore` 대상 — 커밋된 env 파일 0건 확인: `git ls-files | grep -c '^\.env'` → `0`
 
 ---
@@ -191,4 +202,4 @@ npx vercel --prod --yes      # 계정 pingjueuna-3402 · 프로젝트 pmc-round2
 
 | 날짜 | 커밋 | 마이그레이션 | 비고 |
 |---|---|---|---|
-| (미배포) | `bf9e378` 이후 | 0001~0006 적용 · **0007 대기** | 서버 연동 후 첫 배포 예정 |
+| 2026-08-04 | `4e9b57a` | 0001~0006 적용 · **0007 대기** | 서버 연동 후 첫 배포. `dpl_9bXxqeuMugvrtqoG9fQfUMUZU6Cz`<br>배포 전 환경변수 2개를 새로 등록(그 전엔 0건이었다).<br>배포본 검증: 서버 모드 주입 ✅ · 정답·비밀키 0건 ✅ · `game_state` RPC 응답 ✅ · Realtime 연결 ✅ |
