@@ -251,3 +251,4 @@ npx vercel --prod --yes      # 계정 pingjueuna-3402 · 프로젝트 pmc-round2
 | 날짜 | 커밋 | 마이그레이션 | 비고 |
 |---|---|---|---|
 | 2026-08-04 | `4e9b57a` | 0001~0006 적용 · **0007 대기** | 서버 연동 후 첫 배포. `dpl_9bXxqeuMugvrtqoG9fQfUMUZU6Cz`<br>배포 전 환경변수 2개를 새로 등록(그 전엔 0건이었다).<br>배포본 검증: 서버 모드 주입 ✅ · 정답·비밀키 0건 ✅ · `game_state` RPC ✅ · Realtime 연결 ✅<br>프로덕션 anon 침투 점검 9/9 차단 ✅ · Auth provider ON ✅ |
+| 2026-08-05 | `4c11df5` | 0001~0007 적용 · **0008 대기 · 0003 재적용 대기** | 배점 100점 전환 + 사건 #001 확정본. `dpl_AfdHheDV9mFhX9EufmB7kMWnj9MH` (READY)<br>⚠️ **`0008_stage_points.sql` 미적용 상태로 배포됐다** — 서버는 아직 사건당 20점을 주고 화면은 `/100`으로 표시한다. 행사 전 반드시 적용할 것.<br>⚠️ 사건 #001 해설 확정본은 `0003_seed_answers.sql` 재생성·재적용 전까지 서버 응답에 반영되지 않는다.<br>배포 전 검증: `npm run validate` 오류 0 · `npm run build` 성공 · 번들에 해설·정답 0건.<br>GitHub push는 **실패**(자격 증명이 `pingjueuna` 계정으로 잡혀 403) → 커밋은 로컬에만 있다. |
