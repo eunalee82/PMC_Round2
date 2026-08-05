@@ -70,6 +70,12 @@ on conflict (case_id) do update
       answer_index = excluded.answer_index,
       analysis_ko  = excluded.analysis_ko,
       analysis_en  = excluded.analysis_en;
+
+-- 사건 목록에 없는 옛 정답 행 정리 — cases.js 가 정본이다.
+-- upsert 는 사라진 사건을 지우지 않으므로, 사건 id 를 바꾸거나 사건을 교체하면 유령 행이 남는다
+-- (2026-08-05 실측: case_answers 15행이어야 하는데 18행이었다). 배열 비교라 safeupdate 제약도 통과한다.
+delete from public.case_answers
+ where case_id <> all (array[${CASES.map((c) => q(c.id)).join(', ')}]);
 `
 writeFileSync(join(outDir, '0003_seed_answers.sql'), answersSql, 'utf8')
 
