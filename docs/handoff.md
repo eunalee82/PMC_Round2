@@ -227,7 +227,7 @@ Stage 3 아이템(배째 마스터)
 
 ### 7.3 Stage 1 리뷰에서 발견된 미해결 항목
 
-- **`case-003`(가치 판단)의 국문 brief가 "음성을 듣고"라고 지시하는데 음성 소스가 없다.** `public/audio/sfx/`에는 `question3`(=`case-002` 녹취 A~D)·`question11`·`question14`만 있고 `question2/`는 없다. 게다가 **국문과 영문 brief 내용이 다르다** — 영문에는 프로젝트 성과 5항목(일정 준수·예산 내·기능 100%·불만 35%↓·이용 18%↑)과 길동 책임 발언이 있으나 국문에는 그 맥락이 전혀 없어 한국어 참가자가 판단 근거 없이 다이어리 4장만 본다. **결정 필요**: (a) 브리핑 음성 제작 + 자막 제공, (b) 국문 brief를 영문판처럼 텍스트 맥락으로 교체하고 "음성" 문구 삭제(에셋 대기 없음).
+- **`case-003`(가치 판단) 콘텐츠는 사용자가 재작성해 2026-08-06에 전달 예정이다.** 전달되면 국문·영문 brief와 보기·해설을 함께 교체한다. 현재 문제: **국문 brief가 "음성을 듣고"라고 지시하는데 음성 소스가 없다.** `public/audio/sfx/`에는 `question3`(=`case-002` 녹취 A~D)·`question11`·`question14`만 있고 `question2/`는 없다. 게다가 **국문과 영문 brief 내용이 다르다** — 영문에는 프로젝트 성과 5항목(일정 준수·예산 내·기능 100%·불만 35%↓·이용 18%↑)과 길동 책임 발언이 있으나 국문에는 그 맥락이 전혀 없어 한국어 참가자가 판단 근거 없이 다이어리 4장만 본다. **결정 필요**: (a) 브리핑 음성 제작 + 자막 제공, (b) 국문 brief를 영문판처럼 텍스트 맥락으로 교체하고 "음성" 문구 삭제(에셋 대기 없음).
 - **`question4.webp`(222KB)가 디스크에만 있고 코드 미연결** — `assets.js`에 `q4` 키가 없다. 출시 전 지표는 전부 GREEN인데 출시 17분 뒤 AUTH ERROR로 전 기능 DOWN, "성능시험이 보안 우회 시나리오를 포함하지 않았다"는 Incident Analysis가 그려진 **Stage 2용 확정 단서 이미지**다. Stage 2 콘텐츠가 오면 이 이미지가 그 사건의 단서다.
 - **에셋 키 ↔ 사건 순번 불일치**(2↔3 순서 교체 잔재): `case-002`가 `q3`/`q3_1~4`, `case-003`이 `q2_1~4`를 쓴다. `docs/assets-list.md`도 교체 전 번호(#014·#021)로 남아 있다. 동작은 정상이나 다음 사람이 헷갈린다.
 - `case-002` 국문 brief는 문자열 안 `\n`과 `join('\n')`이 섞여 줄 간격이 불규칙하다. 또 국문 prompt("가장 부적절한 대화")보다 **영문 prompt가 Mindset 이름을 명시해 힌트를 더 준다**.
@@ -236,9 +236,23 @@ Stage 3 아이템(배째 마스터)
 
 `~/.claude.json`의 `CONFLUENCE_URL`이 `http://collab.lge.com`인데 실제 컨텍스트 경로는 **`http://collab.lge.com/main`**이다(페이지 URL이 `/main/spaces/...`). 그래서 REST 호출이 다른 인스턴스로 가서 `get_page`는 "no content with the given id", `search`는 404다. → `CONFLUENCE_URL`에 `/main`을 붙이고 MCP 재연결해야 원본 문제 페이지(예: `Gate1. Mindset`)를 읽을 수 있다.
 
-### 7.5 다음 세션에서 바로 해야 할 일
+### 7.5 서버 적용 완료 (2026-08-05 실측 검증)
 
-1. **`0008_stage_points.sql` 적용** (SQL Editor). 미적용 상태에서는 서버가 여전히 20점을 주는데 화면은 `/100`으로 표시한다. 확인: `select public.stage_points(1::smallint)*3 + public.stage_points(2::smallint)*7 + public.stage_points(3::smallint)*5;` → `100`.
-2. **`0003_seed_answers.sql` 적용 후 삭제** (`node scripts/export-seed.mjs`로 재생성 가능 · `.gitignore` 등록됨 · `on conflict do update` 멱등). 사건 #001 해설 확정본이 서버 `case_answers`에 반영돼야 참가자에게 보인다.
-3. 진행 데이터 초기화: 관리자 `?admin` → [대기 상태로 되돌리기] → 확인(=`admin_reset_game(true)`, 입장 점유까지 삭제). 입장 정보를 남기려면 `answers`·`team_progress`만 지우고 `team_progress` 0점 로우를 복원한다(`where true` 필수 — Supabase safeupdate).
-4. §7.3의 `case-003` 음성 결정.
+`0008_stage_points.sql` · `0003_seed_answers.sql` 모두 적용하고 아래를 확인했다.
+
+| 검증 | 값 |
+|---|---|
+| `stage_points(1)*3 + stage_points(2)*7 + stage_points(3)*5` | **100** |
+| `submit_answer` 본문이 `stage_points` 사용 | true |
+| `answers` 중 배점이 0·6·7 이 아닌 행(구 20점 잔재) | 0 |
+| `team_progress` 중 100점 초과 | 0 |
+| `case_answers` 행 수 | **15** |
+| `case-001` 정답 인덱스 · 확정 해설 반영 | 3 · true |
+
+**이 과정에서 발견한 함정**: 정답 시드가 upsert만 해서 **사건 id를 바꾸거나 사건을 교체하면 `case_answers`에 유령 행이 남는다**(실측 18행). `scripts/export-seed.mjs`가 이제 시드 끝에 `delete ... where case_id <> all (array[...])`를 함께 생성한다(커밋 `d1ea95b`). 콘텐츠를 교체할 때마다 재생성·재적용하면 자동으로 정리된다.
+
+### 7.6 다음 세션에서 바로 해야 할 일
+
+1. **`case-003` 확정 콘텐츠 반영** — 사용자가 2026-08-06에 재작성해 전달할 예정(§7.3). 교체 후 `node scripts/export-seed.mjs` → `0003` 재적용 → 파일 삭제.
+2. Stage 2 확정 콘텐츠 7사건 교체(`⏳ STAGE 2 · 임시 데이터` 블록 + `SOLUTIONS` 같은 구간). 단서 이미지 `question4.webp`는 이미 확보돼 있다(§7.3).
+3. 콘텐츠를 바꾼 뒤에는 항상 `npm run validate`(만점 100점 정합 자동 검사) → `npm run build` → `npx vercel --prod --yes`.
