@@ -16,26 +16,25 @@ import { getLocale } from '../lib/i18n.js'
 //    answerIndex 는 choices 배열의 0-기준 인덱스다 (예: 3 = 화면상 "4번").
 // ──────────────────────────────────────────────────────────────────────────
 export const SOLUTIONS = {
-  'case-007': {
-    answerIndex: 3, // 정답: 4번
+  'case-001': {
+    // 확정 콘텐츠(2026-08-05) — 이미지 교체로 단서 5개 → 4개(CLUE 1~4), 해설 본문도 확정본으로 교체.
+    answerIndex: 3, // 정답: ④ 단서 4 · 프로젝트 운영 현황
     analysis: [
-      '이 문제의 함정은 ④도 좋은 PM 활동처럼 보인다는 점입니다.',
-      '실제로 이슈를 관리하고, 버그를 해결하며, 진행률을 관리하는 것은 중요한 PM 업무입니다.',
-      '그러나 PMBOK 8판의 Proactive Mindset은 현재를 잘 관리하는 것을 넘어 미래를 예측하고, 문제를 예방하며, 필요한 의사결정을 앞당기는 것을 강조합니다.',
-      '①, ②, ③, ⑤는 모두 미래를 예측하거나 미래의 문제를 줄이기 위한 활동입니다.',
-      '반면 ④는 이미 발생한 이슈를 얼마나 잘 처리했는지에 초점이 맞춰져 있습니다.'
+      // 해설 문체는 15개 사건 전체가 존댓말이다 — 새 확정본도 같은 문체로 맞춘다(2026-08-05).
+      '정답은 ④ 단서 4 · 프로젝트 운영 현황입니다.',
+      'PMBOK® 8판의 Proactive Mindset은 현재 상태만 보고 안심하는 것이 아니라, 미래 위험과 잠재 문제를 미리 예측하고 대응하는 사고방식을 의미합니다. 단서 ④는 현재 진행률과 이슈 처리율 등 현재 상태만 보여줄 뿐 미래 위험이나 선제적 대응 관점이 나타나지 않아 Proactive Mindset과 가장 거리가 멉니다.',
+      '[단서별 판단]\n① 단서 1 · 프로젝트 일정 예측 대시보드 — 오답입니다. 향후 일정 지연 가능성과 병목 위험을 예측하고 대응계획까지 검토하고 있습니다.\n② 단서 2 · 변경 영향 분석서 — 오답입니다. 변경이 일정·테스트·메모리에 미칠 영향을 사전에 분석하고 있습니다.\n③ 단서 3 · 회의 안건 — 오답입니다. 리스크 검토, Critical Path 점검, 변경 영향 검토 등 선제적 관리 활동을 포함합니다.\n④ 단서 4 · 프로젝트 운영 현황 — 정답입니다. 현재 성과 지표만 보고 있으며 미래 위험 예측이나 예방적 대응 관점이 보이지 않습니다.'
     ].join('\n\n'),
     en: {
       analysis: [
-        'The trap here is that ④ also looks like good PM work.',
-        'Managing issues, fixing bugs, and tracking progress are indeed important PM duties.',
-        'But the Proactive Mindset of PMBOK 8th goes beyond managing the present well — it stresses foreseeing the future, preventing problems, and bringing necessary decisions forward.',
-        '①, ②, ③, and ⑤ are all activities that predict the future or reduce future problems.',
-        '④, by contrast, focuses on how well an issue that has already occurred was handled.'
+        'The answer is ④ Clue 4 · Project Operations Status.',
+        'The Proactive Mindset of PMBOK® 8th Edition means not settling for a look at the present state, but foreseeing future risks and latent problems and acting on them in advance. Clue ④ shows only the present state — overall progress and issue resolution rate — with no view of future risk or pre-emptive response, so it is the farthest from the Proactive Mindset.',
+        '[Clue by clue]\n① Clue 1 · Project Schedule Forecast Dashboard — Incorrect. It forecasts possible schedule delay and bottleneck risk, and reviews the response plans as well.\n② Clue 2 · Change Impact Analysis — Incorrect. It analyses in advance how the change will affect schedule, test cases and memory.\n③ Clue 3 · Meeting Agenda — Incorrect. It covers pre-emptive management activities: risk review, critical path check and change impact review.\n④ Clue 4 · Project Operations Status — Correct. It looks only at current performance indicators, with no future risk forecast or preventive response.'
       ].join('\n\n')
     }
   },
-  'case-014': {
+  // 사건 순서 2↔3 교체(2026-08-05) — 파일 순서는 CASES 와 다르다: 001 → 003 → 002
+  'case-003': {
     answerIndex: 2, // 정답: 3번 (증거물 C)
     analysis: [
       '정답은 증거물 C입니다.',
@@ -54,7 +53,7 @@ export const SOLUTIONS = {
       ].join('\n\n')
     }
   },
-  'case-021': {
+  'case-002': {
     answerIndex: 3, // 정답: 4번 (녹취 D)
     analysis: [
       '정답은 녹취 D입니다.',

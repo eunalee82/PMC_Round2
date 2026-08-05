@@ -156,7 +156,7 @@ Mock 전체 흐름을 커밋하기 전 실시한 점검. **결과: 오류 0**.
 | 콘솔 오류 | 국문·영문 전체 플레이 + 손상 스토리지 부팅 + 초기화까지 **0건**(Vite HMR 로그만) |
 | 프로덕션 번들 DEV 코드 | `fastForward`·`devmenu`·`DEV 잠금`·`createTeamManager` 등 **전부 0건** (DEV 메뉴 미노출 확인) |
 | 없는 에셋 요청 | 종반부까지 네트워크 로그 전수 확인 — `ending.mp4`·미제작 SFX **요청 없음**, 전 요청 200/206/304 |
-| 국문 전체 흐름 | Entry→…→Stage 1(3)→Stage 2(7)→Stage 3(5)→임명→레이드→금배지→종료: 300점·15/15 |
+| 국문 전체 흐름 | Entry→…→Stage 1(3)→Stage 2(7)→Stage 3(5)→임명→레이드→금배지→종료: 100점·15/15 (배점 변경 전 실측은 300점) |
 | 영문 전체 흐름 | 동일 경로 완주, 라벨·해설 전부 영문 |
 | Final Raid 종료 | 클릭 30회 → 20.0초에 격퇴 / 백그라운드 탭(rAF 정지) → **setTimeout 안전망이 20.6초에 종료** |
 
@@ -192,5 +192,53 @@ Stage 3 아이템(배째 마스터)
 - **저장 지점(docs/game-flow.md §18)**: `progress.finale = { appointedAt, raidStartedAt, raidEndedAt, raidHits, raidDamage, badgeAt, endedAt }`. 시각은 최초 1회만 기록하고 누적치(타수·데미지)는 최댓값을 유지한다 → 새로고침해도 기여도가 깎이지 않는다.
 - **새로고침 복구**: 임명 전 → 임명 화면 / 임명 후 레이드 미완료 → 경보부터 다시 / 레이드 완료 → 격퇴 결과 화면 / 금배지 이후 → 마무리했으면(endedAt) 종료 안내, 아니면 금배지 수여식. Stage 3 마지막 사건 제출 직후 새로고침하면 **Stage 3 결과 화면**으로 복구된다(아이템 획득 연출을 건너뛰지 않도록).
 - **레이드 안전장치**: 체력은 `max(경과시간/20초, 타수/140)`로 감소 → 클릭 0회여도 20초에 0이 된다. rAF가 멈추는 백그라운드 탭 대비 `setTimeout(20.6초)` 안전망이 있고 `finish()`는 멱등이다.
-- **랭킹 기준**(`lib/progress.js getRanking`): 총점 → 정답 수 → 제출 완료 시각 → Raid 기여도(§15.1). Raid 타수는 **점수에 가산하지 않고** 표시·동점 처리에만 쓴다(300점 만점 유지).
+- **랭킹 기준**(`lib/progress.js getRanking`): 총점 → 정답 수 → 제출 완료 시각 → Raid 기여도(§15.1). Raid 타수는 **점수에 가산하지 않고** 표시·동점 처리에만 쓴다(100점 만점 유지).
+- **배점**(확정 2026-08-05): 스테이지별 배점 — Stage 1 = 7점×3 = 21 · Stage 2 = 7점×7 = 49 · Stage 3 = 6점×5 = 30 → **총 100점**. 클라이언트 표시값은 `src/js/constants/scoring.js`, 서버 판정은 `stage_points()` + `submit_answer`(`supabase/migrations/0008_stage_points.sql`). 두 값은 항상 같이 고친다.
 - **스크롤 리셋**: 화면 스크롤 컨테이너는 `#flow-root`다. `flow.js`가 화면 전환 시, 각 컨트롤러는 하위 국면 전환 시 `ctx.scrollToTop()`으로 맨 위로 되돌린다(긴 랭킹 화면에서 중간부터 보이던 문제 수정).
+
+---
+
+## 7. 2026-08-05 세션 기록 — 배점 100점 전환 · 사건 #001 확정
+
+### 7.1 배점: 사건당 20점(300점) → 스테이지별 배점(100점)
+
+| Stage | 사건 수 | 사건당 | 스테이지 만점 |
+|---|---|---|---|
+| 1 · Mindset | 3 | 7점 | 21 |
+| 2 · Performance Domain | 7 | 7점 | 49 |
+| 3 · AI Use Case | 5 | 6점 | 30 |
+| **합계** | **15** | — | **100** |
+
+- **단일 출처**: `src/js/constants/scoring.js` (`STAGE_POINTS` · `STAGE_TOTALS` · `STAGE_SCORE_MAX` · `SCORE_MAX` · `pointsFor()`). 양쪽 progress 구현에 중복돼 있던 `STAGE_TOTALS`도 여기로 합쳤고, `POINTS_PER_CASE`(=20)는 **삭제**했다.
+- 표시 반영 지점: 사이드바 만점(`case.js` `scoreMax`) · Stage Result 점수(`solved × pointsFor(s)`) · 관리자 랭킹의 Stage별 점수(`정답 수 × STAGE_POINTS[s]`).
+- **사이드바 `Stage Score` 행은 정답 수/사건 수(`2/7`) 유지** — LayOut 설계값이다(운영 결정). 점수 표기로 바꾸지 않았다.
+- **서버**: `supabase/migrations/0008_stage_points.sql` — `stage_points(stage)` 함수 + `submit_answer`가 이를 사용(stage 는 서버가 `case_answers`에서 확정하므로 클라이언트가 배점을 조작할 수 없다). 기존 20점 기록을 재환산하고 `recalc_team_progress`로 팀 총점을 재집계하는 멱등 블록이 포함돼 있다.
+- **검증 자동화**: `npm run validate`가 "제작된 사건 기준 만점 ≠ `SCORE_MAX`"를 **오류**로 잡는다 → 콘텐츠 교체로 배점이 깨지면 즉시 실패한다.
+- 클라이언트 `scoring.js`와 서버 `stage_points()`는 **항상 같이 고친다**.
+
+### 7.2 사건 #001 (Stage 1 · Proactive Mindset) 확정
+
+- 단서 이미지를 **영문판 1종으로 운영**하기로 결정(국문판 별도 제작 없음). 교체된 `question1.webp`는 단서가 `CLUE 1~4` **4개**(이전 국문판은 5개, ⑤ 리스크 Trigger 관리표가 있었다).
+- 그래서 국문 보기에 **한글 단서명을 `desc`로 붙였다** — 영문 이미지의 소제목을 한글이 짚어주는 구조(`{ label: '단서 1', desc: '프로젝트 일정 예측 대시보드' }`).
+- `fileNo`를 **`#007`로 변경** — 이미지에 인쇄된 `CASE FILE #007`과 화면이 어긋나면 참가자가 다른 사건으로 오인한다. `caseNo`(진행 순번 1)와는 별개 값이다.
+- 해설을 확정본으로 교체(총평 + `[단서별 판단]` 4항목), **문체는 존댓말로 통일** — 15개 사건 중 14개가 존댓말이었다. 정답 인덱스는 `3`(④ 프로젝트 운영 현황) 그대로라 기존 제출 채점 결과는 영향 없다.
+- **PNG → WebP 변환은 필수 작업이다.** 코드가 `.webp` 경로 상수를 참조하므로 PNG만 넣으면 404다. 변환 기준: 일러스트·사진형 = 손실 `q90`, 평면 텍스트·표 캡처형 = 무손실(`lossless=True, method=6`). 이번 건은 q90 → 2.1MB → **211KB, PSNR 44.6dB**. 원본 PNG는 서빙되지 않는 `img/questions/`에 보관했다(git 미추적).
+- 최상위 `img/`·`audio/`·`video/`는 **빈 잔재 폴더**다. 런타임 에셋은 반드시 `public/` 아래.
+
+### 7.3 Stage 1 리뷰에서 발견된 미해결 항목
+
+- **`case-003`(가치 판단)의 국문 brief가 "음성을 듣고"라고 지시하는데 음성 소스가 없다.** `public/audio/sfx/`에는 `question3`(=`case-002` 녹취 A~D)·`question11`·`question14`만 있고 `question2/`는 없다. 게다가 **국문과 영문 brief 내용이 다르다** — 영문에는 프로젝트 성과 5항목(일정 준수·예산 내·기능 100%·불만 35%↓·이용 18%↑)과 길동 책임 발언이 있으나 국문에는 그 맥락이 전혀 없어 한국어 참가자가 판단 근거 없이 다이어리 4장만 본다. **결정 필요**: (a) 브리핑 음성 제작 + 자막 제공, (b) 국문 brief를 영문판처럼 텍스트 맥락으로 교체하고 "음성" 문구 삭제(에셋 대기 없음).
+- **`question4.webp`(222KB)가 디스크에만 있고 코드 미연결** — `assets.js`에 `q4` 키가 없다. 출시 전 지표는 전부 GREEN인데 출시 17분 뒤 AUTH ERROR로 전 기능 DOWN, "성능시험이 보안 우회 시나리오를 포함하지 않았다"는 Incident Analysis가 그려진 **Stage 2용 확정 단서 이미지**다. Stage 2 콘텐츠가 오면 이 이미지가 그 사건의 단서다.
+- **에셋 키 ↔ 사건 순번 불일치**(2↔3 순서 교체 잔재): `case-002`가 `q3`/`q3_1~4`, `case-003`이 `q2_1~4`를 쓴다. `docs/assets-list.md`도 교체 전 번호(#014·#021)로 남아 있다. 동작은 정상이나 다음 사람이 헷갈린다.
+- `case-002` 국문 brief는 문자열 안 `\n`과 `join('\n')`이 섞여 줄 간격이 불규칙하다. 또 국문 prompt("가장 부적절한 대화")보다 **영문 prompt가 Mindset 이름을 명시해 힌트를 더 준다**.
+
+### 7.4 Confluence MCP 가 동작하지 않는다 (도구 설정)
+
+`~/.claude.json`의 `CONFLUENCE_URL`이 `http://collab.lge.com`인데 실제 컨텍스트 경로는 **`http://collab.lge.com/main`**이다(페이지 URL이 `/main/spaces/...`). 그래서 REST 호출이 다른 인스턴스로 가서 `get_page`는 "no content with the given id", `search`는 404다. → `CONFLUENCE_URL`에 `/main`을 붙이고 MCP 재연결해야 원본 문제 페이지(예: `Gate1. Mindset`)를 읽을 수 있다.
+
+### 7.5 다음 세션에서 바로 해야 할 일
+
+1. **`0008_stage_points.sql` 적용** (SQL Editor). 미적용 상태에서는 서버가 여전히 20점을 주는데 화면은 `/100`으로 표시한다. 확인: `select public.stage_points(1::smallint)*3 + public.stage_points(2::smallint)*7 + public.stage_points(3::smallint)*5;` → `100`.
+2. **`0003_seed_answers.sql` 적용 후 삭제** (`node scripts/export-seed.mjs`로 재생성 가능 · `.gitignore` 등록됨 · `on conflict do update` 멱등). 사건 #001 해설 확정본이 서버 `case_answers`에 반영돼야 참가자에게 보인다.
+3. 진행 데이터 초기화: 관리자 `?admin` → [대기 상태로 되돌리기] → 확인(=`admin_reset_game(true)`, 입장 점유까지 삭제). 입장 정보를 남기려면 `answers`·`team_progress`만 지우고 `team_progress` 0점 로우를 복원한다(`where true` 필수 — Supabase safeupdate).
+4. §7.3의 `case-003` 음성 결정.

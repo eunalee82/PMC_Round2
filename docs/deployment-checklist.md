@@ -12,7 +12,7 @@
 
 | # | 항목 | 확인 방법 | 현재 |
 |---|---|---|---|
-| 1 | 마이그레이션 `0001`~`0007` 전부 적용 | §2 쿼리 | ✅ 적용(2026-08-04) · 쿼리 확인 권장 |
+| 1 | 마이그레이션 `0001`~`0008` 전부 적용 | §2 쿼리 | ✅ `0001`~`0007` 적용(2026-08-04) · **`0008`(배점 100점) 적용 필요** |
 | 2 | 관리자 계정 1개 + `admins` 등록 + 로그인 성공 | §3 | ✅ (`euna.lee@lge.com`) |
 | 3 | Email provider **ON** (로그인 가능) | §3.1 | ✅ 2026-08-04 |
 | 3b | 공개 가입 **OFF** | §3.1 | ⚠️ 아직 열림 — **차단 아님**(§3.3) |
@@ -50,6 +50,7 @@ Supabase 대시보드 → **SQL Editor** 에서 **순서대로** 실행(파일 �
 | `0005_fix_admin_reset.sql` | 리허설 초기화의 WHERE 누락 수정 |
 | `0006_transfer_returns_emails.sql` | 기기 인계 시 팀원 명단 반환 |
 | `0007_fix_submit_end_reason.sql` | **종료 후 제출 사유를 `game_ended`로 정정** |
+| `0008_stage_points.sql` | **배점 변경: 스테이지별 7·7·6 → 총 100점** (기존 제출분 재환산 포함) |
 
 `0003` 생성: `node scripts/export-seed.mjs` → `supabase/migrations/0003_seed_answers.sql` 생성 → 적용 → **파일 삭제**.
 
@@ -73,6 +74,12 @@ select position('status = ''ended''' in pg_get_functiondef(p.oid)) > 0 as has_en
 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
 where n.nspname='public' and p.proname='submit_answer';
 -- 기대: true
+
+-- 0008 적용 여부 (배점: 7·7·6 → 총 100점)
+select public.stage_points(1::smallint) * 3
+     + public.stage_points(2::smallint) * 7
+     + public.stage_points(3::smallint) * 5 as score_max;
+-- 기대: 100 (함수가 없으면 0008 미적용)
 
 -- Realtime publication
 select tablename from pg_publication_tables
@@ -217,7 +224,7 @@ npx vercel --prod --yes      # 계정 pingjueuna-3402 · 프로젝트 pmc-round2
 - [ ] A기기: 입장 → 팀 선택(테스트 팀) → 이메일 3개 → 서약 → 대기실
 - [ ] 관리자(`?admin`) 로그인 → 상태 `SCHEDULED` 확인 → **[게임 시작]**
 - [ ] A기기 대기실이 **5초 내** Stage 1로 자동 전환
-- [ ] 사건 1건 제출 → `CASE RESOLVED` + 해설 표시 + 사이드바 점수 20점
+- [ ] 사건 1건 제출 → `CASE RESOLVED` + 해설 표시 + 사이드바 점수 가산(Stage 1·2 = 7점, Stage 3 = 6점 / 만점 100)
 - [ ] A기기 **새로고침** → 같은 지점·점수로 복구
 - [ ] B기기에서 같은 팀 선택 → 재입장 모달 → 등록 이메일로 인계 → A기기는 팀 선택으로 되돌아감
 - [ ] 관리자 [팀 현황] → 입장 팀·이메일 확인 / [최종 랭킹 발표] → 점수 확인

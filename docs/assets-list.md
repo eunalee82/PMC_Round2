@@ -40,7 +40,7 @@
 
 | File | Purpose | Status |
 |---|---|---|
-| /images/questions/question1.webp | Stage 1 · 1번째 사건 #007 단서 5 (Proactive Mindset) | 있음 · 사용 중 |
+| /images/questions/question1.webp | Stage 1 · 1번째 사건 #007 단서 4 (Proactive Mindset) — **영문판 이미지**(CLUE 1~4). 2026-08-05 교체: 단서 5개→4개, 국문→영문 | 있음 · 사용 중 |
 | /images/questions/question2-1.webp | Stage 1 · 2번째 사건 #014 단서 1/4 (증거물 A) | 있음 · 사용 중 |
 | /images/questions/question2-2.webp | Stage 1 · 2번째 사건 #014 단서 2/4 (증거물 B) | 있음 · 사용 중 |
 | /images/questions/question2-3.webp | Stage 1 · 2번째 사건 #014 단서 3/4 (증거물 C) | 있음 · 사용 중 |

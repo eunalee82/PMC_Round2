@@ -1,10 +1,12 @@
 // LeftSidebar — persistent case HUD (LayOut.png):
-// selected Agent Team + Investigation Score (/300) · Ranking · Stage Score · Evidence Items · Version.
-// Scoring model: 20 pts per case × 15 = 300 max (Stage 1 = 60, Stage 2 = 140, Stage 3 = 100).
+// selected Agent Team + Investigation Score (/100) · Ranking · Stage Score · Evidence Items · Version.
+// Scoring model (js/constants/scoring.js): Stage 1 = 7×3 = 21, Stage 2 = 7×7 = 49, Stage 3 = 6×5 = 30 → 100 max.
+// scoreMax 는 화면(screens)이 넘긴다 — 이 컴포넌트는 표시만 한다.
 // update(props)로 점수·랭킹·아이템을 다시 그린다 (사건 해결 시 사이드바 갱신). 서버 연결 시 store 구독으로 교체.
 import { el } from '../../js/utils/dom.js'
 import { icon } from '../../js/utils/icons.js'
 import { t } from '../../js/lib/copy.js'
+import { SCORE_MAX } from '../../js/constants/scoring.js'
 
 const STAGE_ICONS = { mindset: 'brain', domain: 'cube', ai: 'cpu' }
 
@@ -21,7 +23,7 @@ export function createLeftSidebar (props = {}) {
 
   function render (p) {
     const {
-      team = { name: 'UNASSIGNED', rank: '신입 수사관', score: 0, scoreMax: 300 },
+      team = { name: 'UNASSIGNED', rank: '신입 수사관', score: 0, scoreMax: SCORE_MAX },
       ranking = [],
       stageScore = [],
       items = [],
@@ -30,7 +32,7 @@ export function createLeftSidebar (props = {}) {
 
     const scorePct = team.scoreMax > 0 ? Math.max(0, Math.min(100, (team.score / team.scoreMax) * 100)) : 0
 
-    // Agent — selected team, rank, Investigation Score out of 300
+    // Agent — selected team, rank, Investigation Score out of 100
     const agent = el('div', { class: 'agent framed' }, [
       el('div', { class: 'agent__top' }, [
         el('span', { class: 'agent__team', text: team.name }),
@@ -39,7 +41,7 @@ export function createLeftSidebar (props = {}) {
       el('div', { class: 'agent__label caps', text: 'Investigation Score' }),
       el('div', { class: 'agent__score' }, [
         el('b', { text: String(team.score ?? 0) }),
-        el('span', { text: `/ ${team.scoreMax ?? 300} ${t('sidebar.points')}` })
+        el('span', { text: `/ ${team.scoreMax ?? SCORE_MAX} ${t('sidebar.points')}` })
       ]),
       el('div', { class: 'agent__bar' }, [el('div', { class: 'agent__bar-fill', style: { width: `${scorePct}%` } })])
     ])

@@ -2,10 +2,11 @@
 // 서버 연결 시(Step 3): 제출·채점·점수·시각은 서버가 판정·저장(권위) → 이 모듈은 그 결과 캐시로 바뀐다
 // (CLAUDE.md §8 저장 시점, §10 서버 권위, §11 중복 방지). 지금은 lib/grade.js(MOCK) 결과를 여기 기록.
 import { getTeams } from './teams.js'
+import { STAGE_TOTALS, pointsFor } from '../constants/scoring.js'
 
 const KEY = 'pmb.progress.v1'
-export const POINTS_PER_CASE = 20 // 20점 × 15사건 = 300점 만점 (LeftSidebar 기준)
-export const STAGE_TOTALS = { 1: 3, 2: 7, 3: 5 } // 스테이지별 사건 수 (LayOut 0/3·0/7·0/5)
+// 배점은 constants/scoring.js 가 단일 출처다 (Stage 1·2 = 7점, Stage 3 = 6점 → 총 100점).
+export { STAGE_TOTALS }
 
 function readAll () {
   try { const v = JSON.parse(localStorage.getItem(KEY)); return v && typeof v === 'object' ? v : {} } catch { return {} }
@@ -74,7 +75,7 @@ export function recordSubmission (teamId, caseId, stage, isCorrect) {
   // 정답 집계 — 점수/정답 수
   if (isCorrect && !p.solved.includes(caseId)) {
     p.solved.push(caseId)
-    p.score += POINTS_PER_CASE
+    p.score += pointsFor(stage) // 스테이지별 배점 (7·7·6)
     p.stage[stage] = (p.stage[stage] || 0) + 1
   }
   all[k] = p
@@ -83,7 +84,8 @@ export function recordSubmission (teamId, caseId, stage, isCorrect) {
 }
 
 // 랭킹 — 순위 기준은 docs/game-flow.md §15.1: 총점 → 정답 수 → 제출 완료 시각 → Final Raid 기여도.
-// (총점 = 20 × 정답 수라 실질 동점 판정은 제출 시각부터 갈린다. 미제출=시각 없음은 동점 그룹 최하위.)
+// (스테이지별 배점이 달라 같은 총점에도 정답 수가 다를 수 있다 → 정답 수가 실제 tie-break로 동작한다.
+//  미제출=시각 없음은 동점 그룹 최하위.)
 // 최종 랭킹 화면(SCR-022)이 Stage별 점수·정답 수·완료 시각·Raid 공격 수·획득 장비를 함께 쓴다.
 // 서버 연동 시 rankings 뷰로 교체.
 export function getRanking () {

@@ -11,8 +11,8 @@ import * as server from './progress-server.js'
 
 const impl = isServerMode() ? server : mock
 
-export const POINTS_PER_CASE = impl.POINTS_PER_CASE
-export const STAGE_TOTALS = impl.STAGE_TOTALS
+// 배점·사건 수는 백엔드와 무관한 게임 규칙이므로 constants/scoring.js 를 그대로 다시 내보낸다.
+export { STAGE_TOTALS, STAGE_POINTS, STAGE_SCORE_MAX, SCORE_MAX, pointsFor } from '../constants/scoring.js'
 
 // ── 동기 조회 ──
 export function getProgress (teamId) { return impl.getProgress(teamId) }

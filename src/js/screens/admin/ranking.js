@@ -8,7 +8,7 @@ import { el } from '../../utils/dom.js'
 import { icon } from '../../utils/icons.js'
 import { t } from '../../lib/copy.js'
 import { STAGE_META, STAGE_ITEM_ICONS } from '../../constants/stages.js'
-import { getRanking, POINTS_PER_CASE } from '../../lib/progress.js'
+import { getRanking, STAGE_POINTS } from '../../lib/progress.js'
 import { builtTotal, STAGES } from '../../lib/stage-progress.js'
 import { supabase, isServerMode } from '../../lib/supabase.js'
 import { createButton } from '../../../components/primitives/button.js'
@@ -61,7 +61,8 @@ export function createRankingView (props = {}) {
       el('span', { class: 'rankrow__rank mono', text: String(r.rank) }),
       el('span', { class: 'rankrow__team', text: r.name }),
       el('span', { class: 'rankrow__score mono', text: String(r.score) }),
-      el('span', { class: 'rankrow__stages mono', text: `${r.stage[1] * POINTS_PER_CASE} · ${r.stage[2] * POINTS_PER_CASE} · ${r.stage[3] * POINTS_PER_CASE}` }),
+      // Stage별 점수 = 정답 수 × 스테이지 배점(7·7·6) — 총점(서버 값)과 같은 규칙으로 환산한다.
+      el('span', { class: 'rankrow__stages mono', text: STAGES.map((s) => (r.stage[s] || 0) * STAGE_POINTS[s]).join(' · ') }),
       el('span', { class: 'rankrow__solved mono', text: String(r.solved) }),
       el('span', { class: 'rankrow__time mono', text: fmtTime(r.lastSubmitAt) }),
       el('span', { class: 'rankrow__raid mono', text: String(r.raidHits) }),

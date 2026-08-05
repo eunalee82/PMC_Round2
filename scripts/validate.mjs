@@ -1,6 +1,6 @@
 // 콘텐츠 정합성 검증 — `npm run validate` (Node만 사용, 추가 패키지 없음).
 // 무엇을 보는가:
-//   1) 사건 데이터: id 유일성, stage/caseNo 순번, 보기 개수, 정답 인덱스 범위, 스테이지별 사건 수
+//   1) 사건 데이터: id 유일성, stage/caseNo 순번, 보기 개수, 정답 인덱스 범위, 스테이지별 사건 수, 만점 100점
 //   2) 다국어(ko/en): en 필드 존재 여부, ko와 보기 개수 일치, 해설 en 존재 여부
 //   3) 미디어 경로: evidence의 이미지·오디오가 public/ 에 실제로 있는지 (Vercel/Linux 대소문자 구분)
 //   4) UI 문구 키: 코드가 t('키')로 찾는 키가 COPY.ko에 있는지, en 누락 키 목록
@@ -19,7 +19,7 @@ globalThis.localStorage = { getItem: () => null, setItem: () => {} }
 const { CASES } = await import('../src/js/data/cases.js')
 const { SOLUTIONS } = await import('../src/js/dev/solutions.js') // 정답은 DEV 전용 모듈
 const { COPY } = await import('../src/js/constants/copy.js')
-const { STAGE_TOTALS } = await import('../src/js/lib/progress.js')
+const { STAGE_TOTALS, STAGE_POINTS, SCORE_MAX } = await import('../src/js/lib/progress.js')
 
 const errors = []
 const warnings = []
@@ -93,6 +93,13 @@ for (const s of [1, 2, 3]) {
   })
   const placeholders = cases.filter((c) => c.placeholder).length
   if (placeholders) warn(`Stage ${s}: 임시(placeholder) 사건 ${placeholders}/${cases.length}개 — 확정 콘텐츠로 교체 대상`)
+}
+
+// ── 3b) 배점 — 제작된 사건으로 실제 만점이 100점인지 (constants/scoring.js와 서버 배점이 어긋나면 랭킹이 깨진다)
+const builtMax = [1, 2, 3].reduce((sum, s) => sum + byStage[s].length * STAGE_POINTS[s], 0)
+if (builtMax !== SCORE_MAX) {
+  fail(`배점 불일치: 제작된 사건 기준 만점 ${builtMax}점 ≠ 설계 만점 ${SCORE_MAX}점 ` +
+    `(Stage별 ${[1, 2, 3].map((s) => `${byStage[s].length}×${STAGE_POINTS[s]}`).join(' + ')})`)
 }
 
 // SOLUTIONS에만 남은 고아 정답(사건 교체 후 잔재) 탐지

@@ -28,3 +28,6 @@ dist-ssr
 
 # 정답 시드 — 저장소에 정답을 남기지 않는다 (생성 → 적용 → 삭제)
 supabase/migrations/0003_seed_answers.sql
+
+# 이미지 원본 반입용 폴더 — 서빙·번들 대상이 아니다(WebP로 변환해 public/ 에 넣는다)
+/img/

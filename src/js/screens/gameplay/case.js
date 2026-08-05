@@ -14,7 +14,7 @@ import { localizeCase } from '../../data/cases.js'
 import { submitCase } from '../../lib/grade.js'
 import { findTeam } from '../../lib/teams.js'
 import { remainingSeconds, isEnded, subscribe as subscribeGame, getConnection, subscribeConnection } from '../../lib/game.js'
-import { getProgress, getRanking, STAGE_TOTALS, subscribeProgress } from '../../lib/progress.js'
+import { getProgress, getRanking, STAGE_TOTALS, SCORE_MAX, pointsFor, subscribeProgress } from '../../lib/progress.js'
 import { stageCases, builtTotal, submittedCount, isStageComplete, firstIncompleteStage } from '../../lib/stage-progress.js'
 import { createButton } from '../../../components/primitives/button.js'
 import { createModal } from '../../../components/primitives/modal.js'
@@ -33,7 +33,7 @@ function sidebarSnapshot (teamId, teamName, p) {
   const base = scored.length ? scored : ranking.filter((r) => r.teamId === teamId)
   const rankingRows = base.slice(0, 4).map((r) => ({ rank: r.rank, name: r.name, score: r.score, isMe: r.teamId === teamId }))
   return {
-    team: { name: teamName, rank: t('agent.rankRookie'), score: p.score, scoreMax: 300 },
+    team: { name: teamName, rank: t('agent.rankRookie'), score: p.score, scoreMax: SCORE_MAX },
     ranking: teamName !== 'UNASSIGNED' ? rankingRows : [],
     stageScore: [
       { key: 'mindset', label: 'Mindset', score: p.stage[1] || 0, max: STAGE_TOTALS[1] },
@@ -292,7 +292,7 @@ export function createCaseScreen (ctx) {
     const p = getProgress(teamId)
     const total = stageCasesFor(s).length
     const solved = p.stage[s] || 0
-    const score = solved * 20
+    const score = solved * pointsFor(s) // Stage 배점: 1·2 = 7점, 3 = 6점 (constants/scoring.js)
     const rate = total ? Math.round((solved / total) * 100) : 0
     const stat = (k, v) => el('div', { class: 'sresult__stat' }, [
       el('span', { class: 'sresult__stat-val mono', text: v }),

@@ -9,9 +9,10 @@
 // 점수·정답 판정은 절대 여기서 하지 않는다. 서버 응답만 반영한다(CLAUDE.md §2 §7).
 import { supabase, rpc } from './supabase.js'
 import { getClaimToken } from './entries.js'
+import { STAGE_TOTALS } from '../constants/scoring.js'
 
-export const POINTS_PER_CASE = 20 // 표시용 상수 (실제 배점은 서버 submit_answer)
-export const STAGE_TOTALS = { 1: 3, 2: 7, 3: 5 }
+// 배점 표시는 constants/scoring.js, 실제 배점 판정은 서버 submit_answer 가 한다(둘은 같은 값을 유지).
+export { STAGE_TOTALS }
 
 function blankFinale () {
   return { appointedAt: null, raidStartedAt: null, raidEndedAt: null, raidHits: 0, raidDamage: 0, badgeAt: null, endedAt: null }

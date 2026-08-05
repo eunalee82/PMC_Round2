@@ -14,28 +14,33 @@ export const CASES = [
     id: 'case-001',
     stage: 1, // Stage 1 · Mindset
     caseNo: 1, // Stage 내 사건 순번
-    fileNo: '#001',
+    // 사건 파일 번호는 단서 이미지에 인쇄된 값(CASE FILE #007)에 맞춘다 — 화면과 이미지가 어긋나면
+    // 참가자가 다른 사건으로 오인한다(운영 결정 2026-08-05). caseNo(진행 순번)와는 별개 값이다.
+    fileNo: '#007',
     title: '양산 D-30, 누가 미래를 놓쳤는가?',
     brief: [
       'PM보호국은 양산 30일 전 진행된 프로젝트 회의실을 조사했다.',
       '프로젝트는 당시 모든 일정이 정상으로 보고되었지만, 양산 직전 핵심 기능의 결함이 발견되어 출시가 3주 연기되었다.',
       '현장에는 PM이 남긴 여러 자료가 있었다.',
-      '그런데… 단 하나의 자료만 PMBOK® 8판의 Proactive Mindset과 가장 거리가 멀었다.',
+      '그런데…',
+      '단 하나의 자료만 PMBOK® 8판의 Proactive Mindset과 가장 거리가 멀었다.',
       '그 증거를 찾아라.'
     ].join('\n'),
     prompt: '다음 프로젝트 현장에 남아 있는 4가지 단서 중 PMBOK® 8판의 Proactive Mindset과 가장 거리가 먼 단서는 무엇인가?',
     evidence: {
       caption: 'EVIDENCE · 현장 단서 4',
       images: [
-        { src: ASSETS.questions.q1, alt: '사건 #007 현장에 남은 4가지 단서' }
+        { src: ASSETS.questions.q1, alt: '사건 현장에 남은 4가지 단서 (CLUE 1~4)' }
       ]
     },
-    // 보기(단서) — 순서 = 화면 번호 1~4, 이미지의 단서 라벨과 일치.
+    // 보기(단서) — 순서 = 화면 번호 1~4 = 이미지의 CLUE 1~4.
+    // 단서 이미지는 영문판 하나로 운영하므로(운영 결정 2026-08-05), 국문 화면에서는 desc의 한글 단서명이
+    // 이미지의 영문 소제목(Project Schedule Forecast Dashboard 등)을 대신 짚어주는 역할을 한다.
     choices: [
-      '단서 1',
-      '단서 2',
-      '단서 3',
-      '단서 4'
+      { label: '단서 1', desc: '프로젝트 일정 예측 대시보드' },
+      { label: '단서 2', desc: '변경 영향 분석서' },
+      { label: '단서 3', desc: '회의 안건' },
+      { label: '단서 4', desc: '프로젝트 운영 현황' }
     ],
     en: {
       title: 'Mass Production D-30: Who Missed the Future?',
@@ -48,13 +53,13 @@ export const CASES = [
       prompt: 'Among the four clues left at the project scene, which is farthest from the Proactive Mindset of PMBOK® 8th Edition?',
       evidence: {
         caption: 'EVIDENCE · 4 scene clues',
-        images: [{ src: ASSETS.questions.q1, alt: 'Four clues left at the scene of Case #007' }]
+        images: [{ src: ASSETS.questions.q1, alt: 'Four clues left at the scene (CLUE 1-4)' }]
       },
       choices: [
-        'Clue 1',
-        'Clue 2',
-        'Clue 3',
-        'Clue 4'
+        { label: 'Clue 1', desc: 'Project Schedule Forecast Dashboard' },
+        { label: 'Clue 2', desc: 'Change Impact Analysis' },
+        { label: 'Clue 3', desc: 'Meeting Agenda' },
+        { label: 'Clue 4', desc: 'Project Operations Status' }
       ]
     }
   },
@@ -167,7 +172,7 @@ export const CASES = [
   //    끊김 없이 테스트·시연하기 위한 최소 Mock이며, 다음 규칙만 지키면 확정 콘텐츠로 그대로 교체된다.
   //      · 데이터 구조·게임 엔진은 손대지 않는다 — 이 배열 항목과 SOLUTIONS 항목만 바꾼다.
   //      · placeholder: true 를 지우면 화면의 '임시 데이터' 표시가 사라진다(case.js가 이 필드만 본다).
-  //      · 사건 수 7개 = STAGE_TOTALS[2] (점수 만점 300점 = 20점 × 15사건) 유지.
+  //      · 사건 수 7개 = STAGE_TOTALS[2] 유지 (Stage 2 만점 49점 = 7점 × 7사건 · 총 100점 · constants/scoring.js).
   //      · 단서 미디어가 준비되면 evidence(images/audios)를 추가한다 — 지금은 텍스트 단서만 사건 개요에 있다.
   //    주제는 docs/game-flow.md §9.2의 Q4~Q10(Governance·Financial·Scope·Stakeholders·Risk·Schedule·Resources)을 따른다.
   //    fileNo(#T04~#T10)는 임시 번호다 — 확정 시 실제 사건 파일 번호로 바꾼다.
