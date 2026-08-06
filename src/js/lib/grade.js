@@ -15,7 +15,14 @@ import { isEnded } from './game.js'
 
 const SERVER_REASONS = ['already_submitted', 'game_ended', 'game_not_started', 'not_owner', 'unknown_case', 'no_backend']
 
-export async function submitCase ({ teamId, caseId, stage, choiceIndex }) {
+// 복수 정답 사건(사건 #005)은 choiceIndexes(배열)로 온다 — 집합이 정확히 일치해야 정답이다(부분 점수 없음).
+const sameSet = (a, b) => {
+  if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false
+  const s = new Set(b)
+  return a.every((v) => s.has(v))
+}
+
+export async function submitCase ({ teamId, caseId, stage, choiceIndex, choiceIndexes = null }) {
   if (!isServerMode()) {
     // ── mock 채점 (비상 경로) ──
     // 정답은 DEV 전용 모듈에만 있고, 이 분기는 프로덕션 빌드에서 통째로 제거된다
@@ -25,28 +32,40 @@ export async function submitCase ({ teamId, caseId, stage, choiceIndex }) {
     const { SOLUTIONS, localizeAnalysis } = await import('../dev/solutions.js')
     const sol = SOLUTIONS[caseId]
     if (!sol) return { ok: false, reason: 'unknown_case' }
-    const isCorrect = choiceIndex === sol.answerIndex
+    const isMulti = Array.isArray(sol.answerIndexes)
+    const isCorrect = isMulti ? sameSet(choiceIndexes, sol.answerIndexes) : choiceIndex === sol.answerIndex
     recordSubmission(teamId, caseId, stage, isCorrect)
-    return { ok: true, isCorrect, correctIndex: sol.answerIndex, analysis: localizeAnalysis(sol) }
+    return {
+      ok: true,
+      isCorrect,
+      correctIndex: isMulti ? undefined : sol.answerIndex,
+      correctIndexes: isMulti ? sol.answerIndexes : undefined,
+      analysis: localizeAnalysis(sol)
+    }
   }
 
   const token = getClaimToken(teamId)
   if (!token) return { ok: false, reason: 'not_owner' }
 
   try {
-    const data = await rpc('submit_answer', {
+    // p_choice_indexes 는 **복수 정답 사건일 때만** 넣는다. 항상 보내면 0009 미적용 서버에서
+    // PostgREST 가 함수 시그니처를 못 찾아 단일 선택 사건의 제출까지 전부 실패한다.
+    const args = {
       p_team_id: teamId,
       p_token: token,
       p_case_id: caseId,
       p_stage: stage,
-      p_choice_index: choiceIndex,
+      p_choice_index: choiceIndexes ? null : choiceIndex,
       p_locale: getLocale()
-    })
+    }
+    if (choiceIndexes) args.p_choice_indexes = choiceIndexes
+    const data = await rpc('submit_answer', args)
     applySubmit(caseId, data.stage || stage, data) // 서버 응답으로 캐시 확정
     return {
       ok: true,
       isCorrect: !!data.is_correct,
       correctIndex: data.correct_index,
+      correctIndexes: data.correct_indexes || null,
       analysis: data.analysis || ''
     }
   } catch (err) {

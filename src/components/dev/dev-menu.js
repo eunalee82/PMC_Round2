@@ -102,8 +102,33 @@ export function createDevMenu ({ flow }) {
       on: { click: () => { fastForwardToFinale(flow.teamId(), ff); flow.goTo(step, { skipGuard: true }) } }
     }, [label]))
     // 관리자 Start 흉내 — 대기실이 구독 중이면 자동으로 Stage 1로 전환된다 (lib/game.js).
-    const startGameBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => startGame() } }, ['관리자: 게임 시작 ▶'])
-    const resetGameBtn = el('button', { class: 'devmenu__jump', type: 'button', on: { click: () => { resetGame(); resetAllProgress() } } }, ['대기 상태로 되돌리기'])
+    // ⚠️ 서버 모드에서는 관리자 액션이 서버 `is_admin()` 검증을 거친다 → DEV 메뉴로는 'forbidden'이 난다.
+    //    이전 판은 실패한 Promise를 그대로 버려서 "눌러도 아무 일이 없다"로 보였다(원인 파악 불가).
+    //    실패 사유를 버튼에 직접 띄운다 — DEV 도구라 별도 토스트 대신 라벨을 임시로 바꾼다.
+    const adminAction = (btn, label, fn) => async () => {
+      btn.disabled = true
+      btn.textContent = '실행 중…'
+      try {
+        await fn()
+        btn.textContent = label
+      } catch (err) {
+        const forbidden = err && (err.code === 'forbidden' || err.code === '42501')
+        btn.textContent = forbidden ? '권한 없음 — ?admin 로그인 필요' : `실패: ${(err && err.code) || 'unknown'}`
+        console.warn('[dev] 관리자 액션 실패 —', err)
+        setTimeout(() => { btn.textContent = label }, 4000)
+      } finally {
+        btn.disabled = false
+      }
+    }
+    const startLabel = '관리자: 게임 시작 ▶'
+    const startGameBtn = el('button', { class: 'devmenu__jump', type: 'button' }, [startLabel])
+    startGameBtn.addEventListener('click', adminAction(startGameBtn, startLabel, () => startGame()))
+    const resetLabel = '대기 상태로 되돌리기'
+    const resetGameBtn = el('button', { class: 'devmenu__jump', type: 'button' }, [resetLabel])
+    resetGameBtn.addEventListener('click', adminAction(resetGameBtn, resetLabel, async () => {
+      await resetGame()
+      resetAllProgress()
+    }))
 
     body.replaceChildren(
       el('span', { class: 'devmenu__label', text: 'JUMP TO SCREEN' }),

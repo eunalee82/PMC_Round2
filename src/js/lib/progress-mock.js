@@ -2,11 +2,35 @@
 // 서버 연결 시(Step 3): 제출·채점·점수·시각은 서버가 판정·저장(권위) → 이 모듈은 그 결과 캐시로 바뀐다
 // (CLAUDE.md §8 저장 시점, §10 서버 권위, §11 중복 방지). 지금은 lib/grade.js(MOCK) 결과를 여기 기록.
 import { getTeams } from './teams.js'
+import { CASES } from '../data/cases.js'
 import { STAGE_TOTALS, pointsFor } from '../constants/scoring.js'
 
 const KEY = 'pmb.progress.v1'
 // 배점은 constants/scoring.js 가 단일 출처다 (Stage 1·2 = 7점, Stage 3 = 6점 → 총 100점).
 export { STAGE_TOTALS }
+
+// 사건 id → stage. **스테이지별 집계와 점수는 저장된 누적 카운터가 아니라 이 표로 매번 다시 계산한다.**
+// 이전에는 recordSubmission 이 p.stage[s]·p.score 를 += 로 쌓아 두고 그 값을 그대로 보여줬다. 그래서
+// 콘텐츠를 교체해 사건 id가 사라지거나 옛 테스트 기록이 localStorage 에 남으면 카운터가 영구히 부풀어
+// '해결 4/3' 처럼 사건 수를 넘는 값이 나오고, 총점도 스테이지 합과 어긋났다(실측 2026-08-06).
+// 지금은 solved/submitted 목록(=원본 기록)만 저장하고 집계는 파생값이라, 사라진 사건은 자동으로 빠진다.
+const STAGE_OF_CASE = new Map(CASES.map((c) => [c.id, c.stage]))
+
+// 현재 사건 목록에 있는 id만 스테이지별로 센다 (없는 id = 콘텐츠 교체 잔재 → 무시).
+function tally (ids) {
+  const per = { 1: 0, 2: 0, 3: 0 }
+  for (const id of ids || []) {
+    const s = STAGE_OF_CASE.get(id)
+    if (s) per[s] += 1
+  }
+  return per
+}
+function scoreOf (perStage) {
+  return [1, 2, 3].reduce((sum, s) => sum + perStage[s] * pointsFor(s), 0)
+}
+function countOf (perStage) {
+  return perStage[1] + perStage[2] + perStage[3]
+}
 
 function readAll () {
   try { const v = JSON.parse(localStorage.getItem(KEY)); return v && typeof v === 'object' ? v : {} } catch { return {} }
@@ -26,12 +50,15 @@ function keyOf (teamId) { return teamId || 'preview' }
 export function getProgress (teamId) {
   const p = readAll()[keyOf(teamId)]
   if (!p) return blank()
+  const solved = [...(p.solved || [])]
+  const submitted = [...(p.submitted || [])]
+  const stage = tally(solved)
   return {
-    solved: [...(p.solved || [])],
-    score: p.score || 0,
-    stage: { 1: 0, 2: 0, 3: 0, ...(p.stage || {}) },
-    submitted: [...(p.submitted || [])],
-    submittedStage: { 1: 0, 2: 0, 3: 0, ...(p.submittedStage || {}) },
+    solved,
+    score: scoreOf(stage), // 스테이지 합과 항상 일치한다 (저장된 p.score 는 더 이상 신뢰하지 않는다)
+    stage,
+    submitted,
+    submittedStage: tally(submitted),
     lastSubmitAt: p.lastSubmitAt || null,
     finale: { ...blankFinale(), ...(p.finale || {}) }
   }
@@ -60,24 +87,18 @@ export function recordFinale (teamId, patch = {}) {
 
 // 사건 제출 기록 — 마지막 제출 시각(종료 시간 판정·랭킹 동점 처리용)을 남기고,
 // 정답이면 점수·정답 수를 가산한다. 이미 푼 사건은 재가산하지 않는다 (중복 방지, CLAUDE.md §8).
+// stage 인자는 서버 구현(progress-server.js)과 시그니처를 맞추기 위해 남겨 둔다 — mock 은 집계를
+// solved/submitted 목록에서 파생하므로 쓰지 않는다(사건의 stage 는 CASES 가 단일 출처다).
 export function recordSubmission (teamId, caseId, stage, isCorrect) {
   const all = readAll()
   const k = keyOf(teamId)
   const p = all[k] || blank()
   if (!p.submitted) p.submitted = []
-  if (!p.submittedStage) p.submittedStage = { 1: 0, 2: 0, 3: 0 }
+  if (!p.solved) p.solved = []
   p.lastSubmitAt = Date.now()
-  // 제출 집계 (정답/오답 무관) — EVIDENCE 해제 판정용. 사건은 1회만 제출되므로 caseId로 중복 방지.
-  if (!p.submitted.includes(caseId)) {
-    p.submitted.push(caseId)
-    p.submittedStage[stage] = (p.submittedStage[stage] || 0) + 1
-  }
-  // 정답 집계 — 점수/정답 수
-  if (isCorrect && !p.solved.includes(caseId)) {
-    p.solved.push(caseId)
-    p.score += pointsFor(stage) // 스테이지별 배점 (7·7·6)
-    p.stage[stage] = (p.stage[stage] || 0) + 1
-  }
+  // 원본 기록만 남긴다 — 사건은 1회만 제출되므로 caseId로 중복 방지. 카운터·점수는 저장하지 않는다.
+  if (!p.submitted.includes(caseId)) p.submitted.push(caseId)
+  if (isCorrect && !p.solved.includes(caseId)) p.solved.push(caseId)
   all[k] = p
   writeAll(all)
   return getProgress(teamId)
@@ -93,13 +114,15 @@ export function getRanking () {
   const rows = getTeams().map((team) => {
     const p = all[team.id]
     const finale = { ...blankFinale(), ...((p && p.finale) || {}) }
+    // 사이드바·최종 랭킹도 같은 파생 집계를 쓴다 — 저장 카운터를 읽으면 화면끼리 값이 갈린다.
+    const stage = tally((p && p.solved) || [])
     return {
       teamId: team.id,
       name: team.name,
-      score: (p && p.score) || 0,
-      stage: { 1: 0, 2: 0, 3: 0, ...((p && p.stage) || {}) },
-      submittedStage: { 1: 0, 2: 0, 3: 0, ...((p && p.submittedStage) || {}) },
-      solved: (p && p.solved) ? p.solved.length : 0,
+      score: scoreOf(stage),
+      stage,
+      submittedStage: tally((p && p.submitted) || []),
+      solved: countOf(stage),
       lastSubmitAt: (p && p.lastSubmitAt) || null,
       raidHits: finale.raidHits || 0,
       raidDamage: finale.raidDamage || 0

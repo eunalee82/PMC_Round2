@@ -68,11 +68,14 @@ export function createEvidenceViewer (props = {}) {
     }))
     : null
 
-  const figure = el('figure', { class: 'evidence' }, [
-    images.length ? grid : null,
-    evidence.caption ? el('figcaption', { class: 'evidence__cap mono caps', text: evidence.caption }) : null,
-    audioBlock
-  ])
+  // audioFirst: 오디오가 '단서를 읽는 전제'인 사건(사건 #003 감독관 브리핑)은 음성이 증거물 위에 와야 한다.
+  // 반대로 사건 #002처럼 현장 이미지가 배경이고 녹취가 보기인 경우는 이미지 아래가 맞다 → 데이터로 결정한다.
+  const cap = evidence.caption
+    ? el('figcaption', { class: 'evidence__cap mono caps', text: evidence.caption })
+    : null
+  const figure = el('figure', { class: 'evidence' }, evidence.audioFirst
+    ? [audioBlock, images.length ? grid : null, cap]
+    : [images.length ? grid : null, cap, audioBlock])
 
   // 전역 볼륨/음소거를 오디오 요소에 반영 + 변경 구독
   let audioUnsub = null

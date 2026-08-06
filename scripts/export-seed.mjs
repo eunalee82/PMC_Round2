@@ -53,23 +53,32 @@ if (missing.length) {
   process.exit(1)
 }
 
+// 복수 정답 사건은 answer_index 가 null 이고 answer_indexes 배열을 채운다 (0009_multi_answer.sql).
 const answerRows = CASES.map((c) => {
   const sol = SOLUTIONS[c.id]
   const en = sol.en && sol.en.analysis ? q(sol.en.analysis) : 'null'
-  return `  (${q(c.id)}, ${c.stage}, ${sol.answerIndex}, ${q(sol.analysis)}, ${en})`
+  const multi = Array.isArray(sol.answerIndexes)
+  const idx = multi ? 'null' : String(sol.answerIndex)
+  const idxs = multi ? `array[${sol.answerIndexes.join(', ')}]::smallint[]` : 'null'
+  return `  (${q(c.id)}, ${c.stage}, ${idx}, ${idxs}, ${q(sol.analysis)}, ${en})`
 }).join(',\n')
+
+const multiCount = CASES.filter((c) => Array.isArray(SOLUTIONS[c.id].answerIndexes)).length
 
 const answersSql = `-- 0003_seed_answers.sql — 정답·해설 시드 (생성: scripts/export-seed.mjs)
 -- ⚠️ 커밋 금지. 적용 후 이 파일을 삭제한다 (.gitignore 에 등록되어 있다).
 -- 사건 본문은 src/js/data/cases.js 에 남아 있고, 여기에는 정답 인덱스와 해설만 있다.
 
-insert into public.case_answers (case_id, stage, answer_index, analysis_ko, analysis_en) values
+-- ⚠️ answer_indexes 컬럼은 0009_multi_answer.sql 이 만든다 — 0009 를 먼저 적용해야 이 시드가 돈다.
+
+insert into public.case_answers (case_id, stage, answer_index, answer_indexes, analysis_ko, analysis_en) values
 ${answerRows}
 on conflict (case_id) do update
-  set stage        = excluded.stage,
-      answer_index = excluded.answer_index,
-      analysis_ko  = excluded.analysis_ko,
-      analysis_en  = excluded.analysis_en;
+  set stage          = excluded.stage,
+      answer_index   = excluded.answer_index,
+      answer_indexes = excluded.answer_indexes,
+      analysis_ko    = excluded.analysis_ko,
+      analysis_en    = excluded.analysis_en;
 
 -- 사건 목록에 없는 옛 정답 행 정리 — cases.js 가 정본이다.
 -- upsert 는 사라진 사건을 지우지 않으므로, 사건 id 를 바꾸거나 사건을 교체하면 유령 행이 남는다
@@ -80,4 +89,5 @@ delete from public.case_answers
 writeFileSync(join(outDir, '0003_seed_answers.sql'), answersSql, 'utf8')
 
 console.log(`✔ 0002_seed_teams.sql   — 팀 ${BASE_TEAMS.length}개`)
-console.log(`✔ 0003_seed_answers.sql — 정답 ${CASES.length}개 (커밋 금지 · 적용 후 삭제)`)
+console.log(`✔ 0003_seed_answers.sql — 정답 ${CASES.length}개 (복수 정답 ${multiCount}개 · 커밋 금지 · 적용 후 삭제)`)
+if (multiCount) console.log('  ↳ 복수 정답이 있으므로 0009_multi_answer.sql 을 먼저 적용해야 한다')

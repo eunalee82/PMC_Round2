@@ -164,9 +164,15 @@ export function createCaseScreen (ctx) {
 
     const evidence = trackView(createEvidenceViewer({ evidence: caseData.evidence, label: t('case.evidenceLabel') }))
     const resultBox = el('div', { class: 'case-result', hidden: true })
+    // 복수 정답 사건(사건 #005)은 정해진 개수를 다 골라야 제출할 수 있다.
+    const multi = !!caseData.multi
+    const need = multi ? (caseData.selectCount || 1) : 1
+    const readyToSubmit = () => choice.getSelectedIndexes().length === need
     const choice = trackView(createQuestionChoice({
       choices: caseData.choices,
-      onChange: () => submitBtn.update({ disabled: choice.getSelected() < 0 })
+      multi,
+      selectCount: need,
+      onChange: () => submitBtn.update({ disabled: !readyToSubmit() })
     }))
     const submitBtn = trackView(createButton({
       label: t('case.submit'), variant: 'primary', size: 'lg', icon: 'crosshair', block: true, disabled: true,
@@ -175,7 +181,7 @@ export function createCaseScreen (ctx) {
 
     // SCR-009 제출 확인 — 실수 제출 방지
     function openConfirm () {
-      if (choice.getSelected() < 0) return
+      if (!readyToSubmit()) return
       closeConfirm()
       confirmModal = createModal({
         title: t('confirm.title'),
@@ -194,13 +200,20 @@ export function createCaseScreen (ctx) {
 
     async function doSubmit () {
       if (submitted) return
-      const idx = choice.getSelected()
-      if (idx < 0) return
+      if (!readyToSubmit()) return
+      const picks = choice.getSelectedIndexes()
       submitted = true
       submitBtn.update({ loading: true, disabled: true })
 
       // 채점·저장은 서버가 한다. 화면은 응답으로만 결과를 확정한다 (CLAUDE.md §2 §7).
-      const res = await submitCase({ teamId, caseId: caseData.id, stage: caseData.stage, choiceIndex: idx })
+      // 단일 선택 사건은 기존 계약(choiceIndex)을 유지하고, 복수 정답 사건만 choiceIndexes 를 보낸다.
+      const res = await submitCase({
+        teamId,
+        caseId: caseData.id,
+        stage: caseData.stage,
+        choiceIndex: multi ? null : picks[0],
+        choiceIndexes: multi ? picks : null
+      })
       submitBtn.update({ loading: false })
 
       if (!res.ok) {
@@ -222,8 +235,8 @@ export function createCaseScreen (ctx) {
         return
       }
 
-      const { isCorrect, correctIndex, analysis } = res
-      choice.reveal(correctIndex, idx)
+      const { isCorrect, correctIndex, correctIndexes, analysis } = res
+      choice.reveal(multi ? (correctIndexes || []) : correctIndex, multi ? picks : picks[0])
       // 제출이 끝나면 [판단 제출]은 비활성 상태로 남긴다 — 다시 누를 수 없고, 제출이 끝났음이 보인다.
       // (hidden 속성은 .btn의 display 규칙에 덮여 먹지 않으므로 disabled로 확실히 잠근다.)
       submitBtn.update({ label: t('case.submitted'), disabled: true })
@@ -272,7 +285,10 @@ export function createCaseScreen (ctx) {
       evidence.el,
       el('section', { class: 'case__prompt' }, [
         el('p', { class: 'case__prompt-text', text: caseData.prompt }),
-        el('span', { class: 'case__hint', text: t('case.selectHint') })
+        el('span', {
+          class: 'case__hint',
+          text: multi ? t('case.selectHintMulti').replace('{n}', String(need)) : t('case.selectHint')
+        })
       ]),
       choice.el,
       submitBtn.el,

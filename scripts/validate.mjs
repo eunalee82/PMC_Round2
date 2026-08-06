@@ -42,9 +42,29 @@ for (const c of CASES) {
 
   const sol = SOLUTIONS[c.id]
   if (!sol) { fail(`${at}: SOLUTIONS에 정답이 없다`); continue }
-  if (!Number.isInteger(sol.answerIndex)) fail(`${at}: answerIndex가 정수가 아니다`)
-  else if (sol.answerIndex < 0 || sol.answerIndex >= c.choices.length) {
-    fail(`${at}: answerIndex ${sol.answerIndex}가 보기 범위(0~${c.choices.length - 1})를 벗어난다`)
+  // 복수 정답 사건(cases.js 의 multi)은 answerIndexes(배열)를 쓴다 — 둘은 짝이어야 한다.
+  if (c.multi) {
+    const need = c.selectCount
+    if (!Number.isInteger(need) || need < 2) fail(`${at}: multi 사건인데 selectCount가 2 이상 정수가 아니다`)
+    if (!Array.isArray(sol.answerIndexes)) fail(`${at}: multi 사건인데 SOLUTIONS에 answerIndexes 배열이 없다`)
+    else {
+      if (sol.answerIndexes.length !== need) {
+        fail(`${at}: 정답 수(${sol.answerIndexes.length}) ≠ selectCount(${need}) — 고를 개수와 정답 개수가 다르면 아무도 못 맞힌다`)
+      }
+      if (new Set(sol.answerIndexes).size !== sol.answerIndexes.length) fail(`${at}: answerIndexes에 중복이 있다`)
+      for (const idx of sol.answerIndexes) {
+        if (!Number.isInteger(idx) || idx < 0 || idx >= c.choices.length) {
+          fail(`${at}: answerIndexes의 ${idx}가 보기 범위(0~${c.choices.length - 1})를 벗어난다`)
+        }
+      }
+    }
+    if (sol.answerIndex !== undefined) fail(`${at}: multi 사건에 answerIndex가 남아 있다 — 채점 기준이 둘이 된다`)
+  } else {
+    if (Array.isArray(sol.answerIndexes)) fail(`${at}: answerIndexes가 있는데 사건에 multi 플래그가 없다`)
+    if (!Number.isInteger(sol.answerIndex)) fail(`${at}: answerIndex가 정수가 아니다`)
+    else if (sol.answerIndex < 0 || sol.answerIndex >= c.choices.length) {
+      fail(`${at}: answerIndex ${sol.answerIndex}가 보기 범위(0~${c.choices.length - 1})를 벗어난다`)
+    }
   }
   if (!sol.analysis) fail(`${at}: 해설(analysis)이 없다`)
 
@@ -67,6 +87,28 @@ for (const c of CASES) {
     }
   }
   if (sol && !(sol.en && sol.en.analysis)) warn(`${at}: 해설 en 번역이 없다 (ko로 폴백)`)
+
+  // ── 2b) prompt 속 개수 표기 ↔ 실제 보기·정답 수 ──
+  // 번역이 낡은 원본을 따라가면 "다섯 단서 중" 처럼 사실이 어긋난다(실측: 사건 #001 영문 초안이 5개라고 썼다).
+  // 보기 개수 / 고를 개수와 맞지 않는 수사(數詞)가 prompt에 있으면 오류로 잡는다.
+  const NUM_KO = { 한: 1, 두: 2, 세: 3, 네: 4, 다섯: 5, 여섯: 6, 일곱: 7, 여덟: 8 }
+  const NUM_EN = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8 }
+  const wanted = new Set([c.choices.length, c.multi ? c.selectCount : 1])
+  const checkPrompt = (text, lang) => {
+    if (!text) return
+    const found = []
+    // 국문: '4가지'·'다섯 건'·'3개' / 영문: 'four clues'·'three pieces'
+    for (const m of text.matchAll(/(\d+)\s*(?:가지|개|건|명|장)/g)) found.push(Number(m[1]))
+    for (const [word, n] of Object.entries(NUM_KO)) if (text.includes(`${word}가지`) || text.includes(`${word} 개`)) found.push(n)
+    for (const m of text.matchAll(/\b(one|two|three|four|five|six|seven|eight)\b/gi)) found.push(NUM_EN[m[1].toLowerCase()])
+    for (const n of found) {
+      if (!wanted.has(n)) {
+        fail(`${at}: ${lang} prompt의 '${n}'이 보기 수(${c.choices.length})·선택 수(${c.multi ? c.selectCount : 1})와 맞지 않는다`)
+      }
+    }
+  }
+  checkPrompt(c.prompt, 'ko')
+  if (c.en) checkPrompt(c.en.prompt, 'en')
 
   // ── 3) 미디어 경로 ──
   const evidences = [c.evidence, c.en && c.en.evidence].filter(Boolean)
@@ -106,6 +148,55 @@ if (builtMax !== SCORE_MAX) {
 for (const id of Object.keys(SOLUTIONS)) {
   if (!ids.has(id)) warn(`SOLUTIONS['${id}']: 대응하는 사건이 없다 (잔재)`)
 }
+
+// ── 3c) 사건 단서 에셋 — 참조/실물 양방향 대조 ────────────────────
+// 참조했는데 파일이 없으면(3) 404, 파일이 있는데 아무도 안 쓰면 배포에 죽은 무게가 실린다.
+// 사건 교체가 잦은 프로젝트라 둘 다 자동으로 본다.
+const referenced = new Set()
+for (const c of CASES) {
+  for (const ev of [c.evidence, c.en && c.en.evidence].filter(Boolean)) {
+    for (const im of ev.images || []) referenced.add(im.src)
+    for (const au of ev.audios || []) referenced.add(au.src)
+  }
+}
+function listFiles (rel) {
+  const dir = join(pub, rel)
+  if (!existsSync(dir)) return []
+  const out = []
+  for (const name of readdirSync(dir)) {
+    const p = join(dir, name)
+    if (statSync(p).isDirectory()) out.push(...listFiles(`${rel}/${name}`))
+    else out.push(`${rel}/${name}`)
+  }
+  return out
+}
+// 사건 단서만 본다 — /audio/sfx 아래에는 연출용 효과음(raid 등)도 있어서 question* 폴더로 한정한다.
+const clueFiles = [
+  ...listFiles('/images/questions'),
+  ...listFiles('/audio/sfx').filter((f) => /^\/audio\/sfx\/question/.test(f))
+]
+const orphanFiles = clueFiles.filter((f) => !referenced.has(f))
+if (orphanFiles.length) {
+  warn(`단서 에셋 ${orphanFiles.length}개가 어느 사건도 참조하지 않는다 (배포 용량만 차지): ${orphanFiles.join(', ')}`)
+}
+// 대소문자 사고 방지 — Windows 의 existsSync 는 대소문자를 무시하므로 로컬에선 통과하고
+// Vercel/Linux 에서만 404 가 난다. 실제 디스크 파일명과 **글자 그대로** 같은지 본다.
+const onDisk = new Set(clueFiles)
+for (const src of referenced) {
+  if (!onDisk.has(src) && existsSync(join(pub, src))) {
+    const actual = clueFiles.find((f) => f.toLowerCase() === src.toLowerCase())
+    fail(`대소문자 불일치 — 코드는 '${src}' 인데 파일은 '${actual}' 이다 (Linux 배포에서 404)`)
+  }
+}
+// 최적화 안 된 원본이 public 에 남으면 배포 용량에 그대로 실린다 → img/ 로 옮길 것
+for (const f of clueFiles) {
+  if (/\.(png|jpg|jpeg|wav)$/i.test(f)) {
+    fail(`최적화되지 않은 단서 원본이 public 에 있다 (WebP/MP3 변환 후 img/ 로 옮길 것): public${f}`)
+  }
+}
+// 파일명 규약(CLAUDE.md §14) — 소문자 kebab-case. 지금 동작하더라도 다음 사람이 손댈 때 사고가 난다.
+const upper = clueFiles.filter((f) => /[A-Z]/.test(f.split('/').pop().replace(/_en(?=\.)/, '')))
+if (upper.length) warn(`파일명에 대문자가 있다(소문자 kebab-case 규약): ${upper.join(', ')}`)
 
 // ── 4) UI 문구 키 ──────────────────────────────────────────────
 function walk (dir, out = []) {
