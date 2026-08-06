@@ -318,9 +318,16 @@ export function createRaidScreen (ctx) {
     const damage = (result && result.damage) || finale.raidDamage || 0
     const contribution = Math.min(100, Math.round((hits / HIT_TARGET) * 100))
 
+    // 임명과 같은 이유로 저장 완료를 기다린 뒤 넘어간다 — raidEndedAt 이 아직 없으면 가드가
+    // 금배지 진입을 막고 이 화면에 머문다(서버 모드에서 record_milestone 이 비동기다).
     const nextBtn = trackView(createButton({
       label: t('defeat.next'), variant: 'gold', size: 'lg', icon: 'award', block: true,
-      onClick: () => ctx.goTo(FLOW.ENDING)
+      onClick: async () => {
+        nextBtn.update({ loading: true, disabled: true })
+        try { await recordFinale(teamId, { raidEndedAt: Date.now(), raidHits: hits, raidDamage: damage }) } catch { /* 아래에서 다룬다 */ }
+        nextBtn.update({ loading: false, disabled: false })
+        ctx.goTo(FLOW.ENDING)
+      }
     }))
     const stat = (k, v) => el('div', { class: 'defeat__stat' }, [
       el('span', { class: 'defeat__stat-val mono', text: v }),

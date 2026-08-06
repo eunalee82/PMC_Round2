@@ -28,8 +28,14 @@ export function createAppointmentScreen (ctx) {
     size: 'lg',
     icon: 'award',
     block: true,
-    onClick: () => {
-      recordFinale(teamId, { appointedAt: Date.now() }) // 저장 시점: 감독관 임명 (§18)
+    // 저장 시점: 감독관 임명 (§18).
+    // ⚠️ recordFinale 은 서버 모드에서 **비동기**(record_milestone RPC)다. await 하지 않고 바로
+    //    goTo 하면 라우터 가드가 appointedAt 이 아직 null 인 상태를 읽어, 레이드로 못 가고 이 화면에
+    //    머문다(버튼이 안 먹는 것처럼 보인다). 저장이 끝난 뒤에 넘어간다.
+    onClick: async () => {
+      acceptBtn.update({ loading: true, disabled: true })
+      try { await recordFinale(teamId, { appointedAt: Date.now() }) } catch { /* 실패는 아래에서 다룬다 */ }
+      acceptBtn.update({ loading: false, disabled: false })
       ctx.goTo(FLOW.RAID)
     }
   })
