@@ -5,7 +5,6 @@
 import { el } from '../../utils/dom.js'
 import { t } from '../../lib/copy.js'
 import { ASSETS } from '../../constants/assets.js'
-import { FLOW } from '../../constants/flow.js'
 import { findTeam } from '../../lib/teams.js'
 import { getProgress, recordFinale } from '../../lib/progress.js'
 import { createButton } from '../../../components/primitives/button.js'
@@ -61,12 +60,6 @@ export function createEndingScreen (ctx) {
   // ── SCR-023 종료 안내 — 순위는 표시하지 않는다(감독관 발표 대상). 총점은 진행 중 계속 보였던 값이라 유지. ──
   function showGameEnd () {
     recordFinale(teamId, { endedAt: Date.now() }) // 저장 시점: 게임 종료 (§18)
-    // 참가자 흐름의 마지막 화면이 막다른 화면이 되지 않도록 팀 선택으로 돌아가는 길을 둔다(운영 요청 2026-08-06).
-    // 진행 기록(endedAt)은 남아 있으므로, 같은 팀으로 다시 들어오면 라우터 가드가 이 화면으로 복구한다.
-    const backBtn = trackView(createButton({
-      label: t('end.backToTeam'), variant: 'ghost', size: 'md', icon: 'logIn',
-      onClick: () => ctx.goTo(FLOW.TEAM)
-    }))
     const p = getProgress(teamId)
     const solved = p.solved.length
     const stat = (k, v) => el('div', { class: 'gameend__stat' }, [
@@ -96,8 +89,7 @@ export function createEndingScreen (ctx) {
         stat(t('rank.colSolved'), `${solved}/15`)
       ]),
       // 최종 순위는 감독관이 발표한다 — 참가자 화면에서는 대기 안내만.
-      el('p', { class: 'gameend__wait', text: t('end.wait') }),
-      backBtn.el
+      el('p', { class: 'gameend__wait', text: t('end.wait') })
     ]))
   }
 

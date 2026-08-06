@@ -85,8 +85,6 @@ const KO = {
   'case.selectHint': '단서 하나를 선택한 뒤 판단을 제출하십시오.',
   // 복수 정답 사건(사건 #005) — {n}은 골라야 하는 개수로 치환된다.
   'case.selectHintMulti': '증거물 {n}개를 선택한 뒤 판단을 제출하십시오.',
-  // 종료 안내 화면에서 팀 선택으로 되돌아가는 버튼 (운영 요청 2026-08-06)
-  'end.backToTeam': '팀 선택으로 돌아가기',
   'case.submit': '판단 제출',
   'case.submitted': '판단 제출 완료', // 제출 후 비활성 상태 라벨
   'case.resolved': 'CASE RESOLVED',
@@ -353,7 +351,6 @@ const EN = {
   'case.evidenceLabel': 'Evidence',
   'case.selectHint': 'Select one clue, then submit your judgment.',
   'case.selectHintMulti': 'Select {n} pieces of evidence, then submit your judgment.',
-  'end.backToTeam': 'Back to team selection',
   'case.submit': 'Submit Judgment',
   'case.submitted': 'Judgment Submitted',
   'case.resolved': 'CASE RESOLVED',
