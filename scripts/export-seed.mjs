@@ -70,6 +70,17 @@ const answersSql = `-- 0003_seed_answers.sql — 정답·해설 시드 (생성: 
 -- 사건 본문은 src/js/data/cases.js 에 남아 있고, 여기에는 정답 인덱스와 해설만 있다.
 
 -- ⚠️ answer_indexes 컬럼은 0009_multi_answer.sql 이 만든다 — 0009 를 먼저 적용해야 이 시드가 돈다.
+-- 순서를 놓치면 'column "answer_indexes" does not exist'(42703) 라는 알아보기 힘든 오류가 나므로,
+-- 사전 검사로 무엇을 먼저 해야 하는지 알려준다.
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+     where table_schema = 'public' and table_name = 'case_answers' and column_name = 'answer_indexes'
+  ) then
+    raise exception '적용 순서가 틀렸습니다. supabase/migrations/0009_multi_answer.sql 을 먼저 실행한 뒤 이 시드를 실행하십시오. (권장 순서: 0009 → 0010 → 0011 → 0003)';
+  end if;
+end $$;
 
 insert into public.case_answers (case_id, stage, answer_index, answer_indexes, analysis_ko, analysis_en) values
 ${answerRows}

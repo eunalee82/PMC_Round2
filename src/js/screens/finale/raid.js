@@ -188,16 +188,22 @@ export function createRaidScreen (ctx) {
     }
 
     // 타격 효과음 — 연타(초당 여러 번)에 겹쳐 울리는 게 자연스럽지만, 무제한으로 Audio 를 만들면
-    // 저사양 기기에서 프레임이 튄다. 최소 간격을 두어 초당 ~16회로 제한한다(HIT_TARGET 140/20초보다 넉넉).
+    // 저사양 기기에서 프레임이 튄다. 최소 간격을 두어 초당 ~16회로 제한한다.
     // 음소거·볼륨은 AudioManager.playSfx 가 세션 설정을 존중한다. 실패는 조용히 무시된다(CLAUDE.md §13).
     const HIT_SFX_MIN_MS = 60
     let lastHitSfxAt = 0
+    // 첫 클릭 전에 파일을 받아 둔다 — 3KB 짜리라도 클릭 순간에 받으면 제스처 창을 놓쳐 첫 타격이 무음이 된다.
+    try { new Audio(ASSETS.sfx.raidHit).load() } catch { /* 미지원 환경 — 무시 */ }
     function playHit () {
       if (!ctx || !ctx.audio) return
+      // 자동재생 정책: 제스처 없이 들어온 화면(DEV 점프·새로고침 복구)에서는 AudioManager 가 잠겨 있어
+      // BGM·효과음이 모두 무음이 된다. 공격 클릭 자체가 제스처이므로 이때 잠금을 푼다(멱등).
+      // 이게 없으면 "오프닝(YouTube)은 들리는데 레이드만 무음"이 된다 — 오프닝은 AudioManager를 안 쓴다.
+      if (!ctx.audio.unlocked) ctx.audio.unlock()
       const now = Date.now()
       if (now - lastHitSfxAt < HIT_SFX_MIN_MS) return
       lastHitSfxAt = now
-      ctx.audio.playSfx(ASSETS.sfx.raidHit, { volume: 0.55 }) // BGM(Killbillian) 위에 얹히므로 낮게
+      ctx.audio.playSfx(ASSETS.sfx.raidHit, { volume: 0.8 })
     }
 
     function fireSkill () {
