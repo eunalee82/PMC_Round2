@@ -15,6 +15,12 @@ function fmtTime (iso) {
   const d = new Date(iso)
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
+// 마지막 제출 시각은 **초까지** 보여준다 — 동점 시 순위 tie-break 기준이라 분 단위로는 구분이 안 된다.
+function fmtTimeSec (iso) {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+}
 
 function csvCell (v) {
   const s = String(v ?? '')
@@ -41,11 +47,11 @@ export function createTeamStatusView (props = {}) {
   let rows = []
 
   function copyCsv () {
-    const header = ['team_no', 'team_name', 'is_claimed', 'member1', 'member2', 'member3', 'entered_at', 'submitted', 'score', 'flags']
+    const header = ['team_no', 'team_name', 'is_claimed', 'member1', 'member2', 'member3', 'entered_at', 'submitted', 'last_submit_at', 'score', 'flags']
     const body = rows.map((r, i) => [
       i + 1, r.name, r.is_claimed ? 'Y' : 'N',
       (r.member_emails || [])[0] || '', (r.member_emails || [])[1] || '', (r.member_emails || [])[2] || '',
-      r.entered_at || '', r.submitted_count, r.score, (r.flags || []).join(' ')
+      r.entered_at || '', r.submitted_count, r.last_submit_at || '', r.score, (r.flags || []).join(' ')
     ])
     const csv = [header, ...body].map((line) => line.map(csvCell).join(',')).join('\n')
     navigator.clipboard.writeText(csv).then(
@@ -86,6 +92,7 @@ export function createTeamStatusView (props = {}) {
         el('span', { class: 'rankrow__emails mono', text: emails.length ? emails.join('  ·  ') : '미등록' }),
         el('span', { class: 'rankrow__time mono', text: fmtTime(r.entered_at) }),
         el('span', { class: 'rankrow__solved mono', text: String(r.submitted_count ?? 0) }),
+        el('span', { class: 'rankrow__time mono', text: fmtTimeSec(r.last_submit_at) }),
         el('span', { class: 'rankrow__score mono', text: String(r.score ?? 0) }),
         el('span', { class: 'rankrow__flags mono', text: flags.join(' ') })
       ])
@@ -100,7 +107,7 @@ export function createTeamStatusView (props = {}) {
     try {
       const { data, error } = await supabase
         .from('admin_team_status')
-        .select('team_id,name,sort_order,is_claimed,member_emails,entered_at,submitted_count,score,flags')
+        .select('team_id,name,sort_order,is_claimed,member_emails,entered_at,submitted_count,score,flags,last_submit_at')
         .order('sort_order')
       if (error) throw error
       rows = data || []
@@ -117,6 +124,7 @@ export function createTeamStatusView (props = {}) {
     el('span', { class: 'rankrow__emails caps', text: '등록 수사관' }),
     el('span', { class: 'rankrow__time mono caps', text: '입장시각' }),
     el('span', { class: 'rankrow__solved mono caps', text: '제출' }),
+    el('span', { class: 'rankrow__time mono caps', text: '마지막제출' }),
     el('span', { class: 'rankrow__score mono caps', text: '점수' }),
     el('span', { class: 'rankrow__flags caps', text: '플래그' })
   ])

@@ -18,8 +18,12 @@ import { STAGES } from '../../lib/stage-progress.js'
 import { createButton } from '../../../components/primitives/button.js'
 
 const RAID_MS = 20000 // 레이드 시간 20초 (docs/game-flow.md §13.3)
-const HIT_TARGET = 140 // 이 횟수를 먼저 채우면 20초 전에 체력이 0이 된다(연타 보상). 못 채워도 20초에 종료.
-const SKILL_EVERY = 14 // 공격 N회마다 장비 스킬 발동 연출 (§13.4 아이템 순서 발동)
+// 이 횟수를 먼저 채우면 20초 전에 체력이 0이 된다(연타 보상). 못 채워도 20초에 종료된다(성공 보장).
+// 운영 결정(2026-08-06): 140 → **10회**. 10번만 치면 바로 격퇴되므로 레이드가 훨씬 짧게 끝난다.
+const HIT_TARGET = 10
+// 공격 N회마다 장비 스킬 발동 연출 (§13.4 아이템 순서 발동). HIT_TARGET 이 10이 되었으므로
+// 14회마다면 스킬이 한 번도 안 나온다 → 3회마다로 낮춰 장비 3종이 3·6·9타에 모두 발동하게 한다.
+const SKILL_EVERY = 3
 const READY_COUNT = 3 // [레이드 준비 완료] 후 출동 카운트다운
 const DMG_MIN = 620
 const DMG_MAX = 2400
@@ -183,6 +187,19 @@ export function createRaidScreen (ctx) {
       later(remove, 1200) // 애니메이션이 실행되지 않는 환경 대비
     }
 
+    // 타격 효과음 — 연타(초당 여러 번)에 겹쳐 울리는 게 자연스럽지만, 무제한으로 Audio 를 만들면
+    // 저사양 기기에서 프레임이 튄다. 최소 간격을 두어 초당 ~16회로 제한한다(HIT_TARGET 140/20초보다 넉넉).
+    // 음소거·볼륨은 AudioManager.playSfx 가 세션 설정을 존중한다. 실패는 조용히 무시된다(CLAUDE.md §13).
+    const HIT_SFX_MIN_MS = 60
+    let lastHitSfxAt = 0
+    function playHit () {
+      if (!ctx || !ctx.audio) return
+      const now = Date.now()
+      if (now - lastHitSfxAt < HIT_SFX_MIN_MS) return
+      lastHitSfxAt = now
+      ctx.audio.playSfx(ASSETS.sfx.raidHit, { volume: 0.55 }) // BGM(Killbillian) 위에 얹히므로 낮게
+    }
+
     function fireSkill () {
       const it = equipment[Math.floor(hits / SKILL_EVERY - 1) % equipment.length] || equipment[0]
       skillEl.hidden = false
@@ -203,6 +220,7 @@ export function createRaidScreen (ctx) {
       damage += dmg
       hitsEl.textContent = String(hits)
       spawnDamage(dmg)
+      playHit()
       if (!soft) {
         villainImg.classList.remove('is-hit')
         requestAnimationFrame(() => villainImg.classList.add('is-hit'))

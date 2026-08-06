@@ -54,8 +54,9 @@
 .admin__warn svg { flex: none; margin-top: 2px; }
 
 /* 관리자 · 팀 현황 표 (screens/admin/team-status.js) — 이메일 열이 넓다 */
+/* 열: 입장 · 팀 · 등록 수사관 · 입장시각 · 제출 · 마지막제출(초까지) · 점수 · 플래그 */
 .ranking__table.is-teams .rankrow {
-  grid-template-columns: 44px minmax(110px, 1fr) minmax(240px, 2fr) 66px 56px 62px 130px;
+  grid-template-columns: 44px minmax(110px, 1fr) minmax(220px, 2fr) 66px 56px 78px 62px 120px;
 }
 .rankrow__emails { color: var(--text-2); font-size: var(--text-xs); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rankrow__flags { color: var(--warning); font-size: 0.625rem; letter-spacing: var(--tracking-caps); }

@@ -18,7 +18,8 @@ const state = {
   status: 'scheduled',
   startedAt: null, // ms
   endsAt: null, // ms
-  durationMinutes: 60,
+  durationMinutes: 80, // 서버 조회 전 표시용 기본값 — 실제 값은 games.duration_minutes(권위)로 덮인다
+
   offset: 0, // serverNow - Date.now()
   loaded: false
 }

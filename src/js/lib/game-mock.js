@@ -9,7 +9,9 @@ const KEY = 'pmb.game.v2' // v2 — 저장 형태를 문자열 → { status, sta
 const SCHEDULED = 'scheduled'
 const STARTED = 'started'
 const ENDED = 'ended'
-const DURATION_MS = 60 * 60 * 1000 // 게임 제한시간 60분 — 서버 연동 시 관리자 설정값으로 교체
+// 게임 제한시간 80분(운영 결정 2026-08-06). 서버 모드에서는 games.duration_minutes 가 권위이며
+// 이 값은 mock(비상 경로) 전용이다 — 둘을 바꿀 때는 반드시 같이 바꾼다(game-server.js 기본값도 동일).
+const DURATION_MS = 80 * 60 * 1000
 
 function read () {
   try {
