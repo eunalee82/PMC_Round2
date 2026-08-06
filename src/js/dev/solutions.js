@@ -35,164 +35,166 @@ export const SOLUTIONS = {
   },
   // 사건 순서 2↔3 교체(2026-08-05) — 파일 순서는 CASES 와 다르다: 001 → 003 → 002
   'case-003': {
+    // 확정 콘텐츠(2026-08-06) — 정답 인덱스는 기존과 같아(③ 증거물 C) 기존 제출 채점 결과에 영향이 없다.
+    // 해설만 확정본으로 교체했다.
     answerIndex: 2, // 정답: 3번 (증거물 C)
     analysis: [
-      '정답은 증거물 C입니다.',
-      '증거물 C는 단순히 고객 요청을 반영하거나 품질을 높인 행동이 아닙니다. 길동 책임은 "요구사항을 모두 구현했는가?"보다 "고객이 실제로 원하는 결과에 도달했는가?"를 더 중요한 성공 기준으로 삼았습니다.',
-      '특히 다음 행동이 Value-Driven Mindset을 보여줍니다.\n· 요구사항 충족 여부에 만족하지 않고 실제 이용 데이터를 확인했다.\n· 기능 수보다 고객이 얻는 결과를 우선했다.\n· 이미 개발한 기능이라도 가치가 낮으면 우선순위를 재조정했다.\n· 산출물의 양을 줄이면서도 실제 사용성과 고객가치를 높였다.\n· 프로젝트 성공을 일정·범위가 아니라 고객 성과로 정의했다.',
-      '즉, 산출물(Output)을 완성하는 데 멈추지 않고 성과(Outcome)와 가치(Value)를 극대화한 의사결정입니다.',
-      '[오답이 헷갈리는 이유]\n① 증거물 A — 좋은 범위관리지만, 판단 기준이 고객가치보다 계약 범위·일정 준수에 가깝습니다. Value-Driven이라면 단순 거절보다 기대가치·비용·일정 영향과 대안을 함께 검토했어야 합니다.\n② 증거물 B — 좋은 품질관리이자 예방적 행동으로 가치지향 요소가 있으나, 품질 강화가 기존 계획과 충돌하지 않았고 가치를 위해 우선순위·계획을 재조정한 결정까지는 아닙니다. 정답에 가장 가까운 강력한 오답입니다.\n④ 증거물 D — 겉으로는 고객 중심으로 보이지만, 고객 요청을 무조건 수용하고 팀의 지속가능성을 희생했습니다. 고객 요청이 곧 가치는 아니며, 기대효과·비용·리스크·팀 영향까지 함께 판단해야 합니다.'
+      '정답은 ③ 증거물 C입니다.',
+      'PMBOK® Guide 8판의 Value-Driven Mindset은 계획된 산출물(Output) 자체보다 고객과 비즈니스가 실제로 얻는 가치(Outcome)를 우선하여 의사결정하는 것을 의미합니다.',
+      '증거물 C는 이미 요구사항은 충족되었지만 고객 행동 데이터를 근거로 핵심 기능을 재설계하여 고객이 실제 원하는 결과를 달성하도록 방향을 전환한 사례로, Value-Driven Mindset을 가장 분명하게 보여줍니다.',
+      '[증거물별 판단]\n① 증거물 A — 오답입니다. 고객 요청보다 범위·일정 준수를 우선하여 기존 계획을 유지한 판단입니다.\n② 증거물 B — 오답입니다. 고객가치와 관련은 있으나 품질 강화와 결함 예방 중심의 의사결정입니다.\n③ 증거물 C — 정답입니다. 기능 완성보다 고객이 실제 얻는 가치와 사용 성과를 우선하여 판단하였습니다.\n④ 증거물 D — 오답입니다. 고객 요청을 수용했지만 범위 확대를 통해 요구를 반영한 사례이지, 가치 관점의 근본적 재검토는 아닙니다.'
     ].join('\n\n'),
     en: {
       analysis: [
-        'The answer is Evidence C.',
-        'Evidence C is not merely reflecting a customer request or raising quality. Lead Gildong made "Did the customer reach the outcome they actually wanted?" a more important success criterion than "Did we implement every requirement?"',
-        'In particular, these actions show the Value-Driven Mindset:\n· Not satisfied with meeting requirements, he checked real usage data.\n· He prioritized the outcome the customer gains over the number of features.\n· Even for features already built, he re-prioritized when their value was low.\n· He reduced the volume of outputs while raising real usability and customer value.\n· He defined project success by customer outcome, not by schedule and scope.',
-        'That is, a decision that did not stop at completing outputs (Output) but maximized outcome (Outcome) and value (Value).',
-        '[Why the wrong options are confusing]\n① Evidence A — Good scope management, but the judgment leans on contract scope and schedule adherence rather than customer value. Value-Driven would weigh expected value, cost, schedule impact and alternatives instead of simply refusing.\n② Evidence B — Good quality management and preventive action, with a value-oriented element, but strengthening quality did not conflict with the plan and it did not re-prioritize for value. The strongest, closest wrong answer.\n④ Evidence D — Looks customer-centric on the surface, but accepting every customer request unconditionally sacrificed the team\'s sustainability. A customer request is not value itself; expected effect, cost, risk and team impact must be judged together.'
+        'The answer is ③ Evidence C.',
+        'The Value-Driven Mindset of PMBOK® Guide 8th Edition means deciding with priority on the value (Outcome) the customer and the business actually gain, rather than on the planned deliverable (Output) itself.',
+        'In Evidence C the requirements were already met, yet the core feature was redesigned on the basis of customer behaviour data so that the customer would reach the result they actually wanted. It shows the Value-Driven Mindset most clearly.',
+        '[Evidence by evidence]\n① Evidence A — Incorrect. It kept the existing plan, prioritizing scope and schedule adherence over the customer request.\n② Evidence B — Incorrect. It relates to customer value, but the decision centres on strengthening quality and preventing defects.\n③ Evidence C — Correct. It prioritized the value and usage outcome the customer actually gains over completing the feature.\n④ Evidence D — Incorrect. The customer request was accepted, but by expanding scope to accommodate it — not a fundamental re-examination from a value standpoint.'
       ].join('\n\n')
     }
   },
   'case-002': {
-    answerIndex: 3, // 정답: 4번 (녹취 D)
+    // 확정 콘텐츠(2026-08-06) — 녹취 음성이 question2/question2-1~4.mp3 로 교체되면서 대화 순서가 바뀌었다.
+    // 그래서 정답이 이전 녹취 D(3)에서 **녹취 B(1)** 로 바뀌었다. 서버 시드(0003)를 반드시 재생성·재적용한다.
+    answerIndex: 1, // 정답: 2번 (녹취 B)
     analysis: [
-      '정답은 녹취 D입니다.',
-      'D의 말은 처음 들으면 상당히 합리적입니다. 전문가의 판단을 존중하고, 관련 조직의 합의를 유도하며, 실무자가 실행을 주도하게 하고, PM은 결과를 공식 계획에 반영합니다.',
-      '그러나 이 사안은 단순한 기술 구현 방식이 아니라 품질·일정·고객 영향이 충돌하는 프로젝트 차원의 의사결정입니다. 홍길동 PM은 논의를 개발팀·품질팀에 맡길 수는 있지만, 두 조직이 서로 다른 목표를 가진 상황에서 다음 역할까지 내려놓아서는 안 됩니다.\n· 판단 기준 제시\n· 대안 간 이해상충 조정\n· 의사결정권자 식별\n· 최종 결정 또는 적절한 에스컬레이션\n· 결정 결과에 대한 책임',
-      'D에서 PM은 전문가에게 "어떻게 실행할지"에 대한 권한을 준 것이 아니라, "무엇을 선택하고 그 결과를 누가 감당할지"까지 넘겼습니다. 또한 "보고자료에 반영하겠다"는 표현은 PM의 역할을 의사결정 리더가 아니라 기록자·일정 관리자 수준으로 축소합니다.',
-      '[보기가 헷갈리는 이유]\n① 녹취 A — PM이 너무 직접 결정하는 것처럼 보이지만, 개발팀에는 기술적 분석·권고안 제시 권한을 주고 PM은 프로젝트 전체 영향을 통합해 결정합니다. 역할에 따른 권한과 책임이 비교적 명확합니다.\n② 녹취 B — 개발팀에 결정을 넘겼지만 그 범위가 이미 합의된 위험 허용범위 안에 있습니다. 세부 구현은 팀에 맡기되 자원 확보·결과 확인 책임을 유지하므로 적절한 Empowerment에 가깝습니다.\n③ 녹취 C — 상위 회의로 넘겼으나, 승인 권한을 벗어난 사안을 적절한 의사결정 기구로 올리는 것은 책임 회피와 다릅니다. 대안·권고안을 준비하고 결정 전에도 팀이 할 수 있는 조치를 지시하므로 Accountability가 유지됩니다.\n④ 녹취 D — 전문가 존중처럼 들리지만, 서로 충돌하는 판단을 조정하지 않고 두 조직의 합의에 맡깁니다. 결정 기준·시한·에스컬레이션 경로가 없고 PM은 결과를 기록하는 역할에 머뭅니다. 위임과 방임의 경계를 넘은 사례입니다.'
+      '정답은 ② 녹취 B입니다.',
+      'PMBOK® Guide 8판은 팀이 전문성을 바탕으로 자율적으로 일할 수 있는 Empowered Culture를 장려하지만, 최종 의사결정과 그 결과에 대한 책임은 Accountable Leader가 수행해야 함을 강조합니다.',
+      '녹취 B는 이해관계자 간 의견이 충돌하는 중요한 의사결정을 팀에 맡기고 PM은 결과만 반영하겠다고 하여, 실행 권한을 위임한 것이 아니라 책임을 사실상 넘기고 있습니다.',
+      '[녹취별 판단]\n① 녹취 A — 오답입니다. 승인 권한이 필요한 의사결정은 PM이 직접 수행하고, 팀은 분석과 검증을 담당합니다.\n② 녹취 B — 정답입니다. 이해관계가 충돌하는 상황에서 PM이 최종 판단을 하지 않고 팀에 의사결정을 맡기고 있습니다.\n③ 녹취 C — 오답입니다. 위험 허용범위 내 세부 실행은 위임했지만, PM은 지원과 관리 책임을 유지하고 있습니다.\n④ 녹취 D — 오답입니다. 기술 검토는 팀에 맡기되 최종 의사결정은 PM이 수행하고 있습니다.'
     ].join('\n\n'),
     en: {
       analysis: [
-        'The answer is Recording D.',
-        'D sounds quite reasonable at first: it respects the expert\'s judgment, guides the relevant organizations to consensus, lets the practitioner lead execution, and the PM reflects the result in the official plan.',
-        'But this is not a mere technical implementation choice — it is a project-level decision where quality, schedule and customer impact collide. PM Hong Gildong may leave the discussion to the dev and QA teams, but with two organizations holding different goals, must not put down the following roles:\n· Setting the decision criteria\n· Coordinating conflicts of interest between alternatives\n· Identifying the decision-maker\n· Making the final call or escalating appropriately\n· Being accountable for the outcome of the decision',
-        'In D, the PM did not grant authority over "how to execute" but handed off "what to choose and who bears the result." Saying "I\'ll reflect it in the report" also shrinks the PM\'s role from decision leader to a mere recorder and schedule keeper.',
-        '[Why the wrong options are confusing]\n① Recording A — Looks like the PM decides too directly, but it grants the dev team authority for technical analysis and recommendations while the PM integrates the whole-project impact to decide. Authority and responsibility by role are relatively clear.\n② Recording B — The decision is handed to the dev team, but within an already-agreed risk tolerance. Implementation details are left to the team while the PM keeps responsibility for securing resources and confirming results — close to proper empowerment.\n③ Recording C — Escalated to a higher meeting, but raising a matter beyond one\'s approval authority to the proper decision body is not buck-passing. The PM prepares alternatives and recommendations and directs what the team can do even before the decision, so Accountability is maintained.\n④ Recording D — Sounds like respecting the expert, but it leaves conflicting judgments unmediated to the two organizations\' consensus. There is no decision criterion, deadline, or escalation path, and the PM stays in a recording role — crossing the line from delegation into neglect.'
+        'The answer is ② Recording B.',
+        'PMBOK® Guide 8th Edition encourages an Empowered Culture in which the team works autonomously on the strength of its expertise, but it stresses that the final decision — and accountability for its outcome — belongs to the Accountable Leader.',
+        'Recording B leaves an important decision, one where stakeholder interests conflict, to the team while the PM says only that the result will be reflected in the plan. That is not delegating authority to execute; it is handing off accountability itself.',
+        '[Recording by recording]\n① Recording A — Incorrect. Decisions that require approval authority are made by the PM, while the team handles analysis and verification.\n② Recording B — Correct. With interests in conflict, the PM does not make the final judgment and leaves the decision to the team.\n③ Recording C — Incorrect. Detailed execution within the risk tolerance is delegated, but the PM keeps responsibility for support and management.\n④ Recording D — Incorrect. The technical review is left to the team, but the final decision is made by the PM.'
       ].join('\n\n')
     }
   },
-  // ── ⏳ STAGE 2 임시 정답·해설 (PLACEHOLDER) — 위 CASES의 임시 블록과 함께 교체한다 ──
-  'case-s2-04': {
-    answerIndex: 1, // 정답: 2번
-    analysis: [
-      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
-      '정답은 ② 편익 실현 계획입니다.',
-      'PMBOK® 8판의 Governance는 프로젝트를 "산출물을 인수하고 끝내는 활동"이 아니라 "약속한 편익이 실제로 실현되는지까지 책임지는 체계"로 봅니다. 종료 보고서에 인수 확인과 예산 반납만 있다면, 편익은 측정 책임자도 시점도 없는 상태로 방치됩니다.',
-      '①③④는 모두 종료 절차를 다듬는 활동이며, 편익이 실현되는지에는 답하지 못합니다.'
-    ].join('\n\n'),
-    en: {
-      analysis: [
-        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
-        'The answer is ② the benefits realization plan.',
-        'Governance in PMBOK® 8th Edition treats a project not as "accept the deliverable and finish" but as a system accountable for whether the promised benefits actually materialize. If the closure report holds only acceptance and budget return, the benefit is left with no measurement owner and no measurement date.',
-        '①, ③ and ④ all polish the closure procedure and none of them answers whether the benefit is realized.'
-      ].join('\n\n')
-    }
-  },
-  'case-s2-05': {
-    answerIndex: 1, // 정답: 2번
-    analysis: [
-      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
-      '정답은 ② EAC 재산정입니다.',
-      'SPI 1.03은 일정이 약간 앞섰다는 뜻이지만, CPI 0.82는 1원의 가치를 얻기 위해 1.2원 이상을 쓰고 있다는 뜻입니다. 누적 실제원가가 계획의 128%인 상태에서 남은 기간이 4개월이라면, 현재 효율이 유지될 때 완료 시점 원가는 계획을 크게 초과합니다.',
-      '따라서 "일정이 정상이므로 프로젝트가 정상"이라는 보고는 성립하지 않습니다. 완료시점예측(EAC)을 다시 산정하고 원가 초과 원인을 분리해 대응해야 합니다.'
-    ].join('\n\n'),
-    en: {
-      analysis: [
-        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
-        'The answer is ② recalculate the EAC.',
-        'SPI 1.03 means the schedule is slightly ahead, but CPI 0.82 means more than 1.2 won is being spent to earn 1 won of value. With cumulative actual cost at 128% of plan and four months remaining, holding the current efficiency puts the cost at completion far above plan.',
-        'So "the schedule is fine, therefore the project is fine" does not hold. The estimate at completion (EAC) must be recalculated and the cost overrun causes isolated and addressed.'
-      ].join('\n\n')
-    }
-  },
-  'case-s2-06': {
+  // ── STAGE 2 정답·해설 — 확정 7사건 (2026-08-06) ──
+  'case-004': {
     answerIndex: 2, // 정답: 3번
     analysis: [
-      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
-      '정답은 ③ 통제 절차를 거치지 않은 변경 누적(Scope Creep)입니다.',
-      '개별 요청이 작다는 사실이 변경 통제를 면제해 주지는 않습니다. 17건이 기준선 갱신 없이 반영되면 범위·일정·원가 기준선과 실제 산출물이 어긋나고, 영향 분석과 회귀 시험 범위도 산정되지 않습니다.',
-      '②는 결과로 드러난 증상이며, ①④는 근본 원인이 아닙니다.'
+      '정답은 ③입니다.',
+      '이 사건의 핵심 문제는 기술적 판단의 정확성보다, 거버넌스(Governance) 관점에서 적절한 의사결정 체계를 적용하지 못한 것입니다. 플랫폼 변경은 개발팀뿐 아니라 운영 조직, 유지보수 체계, 협력사까지 영향을 미치는 중요한 변경이었음에도 PM은 이를 프로젝트 내부 회의체에서만 결정하였습니다.',
+      '사건 파일의 부제 「그 결정은 왜 회의실을 벗어나지 못했는가」가 암시하듯, PM은 타 조직에 큰 영향을 미치는 중대한 사안을 프로젝트 내부의 기술적 관점으로만 한정하여 결정하는 오류를 범했습니다. 출시 6주 전의 핵심 플랫폼 변경은 단순한 개발 이슈를 넘어 운영 프로세스·유지보수 체계·협력사 연계까지 파급력을 가지므로, 반드시 운영 조직을 포함한 주요 이해관계자와 사전에 검토해야 하는 사안입니다.',
+      '그럼에도 PM은 기술 검토 결과에만 의존해 운영 측의 사전 검토 의견을 묵살하고 내부 회의체에서 단독으로 추진을 결정했습니다. 이는 중대한 변경에 대한 의사결정 거버넌스를 적용하지 못한 판단 실수입니다.',
+      '[보기별 판단]\n① 오답입니다. 변경 이후의 모니터링도 중요하지만, 문제의 핵심은 변경을 결정하기 **전에** 적절한 의사결정 체계를 거치지 않은 것입니다.\n② 오답입니다. 영향 분석 부족도 일부 원인이지만, 더 본질적인 문제는 누가 의사결정에 참여해야 하는지에 대한 거버넌스 실패입니다.\n③ 정답입니다. 프로젝트 내부 의사결정과 주요 이해관계자 의사결정을 구분하지 못해, 거버넌스 체계를 우회한 채 변경을 승인하였습니다.\n④ 오답입니다. 작업량 산정의 보수성은 결과적으로 드러난 이슈이며, 근본 원인은 의사결정 구조와 이해관계자 참여 부족입니다.'
     ].join('\n\n'),
     en: {
       analysis: [
-        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
-        'The answer is ③ changes accumulating outside the control procedure (scope creep).',
-        'A request being small does not exempt it from change control. When 17 of them land without a baseline update, the scope, schedule and cost baselines drift away from the actual deliverable, and neither impact analysis nor regression test scope is ever sized.',
-        '② is a symptom that surfaced as a result; ① and ④ are not the root cause.'
+        'The answer is ③.',
+        'The core problem in this case is not the accuracy of the technical judgment but the failure to apply an appropriate decision-making structure from a governance standpoint. The platform change was a significant change affecting not only the dev team but the operations organization, the maintenance structure and the partners — yet the PM decided it inside the project\'s own meeting body alone.',
+        'As the case file subtitle "Why That Decision Never Left the Meeting Room" hints, the PM made the error of confining a matter with heavy impact on other organizations to the project\'s internal technical viewpoint. A core platform change six weeks before launch reaches beyond a development issue into the operating process, the maintenance structure and partner integration, so it had to be reviewed in advance with key stakeholders including the operations organization.',
+        'Even so the PM relied only on the technical review, dismissed operations\' advance review comments, and decided to proceed unilaterally in the internal meeting body. That is a failure to apply decision-making governance to a significant change.',
+        '[Option by option]\n① Incorrect. Post-change monitoring matters too, but the core problem is that no appropriate decision-making structure was applied **before** the change was decided.\n② Incorrect. Insufficient impact analysis is part of the cause, but the more fundamental problem is a governance failure over who should take part in the decision.\n③ Correct. Failing to separate internal project decisions from key-stakeholder decisions, the change was approved while bypassing the governance structure.\n④ Incorrect. Conservatism in effort estimation is an issue that surfaced as a consequence; the root cause is the decision structure and the lack of stakeholder participation.'
       ].join('\n\n')
     }
   },
-  'case-s2-07': {
-    answerIndex: 2, // 정답: 3번
+  'case-005': {
+    // ⚠️ 유일한 **복수 정답** 사건 — answerIndex 가 아니라 answerIndexes(배열)를 쓴다.
+    //    채점은 집합 일치(전부 맞아야 정답, 부분 점수 없음) — cases.js 의 multi/selectCount 와 짝이다.
+    answerIndexes: [1, 2, 4], // 정답: ② 증거물 B · ③ 증거물 C · ⑤ 증거물 E
     analysis: [
-      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
-      '정답은 ③ 단일 진실 공급원(Single Source of Truth)입니다.',
-      '이해관계자 신뢰는 보고 빈도나 양식이 아니라 "같은 숫자를 본다"는 사실에서 만들어집니다. 조직별로 다른 문서와 다른 산정 기준이 있으면 어떤 보고서를 고쳐도 숫자는 계속 어긋납니다.',
-      '①②는 문제를 늦추거나 분산시킬 뿐이고, ④ 평균값은 근거 없는 숫자를 하나 더 만드는 선택입니다.'
+      '정답은 증거물 B · C · E입니다.',
+      'Scope Creep은 승인되지 않은 기능, 업무 또는 검증 활동이 영향도 분석과 변경 통제 없이 점진적으로 증가하는 현상입니다. 증거물 B·C·E는 모두 공식 변경 절차 없이 범위가 확대된 사례에 해당합니다.',
+      '[증거물별 판단]\n① 증거물 A — 오답입니다. 고객 요청에 따른 변경이지만 요구사항과 계획이 함께 업데이트된 통제된 변경으로 볼 수 있습니다.\n② 증거물 B — 정답입니다. 새로운 기능이 제품에 포함되었지만 범위 관리 관점의 의사결정 흔적은 확인되지 않습니다.\n③ 증거물 C — 정답입니다. 검증 활동이 지속적으로 확대되고 있으며 프로젝트 업무 범위 증가를 시사합니다.\n④ 증거물 D — 오답입니다. 규제 대응 과정에서 일부 범위를 이관하여 전체 범위를 재조정한 사례입니다.\n⑤ 증거물 E — 정답입니다. 여러 기능이 누적 추가되고 있으나 범위 조정이나 우선순위 변경 흔적은 보이지 않습니다.'
     ].join('\n\n'),
     en: {
       analysis: [
-        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
-        'The answer is ③ a single source of truth.',
-        'Stakeholder trust is built not on reporting frequency or format but on everyone seeing the same number. While each organization keeps its own document and its own calculation basis, fixing any single report leaves the numbers in conflict.',
-        '① and ② only delay or spread the problem, and ④ simply manufactures one more number with no basis.'
+        'The answer is Evidence B, C and E.',
+        'Scope creep is the incremental growth of unapproved features, work or validation activity without impact analysis and change control. Evidence B, C and E are all cases where scope expanded with no formal change procedure.',
+        '[Evidence by evidence]\n① Evidence A — Incorrect. The change came from a customer request, but requirements and the plan were updated with it, so it counts as a controlled change.\n② Evidence B — Correct. A new feature ended up in the product, yet there is no trace of a scope-management decision.\n③ Evidence C — Correct. Validation activity keeps expanding, which points to growth in the project work scope.\n④ Evidence D — Incorrect. Part of the scope was transferred while handling regulation, re-balancing the overall scope.\n⑤ Evidence E — Correct. Features are accumulating, but there is no sign of scope adjustment or re-prioritization.'
       ].join('\n\n')
     }
   },
-  'case-s2-08': {
-    answerIndex: 0, // 정답: 1번
-    analysis: [
-      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
-      '정답은 ① 리스크 관리대장 상시 갱신과 SPOF 대응입니다.',
-      '리스크는 한 번 등록하는 문서 작업이 아니라 상시 관리 활동입니다. "핵심 인력 이탈"이 8개월간 갱신되지 않았다는 사실 자체가 관리 실패이며, 단일 실패점(SPOF)에는 백업 인력·지식 문서화·리뷰 실질화 같은 사전 대응이 필요합니다.',
-      '②는 부분적 완화이고, ③은 사후 대응, ④는 노출 기간만 줄이며 SPOF 자체를 남겨 둡니다.'
-    ].join('\n\n'),
-    en: {
-      analysis: [
-        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
-        'The answer is ① continuous risk register updates and a response to the SPOF.',
-        'Risk management is a standing activity, not a one-time document entry. That "possible departure of key personnel" went eight months without an update is itself the management failure; a single point of failure calls for advance responses — backup staffing, knowledge documentation, review that is real rather than formal.',
-        '② is a partial mitigation, ③ is reactive, and ④ only shortens exposure while leaving the SPOF in place.'
-      ].join('\n\n')
-    }
-  },
-  'case-s2-09': {
+  'case-006': {
     answerIndex: 1, // 정답: 2번
     analysis: [
-      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
-      '정답은 ② 가치 단위의 완료 정의와 검증된 산출물 기준 진척 인정입니다.',
-      '"코드는 다 됐다"는 진술은 검증되지 않은 자기 보고입니다. 인수 가능한 가치 단위로 완료를 정의하고 시험 통과 같은 객관적 증거로만 진척을 인정하면, 90%에서 멈추는 보고가 구조적으로 불가능해집니다.',
-      '①③은 같은 기준으로 더 자주·다른 사람이 세는 것이고, ④는 과장을 제도화합니다.'
+      '정답은 ②입니다.',
+      'PMBOK® Guide 8판은 현재 상태보다 성과 추세를 기반으로 미래 일정을 예측(Forecasting)하는 것을 중요하게 봅니다.',
+      '본 사례에서는 버퍼가 지속 감소하고(15일 → 5일) Validation Scope가 지속 증가하고(20건 → 38건) 있으므로, 단순 관찰이 아니라 일정 예측을 갱신하고 영향을 분석해야 합니다.',
+      '[보기별 판단]\n① 오답입니다. Validation Scope 증가로 업무량 변화 가능성이 발생했으므로 최신 정보를 반영한 일정 예측 갱신이 필요합니다.\n② 정답입니다. 이미 추세 악화 신호가 관측되고 있는데 단순히 추가 관찰만 하자는 것은 PMBOK 8판의 일정 예측 및 통제 개념과 맞지 않습니다.\n③ 오답입니다. 버퍼 감소는 일정 유연성 저하를 의미할 수 있으며 일정 리스크 분석의 필요성을 시사합니다.\n④ 오답입니다. 진행률 수치만으로 미래 일정 달성을 보장할 수 없으며 성과 추세를 함께 고려해야 합니다.'
     ].join('\n\n'),
     en: {
       analysis: [
-        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
-        'The answer is ② define done as a unit of value and credit progress only against verified deliverables.',
-        '"The code is done" is unverified self-reporting. Define completion as an acceptable unit of value and credit progress only on objective evidence such as passing a test, and a report that parks at 90% becomes structurally impossible.',
-        '① and ③ just count the same basis more often or by a different person, and ④ institutionalizes the exaggeration.'
+        'The answer is ②.',
+        'PMBOK® Guide 8th Edition treats forecasting the future schedule from performance trend — rather than from current status — as important.',
+        'Here the buffer keeps shrinking (15 days → 5 days) and validation scope keeps growing (20 → 38 cases), so the schedule forecast must be updated and its impact analysed, not merely observed.',
+        '[Option by option]\n① Incorrect. Growing validation scope raises the possibility of a change in workload, so the schedule forecast must be updated with the latest information.\n② Correct. Signs of a deteriorating trend are already observed; proposing only further observation does not fit the schedule forecasting and control concepts of PMBOK 8th Edition.\n③ Incorrect. A shrinking buffer can mean reduced schedule flexibility and points to the need for schedule risk analysis.\n④ Incorrect. A progress figure alone cannot guarantee future schedule achievement; the performance trend must be considered with it.'
       ].join('\n\n')
     }
   },
-  'case-s2-10': {
-    answerIndex: 2, // 정답: 3번
+  'case-007': {
+    answerIndex: 2, // 정답: 3번 (PM 후보 C)
     analysis: [
-      '[임시 해설 — Stage 2 콘텐츠 확정 시 교체]',
-      '정답은 ③ 대체 조달 경로 + 실가용 공수 기준의 자원 계획입니다.',
-      '이 사건에는 두 개의 자원 리스크가 겹쳐 있습니다. 단일 공급사 의존(대체 경로 없음)과 겸직 과부하(계획 공수와 실가용 공수의 괴리)입니다. 하나만 해결하면 화재가 나도 대응 인력이 없거나, 인력이 있어도 부품이 없습니다.',
-      '①은 오히려 단일 공급 의존을 강화하고, ②는 지연 자체를 막지 못하며, ④는 인원 수만 늘려 실가용 공수 문제를 그대로 둡니다.'
+      '정답은 ③ PM 후보 C입니다.',
+      '③은 이미 투자한 비용과 시간을 프로젝트 지속의 근거로 삼고 있으며, 이는 미래 가치보다 과거 투자에 얽매이는 매몰비용 오류(Sunk Cost Fallacy)입니다.',
+      '[후보별 판단]\n① PM 후보 A — 오답입니다. Business Case와 변경 영향을 지속적으로 검토하고 있어 적절한 접근입니다.\n② PM 후보 B — 오답입니다. Forecast와 예산 관리뿐 아니라 추가 투자에 따른 가치까지 함께 판단하고 있습니다.\n③ PM 후보 C — 정답입니다. 이미 투입한 비용을 이유로 프로젝트를 계속하려는 것은 매몰비용 오류입니다.\n④ PM 후보 D — 오답입니다. Opportunity Cost와 장기적 사업 가치를 함께 고려하고 있어 적절합니다.'
     ].join('\n\n'),
     en: {
       analysis: [
-        '[Temporary analysis — to be replaced when Stage 2 content is confirmed]',
-        'The answer is ③ an alternative sourcing route plus a resource plan based on realistic available effort.',
-        'Two resource risks overlap here: dependence on a single supplier (no alternative route) and overload from split assignments (planned effort diverging from available effort). Fix only one and either there is no one to respond when the fire happens, or there are people but no part.',
-        '① actually deepens the single-supply dependence, ② does not prevent the delay itself, and ④ adds headcount while leaving the available-effort problem untouched.'
+        'The answer is ③ PM candidate C.',
+        '③ uses the cost and time already invested as the grounds for continuing the project — the sunk cost fallacy, being bound by past investment rather than future value.',
+        '[Candidate by candidate]\n① PM candidate A — Incorrect. Continuously reviewing the business case and change impact is an appropriate approach.\n② PM candidate B — Incorrect. Beyond forecast and budget management, the value of additional investment is also weighed.\n③ PM candidate C — Correct. Continuing a project because money has already been spent is the sunk cost fallacy.\n④ PM candidate D — Incorrect. Opportunity cost and long-term business value are considered together, which is appropriate.'
       ].join('\n\n')
     }
   },
-  // ── STAGE 2 임시 정답·해설 끝 ──
+  'case-008': {
+    answerIndex: 1, // 정답: 2번
+    analysis: [
+      '정답은 ②입니다.',
+      '다섯 개의 메모를 보면 모든 조직이 프로젝트가 성공적으로 완료되었다는 사실에는 동의하고 있습니다. 그러나 성공을 판단하는 기준이 서로 다릅니다.\n· PM은 계획 대비 성과(KPI)와 Baseline 유지를 성공으로 인식합니다.\n· 개발팀은 계획된 요구사항과 일정 달성을 성공으로 인식합니다.\n· 고객은 계약된 기능의 제공 여부를 중요하게 봅니다.\n· 운영조직은 실제 운영 환경에서의 활용과 안정화를 중요하게 봅니다.\n· 사업부는 투자, 시장 상황, 향후 사업 확대 가능성을 중요하게 봅니다.',
+      '즉, 모든 이해관계자가 프로젝트의 성공을 인정하고 있음에도 각 조직이 프로젝트를 평가하는 기준과 기대하는 가치가 서로 달랐습니다. 그 결과 종료 이후 Portfolio Review에서 후속 투자·서비스 확장·기능 확대에 대한 공통된 판단을 내리지 못하게 되었습니다.',
+      'PMBOK® Guide 8판의 Stakeholder Performance Domain 관점에서는 프로젝트 수행 중 이해관계자의 기대·관점·성공 기준을 지속적으로 파악하고 정렬(Alignment)하는 것이 중요합니다.',
+      '[보기별 판단]\n① 오답입니다. 사업 환경 변화나 Scope 재검토의 필요성을 직접적으로 보여주는 증거는 없습니다. 고객 역시 계약된 기능이 모두 제공되었다고 기록하고 있습니다.\n② 정답입니다. 메모 전반에서 프로젝트 성공에 대한 관점과 판단 기준이 조직마다 다르게 나타나며, 수행 과정에서 이 관점 차이를 관리하고 주요 의사결정에 반영할 필요가 있었음을 시사합니다.\n③ 오답입니다. 실제 사용량이나 사업효과 언급이 일부 있으나, 핵심 단서는 Portfolio Review 참석자들이 결과를 서로 다르게 해석했다는 점입니다. 이는 성과지표 부족보다 이해관계자 정렬 부족과 더 직접 연결됩니다.\n④ 오답입니다. 의사결정 기준 재검토의 필요성을 배제할 수는 없으나, 증거물에서 드러나는 핵심 문제는 조직 간 성공 기준과 기대의 차이이지 Governance 체계 자체의 문제는 아닙니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        'The answer is ②.',
+        'Across the five notes every organization agrees the project completed successfully. But each judges success by a different criterion.\n· The PM sees success as performance against plan (KPIs) and holding the baseline.\n· The dev team sees success as meeting the planned requirements and schedule.\n· The customer cares whether the contracted features were delivered.\n· The operations organization cares about adoption and stabilization in the real operating environment.\n· The business unit cares about investment, market conditions and room for future business expansion.',
+        'So although every stakeholder acknowledges the project\'s success, the criteria they evaluate by and the value they expect differ. As a result the Portfolio Review after closure could not reach a shared judgment on follow-up investment, service expansion or additional features.',
+        'From the standpoint of the Stakeholder Performance Domain in PMBOK® Guide 8th Edition, what matters is continuously grasping and aligning stakeholder expectations, perspectives and success criteria during the project.',
+        '[Option by option]\n① Incorrect. There is no evidence directly showing a change in the business environment or a need to re-examine scope. The customer too records that every contracted feature was delivered.\n② Correct. Throughout the notes the perspective and criteria for project success differ by organization, which suggests these differences needed to be managed during execution and fed into key decisions.\n③ Incorrect. Actual usage and business effect are mentioned in places, but the core clue is that the Portfolio Review attendees interpreted the outcome differently. That connects more directly to weak stakeholder alignment than to missing performance indicators.\n④ Incorrect. A need to re-examine decision criteria cannot be ruled out, but the core problem in the evidence is the gap in success criteria and expectations between organizations, not the governance system itself.'
+      ].join('\n\n')
+    }
+  },
+  'case-009': {
+    answerIndex: 3, // 정답: 4번 (Chief Architect)
+    analysis: [
+      '정답은 ④ Chief Architect입니다.',
+      '이 사건은 "누가 PM을 가장 힘들게 했는가"를 묻는 문제가 아닙니다. PMBOK® Guide 8판의 Resource Performance Domain 관점에서 핵심은 자원의 수가 아니라 자원 운영 체계입니다.',
+      '인터뷰 D에서는 프로젝트의 중요한 기술 의사결정이 사실상 Chief Architect 한 사람에게 집중되어 있으며, 그의 부재 시 의사결정이 지연되는 구조가 형성되어 있습니다. 이런 구조에서는 팀 전체의 역량이 충분히 활용되지 못하고, PM은 지속적으로 특정 인물의 일정과 가용성에 의존하여 프로젝트를 운영해야 합니다.',
+      '[관계자별 판단]\n① 개발조직장 — 오답입니다. 자원 제약은 존재했지만 프로젝트에 배정된 인력을 직접 축소하거나 회수한 것은 아니며, 조직 차원의 제약조건에 가깝습니다.\n② 사업부 임원 — 오답입니다. 일정 압박은 있었지만 Scope·Schedule 영역의 영향이 더 크며 Resource Domain의 핵심 문제는 아닙니다.\n③ HR Resource Manager — 오답입니다. 추가 지원을 제한했지만 사업부 차원의 자원 배분을 수행한 것으로, 프로젝트 내부 운영 구조를 결정하지는 않았습니다.\n④ Chief Architect — 정답입니다. 핵심 의사결정이 특정 인물에게 집중되어 자원 활용성과 팀 자율성을 저하시키고 병목 구조를 만들었습니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        'The answer is ④ the Chief Architect.',
+        'This case does not ask "who made the PM\'s life hardest". From the standpoint of the Resource Performance Domain in PMBOK® Guide 8th Edition, what matters is not the number of resources but the resource operating structure.',
+        'Interview D shows that important technical decisions on the project are effectively concentrated in the Chief Architect alone, forming a structure where decisions stall in their absence. In such a structure the team\'s full capability goes unused, and the PM must run the project in continuous dependence on one person\'s schedule and availability.',
+        '[Person by person]\n① Development organization head — Incorrect. Resource constraints existed, but the staff assigned to the project were not directly cut or withdrawn; this is closer to an organization-level constraint.\n② Business unit executive — Incorrect. There was schedule pressure, but the impact falls more in the scope and schedule areas and is not the core resource-domain problem.\n③ HR Resource Manager — Incorrect. Additional support was limited, but this was resource allocation at business-unit level and did not determine the project\'s internal operating structure.\n④ Chief Architect — Correct. Concentrating key decisions in one individual lowered resource utilization and team autonomy and created a bottleneck structure.'
+      ].join('\n\n')
+    }
+  },
+  'case-010': {
+    answerIndex: 1, // 정답: 2번
+    analysis: [
+      '정답은 ②입니다.',
+      '회고 보고서에는 리스크를 공유·기록·대응했다는 내용이 반복적으로 등장하지만, 위험 수준이 높아졌음에도 프로젝트 운영 원칙은 그대로 유지했다는 점이 드러납니다.',
+      'PMBOK® Guide 8판은 리스크를 단순히 관리하는 대상이 아니라, 프로젝트의 범위(Scope)·일정(Schedule)·릴리즈(Release)·투자(Investment)·우선순위(Priority) 등의 의사결정을 조정하는 근거로 활용할 것을 강조합니다. 따라서 이 PM은 리스크를 인식하고 대응하는 역량은 갖추었지만, 리스크를 프로젝트 계획과 의사결정으로 연결하지 못할 가능성이 가장 큽니다.',
+      '[보기별 판단]\n① 오답입니다. 회고만으로 새로운 리스크 탐색이 부족했다고 단정하기는 어렵습니다.\n② 정답입니다. 리스크가 증가했음에도 프로젝트 운영 방향을 조정하지 않는 사고방식이 가장 큰 위험입니다.\n③ 오답입니다. 사후 대응 성향은 보이지만, 더 본질적인 문제는 리스크를 의사결정에 반영하지 않는 점입니다.\n④ 오답입니다. 재평가 부족도 추론 가능하지만, 보고서에는 리스크 수준 변화는 인식하고 있었던 것으로 보입니다.'
+    ].join('\n\n'),
+    en: {
+      analysis: [
+        'The answer is ②.',
+        'The retrospective repeatedly states that risks were shared, recorded and responded to — yet it also reveals that the project\'s operating principles were held unchanged even as the risk level rose.',
+        'PMBOK® Guide 8th Edition stresses using risk not merely as something to manage but as the basis for adjusting decisions on scope, schedule, release, investment and priority. This PM therefore has the capability to recognize and respond to risk, but is most likely to fail at connecting risk to the project plan and to decisions.',
+        '[Option by option]\n① Incorrect. The retrospective alone is not enough to conclude that the scan for new risks was lacking.\n② Correct. The greatest danger is the mindset of not adjusting the project\'s direction even as risk grows.\n③ Incorrect. A reactive tendency is visible, but the more fundamental problem is not reflecting risk in decisions.\n④ Incorrect. Insufficient re-assessment can also be inferred, but the report suggests shifts in risk level were recognized.'
+      ].join('\n\n')
+    }
+  },
+
   'case-011': {
     answerIndex: 3, // 정답: 4번 (품질 담당자 증언)
     analysis: [

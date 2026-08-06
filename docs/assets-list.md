@@ -41,23 +41,37 @@
 | File | Purpose | Status |
 |---|---|---|
 | /images/questions/question1.webp | Stage 1 · 1번째 사건 #007 단서 4 (Proactive Mindset) — **영문판 이미지**(CLUE 1~4). 2026-08-05 교체: 단서 5개→4개, 국문→영문 | 있음 · 사용 중 |
-| /images/questions/question2-1.webp | Stage 1 · 2번째 사건 #014 단서 1/4 (증거물 A) | 있음 · 사용 중 |
-| /images/questions/question2-2.webp | Stage 1 · 2번째 사건 #014 단서 2/4 (증거물 B) | 있음 · 사용 중 |
-| /images/questions/question2-3.webp | Stage 1 · 2번째 사건 #014 단서 3/4 (증거물 C) | 있음 · 사용 중 |
-| /images/questions/question2-4.webp | Stage 1 · 2번째 사건 #014 단서 4/4 (증거물 D) | 있음 · 사용 중 |
-| /images/questions/question3.webp | Stage 1 · 3번째 사건 #021 현장 자료 | 있음 · 사용 중 |
-| /images/questions/question4.webp | Stage 2 · 4번째 사건 단서 | 있음 · 사건 미제작 |
+| /images/questions/question2.webp | Stage 1 · 2번째 사건 #002 현장 자료 — **영문판 1종으로 운영**(프로젝트 상황판). 2026-08-06 신규 | 있음 · 사용 중 |
+| /images/questions/question3-1.webp | Stage 1 · 3번째 사건 #003 다이어리 1/4 (증거물 A) · 국문 | 있음 · 사용 중 |
+| /images/questions/question3-2.webp | Stage 1 · 3번째 사건 #003 다이어리 2/4 (증거물 B) · 국문 | 있음 · 사용 중 |
+| /images/questions/question3-3.webp | Stage 1 · 3번째 사건 #003 다이어리 3/4 (증거물 C) · 국문 | 있음 · 사용 중 |
+| /images/questions/question3-4.webp | Stage 1 · 3번째 사건 #003 다이어리 4/4 (증거물 D) · 국문 | 있음 · 사용 중 |
+| /images/questions/question3-1_en.webp | 같은 단서 **영문판** (2026-08-06 도착). 국문판의 '현장 메모' 포스트잇이 영문판에는 없다 | 있음 · 사용 중 |
+| /images/questions/question3-2_en.webp | 같은 단서 영문판 | 있음 · 사용 중 |
+| /images/questions/question3-3_en.webp | 같은 단서 영문판 | 있음 · 사용 중 |
+| /images/questions/question3-4_en.webp | 같은 단서 영문판 | 있음 · 사용 중 |
+| /images/questions/question4.webp | 출시 17분 후 AUTH ERROR · Incident Analysis 장면. **어느 사건도 쓰지 않는다** — 사건 #004(플랫폼 변경 거버넌스)와 내용이 맞지 않아 `assets.js` 미등록 | 있음 · 미사용 |
+| /images/questions/question5-1~5.webp | Stage 2 · 사건 #005 증거물 A~E (무손실 — 평면 텍스트 패널) · 영문판 1종 | 있음 · 사용 중 |
+| /images/questions/question6.webp | Stage 2 · 사건 #006 Week 4 Schedule Health Board (q90 — 질감 일러스트) | 있음 · 사용 중 |
+| /images/questions/question8-1~5.webp | Stage 2 · 사건 #008 수기 메모 1~5 (q90 — 사진) | 있음 · 사용 중 |
+| /images/questions/question10.webp | Stage 2 · 사건 #010 회고 보고서 발췌 · 국문 (q96 — 평면 인포그래픽, 텍스트 선명도 우선) | 있음 · 사용 중 |
+| /images/questions/question10_en.webp | 같은 보고서 **영문판** | 있음 · 사용 중 |
 | /images/questions/question12-1.webp | Stage 3 · 12번째 사건 #012 단서 1/4 (확보 단서 A) | 있음 · 사용 중 |
 | /images/questions/question12-2.webp | Stage 3 · 12번째 사건 #012 단서 2/4 (확보 단서 B) | 있음 · 사용 중 |
 | /images/questions/question12-3.webp | Stage 3 · 12번째 사건 #012 단서 3/4 (확보 단서 C) | 있음 · 사용 중 |
 | /images/questions/question12-4.webp | Stage 3 · 12번째 사건 #012 단서 4/4 (확보 단서 D) | 있음 · 사용 중 |
-| /images/questions/question13.webp | Stage 3 · 13번째 사건 #013 복구된 AI 프로젝트 대시보드 | 있음 · 사용 중 |
-| /images/questions/question15-logA.webp | Stage 3 · 15번째 사건 #015 복구된 로그 A (무손실 — 평면 텍스트 패널) | 있음 · 사용 중 |
-| /images/questions/question15-logB.webp | Stage 3 · 15번째 사건 #015 복구된 로그 B | 있음 · 사용 중 |
-| /images/questions/question15-logC.webp | Stage 3 · 15번째 사건 #015 복구된 로그 C | 있음 · 사용 중 |
-| /images/questions/question15-logD.webp | Stage 3 · 15번째 사건 #015 복구된 로그 D | 있음 · 사용 중 |
+| /images/questions/question13.webp | Stage 3 · 13번째 사건 #013 복구된 AI 프로젝트 대시보드. **국문·영문 공용**(운영 결정 2026-08-06 — 별도 영문판을 만들지 않는다) | 있음 · 사용 중 |
+| /images/questions/question15-logA.webp | Stage 3 · 15번째 사건 #015 복구된 로그 A (무손실 — 평면 텍스트 패널) · 국문 | 있음 · 사용 중 |
+| /images/questions/question15-logB.webp | Stage 3 · 15번째 사건 #015 복구된 로그 B · 국문 | 있음 · 사용 중 |
+| /images/questions/question15-logC.webp | Stage 3 · 15번째 사건 #015 복구된 로그 C · 국문 | 있음 · 사용 중 |
+| /images/questions/question15-logD.webp | Stage 3 · 15번째 사건 #015 복구된 로그 D · 국문 | 있음 · 사용 중 |
+| /images/questions/question15-logA~D_en.webp | 같은 로그 **영문판** (2026-08-06 도착 · 무손실 · 장당 8~10KB) | 있음 · 사용 중 |
+| /images/questions/question12-1~4_en.webp | 사건 #012 확보 단서 A~D **영문판** (2026-08-06 도착 · 무손실 · 장당 30~39KB) | 있음 · 사용 중 |
 
 > 파일명은 소문자로 통일 — Vercel/Linux 대소문자 구분 대응(§14). 경로 상수는 `src/js/constants/assets.js`의 `ASSETS.questions`가 단일 출처이며, **사건 미제작 파일은 아직 상수에 등록하지 않았다**(사건 데이터를 만들 때 함께 추가한다).
+>
+> **영문판 단서 규칙**: 같은 단서의 영문 이미지는 `-_en` 접미사(`question3-1_en.webp`)로 두고, `cases.js`의 `en.evidence.images[].src`만 교체한다(사건 #003이 유일한 사례). 영문판이 없는 사건은 en 화면도 국문 이미지를 그대로 쓴다.
+> 원본 PNG는 **서빙되지 않는 `img/questions/`** 에 보관한다(`.gitignore`의 `/img/` — git 미추적). `public/`에는 WebP만 둔다. 확장자 대문자(`.PNG`)로 받은 파일은 반드시 소문자 `.webp`로 변환해 넣는다.
 > ✅ **최적화 완료**: PNG(장당 1.8~2.3MB, 합계 16.1MB) → **WebP(합계 1.5MB, -91%)**. 해상도는 원본 유지. 원본 PNG는 커밋 `2ac781b` 이전 히스토리에 남아 있다(`git show 2ac781b:public/images/questions/question1.png > 파일`로 복구).
 >
 > **인코딩 규칙 — 그림 종류에 따라 다르게 쓴다.** 새 단서 이미지를 넣을 때 이 기준을 따른다(Pillow 사용).
@@ -77,6 +91,7 @@
 | File | Purpose | Status |
 |---|---|---|
 | /videos/opening.mp4 | 게임 시작 전 오프닝 (현재는 YouTube 임베드를 사용) | 있음 · 미사용 |
+| YouTube 임베드 `BLitSGtLXHY` | **실제 사용하는 오프닝 영상**(SCR-002). 교체는 `ASSETS.videos.openingEmbedId` 한 곳만 바꾼다 | 2026-08-06 교체 · 사용 중 |
 | /videos/ending.mp4 | 게임 종료(엔딩) 영상 | 미정 |
 
 > **엔딩 영상 게이트**: 파일이 없으므로 `src/js/constants/assets.js`의 `ASSETS.videos.endingAvailable = false`로 두어 **요청 자체를 하지 않는다**(404 방지). 이 상태에서 SCR-021은 `all-members.png` + `boss.png`(국장 최종 메시지) + `badge-gold.png` 대체 연출로 진행한다(`docs/game-flow.md §14.3`).
@@ -113,11 +128,22 @@ EvidenceViewer가 네이티브 컨트롤로 재생하고 헤더 소리 설정(�
 
 | File | Purpose | Status |
 |---|---|---|
-| /audio/sfx/question3/question3-1.mp3 | Stage 1 · 3번째 사건 #021 녹취 A | 있음 · 사용 중 |
-| /audio/sfx/question3/question3-2.mp3 | Stage 1 · 3번째 사건 #021 녹취 B | 있음 · 사용 중 |
-| /audio/sfx/question3/question3-3.mp3 | Stage 1 · 3번째 사건 #021 녹취 C | 있음 · 사용 중 |
-| /audio/sfx/question3/question3-4.mp3 | Stage 1 · 3번째 사건 #021 녹취 D | 있음 · 사용 중 |
-| /audio/sfx/question11/question11.mp3 | Stage 3 · 11번째 사건 #011 참가자 증언 녹취 (증언 4명 1파일) | 있음 · 사용 중 |
+| /audio/sfx/question2/question2-1.mp3 | Stage 1 · 2번째 사건 #002 녹취 A | 있음 · 사용 중 |
+| /audio/sfx/question2/question2-2.mp3 | Stage 1 · 2번째 사건 #002 녹취 B (**정답 대화**) | 있음 · 사용 중 |
+| /audio/sfx/question2/question2-1~4_en.mp3 | 같은 녹취 **영문판** (2026-08-06 도착) | 있음 · 사용 중 |
+| /audio/sfx/question2/question2-3.mp3 | Stage 1 · 2번째 사건 #002 녹취 C | 있음 · 사용 중 |
+| /audio/sfx/question2/question2-4.mp3 | Stage 1 · 2번째 사건 #002 녹취 D | 있음 · 사용 중 |
+| /audio/sfx/question3/question3.mp3 | Stage 1 · 3번째 사건 #003 감독관 브리핑 · 국문 (2026-08-06 도착) | 있음 · 사용 중 |
+| /audio/sfx/question3/question3_en.mp3 | 같은 브리핑 **영문판** | 있음 · 사용 중 |
+| /audio/sfx/question4/question4.mp3 | Stage 2 · 사건 #004 관계자 인터뷰 · 국문. **인터뷰 1~4가 한 파일**(사건 #011과 같은 형태) | 있음 · 사용 중 |
+| /audio/sfx/question4/question4_en.mp3 | 같은 인터뷰 **영문판** | 있음 · 사용 중 |
+| /audio/sfx/question7/question7-1~4.mp3 | Stage 2 · 사건 #007 PM 후보 A~D 답변 · 국문 | 있음 · 사용 중 |
+| /audio/sfx/question7/question7-1~4_en.mp3 | 같은 답변 **영문판** | 있음 · 사용 중 |
+| /audio/sfx/question9/question9-1~4.mp3 | Stage 2 · 사건 #009 인터뷰 A~D(개발조직장·사업부 임원·HR·Chief Architect) · 국문 | 있음 · 사용 중 |
+| /audio/sfx/question9/question9-1~4_en.mp3 | 같은 인터뷰 **영문판** | 있음 · 사용 중 |
+| /audio/sfx/question11/question11.mp3 | Stage 3 · 11번째 사건 #011 참가자 증언 녹취 (증언 4명 1파일) · 국문 | 있음 · 사용 중 |
+| /audio/sfx/question11/question11_en.mp3 | 같은 증언 **영문판** (2026-08-06 도착). 4개 WAV(각 25~28초 · 합 9.2MB)로 와서 **증언 사이 0.8초 공백을 넣어 1파일로 병합 + 64kbps 모노 MP3**(834KB · 106.7초). 원본 WAV 는 `img/audio-src/` 보관 | 있음 · 사용 중 |
+| /audio/sfx/question14/question14-1~4_en.mp3 | Stage 3 · 사건 #014 후보 PM 인터뷰 **영문판** (2026-08-06 도착). 원본이 WAV(0.7~1.2MB)로 와서 **64kbps 모노 MP3 로 변환**했다(60~103KB). 원본 WAV 는 `img/audio-src/` 보관 | 있음 · 사용 중 |
 | /audio/sfx/question14/question14-1.mp3 | Stage 3 · 14번째 사건 #014 이 PM 인터뷰 녹취 | 있음 · 사용 중 |
 | /audio/sfx/question14/question14-2.mp3 | Stage 3 · 14번째 사건 #014 최 PM 인터뷰 녹취 | 있음 · 사용 중 |
 | /audio/sfx/question14/question14-3.mp3 | Stage 3 · 14번째 사건 #014 한 PM 인터뷰 녹취 | 있음 · 사용 중 |

@@ -17,7 +17,7 @@ body {
     radial-gradient(1100px 720px at 76% -12%, rgba(123, 92, 255, 0.10), transparent 60%),
     radial-gradient(130% 130% at 50% 36%, transparent 50%, rgba(0, 0, 0, 0.62)),
     linear-gradient(180deg, rgba(8, 9, 13, 0.82), rgba(8, 9, 13, 0.93)),
-    url('/images/backgrounds/question-bg.png');
+    url('/images/backgrounds/question-bg.webp');
   background-size: auto, cover, cover, cover;
   background-position: center, center, center, center;
   background-repeat: no-repeat;

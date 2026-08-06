@@ -43,14 +43,20 @@ export const CASES = [
       { label: '단서 4', desc: '프로젝트 운영 현황' }
     ],
     en: {
-      title: 'Mass Production D-30: Who Missed the Future?',
+      // 제목은 **단서 이미지에 인쇄된 영문**을 그대로 쓴다 — 이미지에 'PRODUCTION D-30, WHO MISSED THE
+      // FUTURE?' 가 박혀 있어 화면 제목이 다르면 참가자가 다른 사건으로 오인한다(fileNo #007과 같은 이유).
+      // 그래서 국문 '양산'의 직역인 'Mass Production' 이 아니라 이미지의 'Production' 을 따른다.
+      title: 'Production D-30: Who Missed the Future?',
+      // 문단은 국문과 1:1로 맞춘다 — 이전 en 판은 6문단을 4문단으로 압축해 '그런데…' 연출 호흡이 사라졌다.
       brief: [
-        'The Bureau investigated the meeting room of a project 30 days before mass production.',
-        'At the time every schedule was reported as normal, but a defect in a core feature was found right before mass production, delaying the launch by three weeks.',
-        'The PM had left several documents at the scene. Yet… only one of them was farthest from the Proactive Mindset of PMBOK® 8th Edition.',
+        'The Bureau investigated the project war room as it stood 30 days before mass production.',
+        'At the time every schedule was reported as on track, but a defect in a core feature was found just before mass production and the launch was delayed by three weeks.',
+        'Several documents left behind by the PM were recovered at the scene.',
+        'And yet…',
+        'Only one of those documents was farthest from the Proactive Mindset of PMBOK® 8th Edition.',
         'Find that piece of evidence.'
       ].join('\n'),
-      prompt: 'Among the four clues left at the project scene, which is farthest from the Proactive Mindset of PMBOK® 8th Edition?',
+      prompt: 'Among the four clues left at the project scene, which one is least consistent with the Proactive Mindset of PMBOK® 8th Edition?',
       evidence: {
         caption: 'EVIDENCE · 4 scene clues',
         images: [{ src: ASSETS.questions.q1, alt: 'Four clues left at the scene (CLUE 1-4)' }]
@@ -69,23 +75,30 @@ export const CASES = [
     caseNo: 2,
     fileNo: '#002',
     title: '권한을 준 것인가, 책임을 넘긴 것인가',
+    // 확정 콘텐츠(2026-08-06). 이전 판은 문자열 안 \n 과 join('\n')이 섞여 줄 간격이 불규칙했다 —
+    // 화면은 brief를 한 덩어리 텍스트로 그리므로(case.js `case__brief-body`) 문단 구분은 join만으로 만든다.
     brief: [
-      '양산을 4주 앞둔 스마트 디바이스 프로젝트에서 간헐적인 통신 장애가 발견되었다. \n 장애 발생률은 약 0.8%로 낮았지만, 실제 발생 시 사용자가 기기를 재부팅해야 하는 문제가 있었다. \n  개발팀은 두 가지 대응안을 제시했다.',
-      '· 대응안 1: 구조를 수정하여 근본 원인을 제거한다. 단, 일정이 최대 1주 지연될 수 있다. \n · 대응안 2: 소프트웨어 재시도 기능을 추가하여 발생 가능성을 낮춘 뒤 예정대로 출시한다. 일정 영향은 거의 없지만 잔여 위험은 남는다.',
-      '이 프로젝트에서는 PM이 일정·품질·고객 영향이 결합된 주요 의사결정을 조정하고, 기술 담당자는 전문 분야의 분석과 대안을 제시하도록 역할이 정의되어 있었다. \n PM보호국 감독관은 홍길동 PM과 개발자 사이에서 오간 네 개의 대화를 확보했다.',
-      '모든 대화는 실무 현장에서 충분히 합리적으로 들린다. \n 그러나 그중 하나는 팀의 자율성을 존중하는 것처럼 보이지만, PMBOK® Guide 8판이 강조하는 Accountable Leader의 역할을 충분히 수행하지 못한 사례였다.'
+      '양산을 4주 앞둔 스마트 디바이스 프로젝트에서 간헐적인 통신 장애가 발견되었다.',
+      '장애 발생률은 약 0.8%로 낮았지만, 실제 발생 시 사용자가 기기를 재부팅해야 하는 문제가 있었다.',
+      '개발팀은 두 가지 대응안을 제시했다.',
+      '· 대응안 1: 구조를 수정하여 근본 원인을 제거한다. 단, 일정이 최대 1주 지연될 수 있다.',
+      '· 대응안 2: 소프트웨어 재시도 기능을 추가하여 발생 가능성을 낮춘 뒤 예정대로 출시한다. 일정 영향은 거의 없지만 잔여 위험은 남는다.',
+      '이 프로젝트에서는 PM이 일정, 품질, 고객 영향을 종합적으로 고려하여 주요 의사결정을 조정하고, 기술 담당자는 전문 분야의 분석과 대안을 제시하도록 역할이 정의되어 있었다.',
+      'PM보호국 감독관은 홍길동 PM과 개발자 사이에서 오간 네 개의 대화를 확보했다.',
+      '모든 대화는 실무 현장에서 충분히 합리적으로 들린다.',
+      '그러나 그중 하나는 팀의 자율성을 존중하는 것처럼 보이지만, PMBOK® Guide 8판이 강조하는 Accountable Leader의 역할을 충분히 수행하지 못한 사례였다.'
     ].join('\n'),
     prompt: '다음 대화 중 팀의 자율성을 지원하는 것처럼 보이지만, PMBOK® Guide 8판 관점에서 가장 부적절한 대화는 무엇인가?',
     evidence: {
       caption: 'EVIDENCE · 현장 자료 + 대화 녹취 4',
       images: [
-        { src: ASSETS.questions.q3, alt: '사건 #002 현장 자료' }
+        { src: ASSETS.questions.q2, alt: '사건 #002 현장 — 프로젝트 상황판(일정 지연 D-28 · 오픈 이슈 27건 · 품질 리스크 HIGH)과 대화 중인 PM·개발자' }
       ],
       audios: [
-        { src: ASSETS.questionAudio.q3_1, label: '녹취 A' },
-        { src: ASSETS.questionAudio.q3_2, label: '녹취 B' },
-        { src: ASSETS.questionAudio.q3_3, label: '녹취 C' },
-        { src: ASSETS.questionAudio.q3_4, label: '녹취 D' }
+        { src: ASSETS.questionAudio.q2_1, label: '녹취 A' },
+        { src: ASSETS.questionAudio.q2_2, label: '녹취 B' },
+        { src: ASSETS.questionAudio.q2_3, label: '녹취 C' },
+        { src: ASSETS.questionAudio.q2_4, label: '녹취 D' }
       ]
     },
     // 보기 = 녹취 A~D (순서 = 화면 번호 1~4)
@@ -97,21 +110,29 @@ export const CASES = [
     ],
     en: {
       title: 'Empowerment, or Passing the Buck?',
+      // 국문 확정본과 정보량을 맞춘다 — 이전 en 판은 brief·prompt가 "PM이 의사결정 책임을 팀에 넘겼다"까지
+      // 밝혀 국문보다 힌트를 더 줬다(로케일 간 난이도 불공평). 문단 구성도 국문과 1:1로 맞췄다.
       brief: [
-        'Four weeks before mass production of a smart-device project, an intermittent communication fault was found. The fault rate is low at about 0.8%, but when it occurs the user must reboot the device. The dev team proposed two options.',
-        '· Option 1: Fix the architecture to remove the root cause. The schedule may slip by up to one week.\n· Option 2: Lower the occurrence with a software retry feature and ship on schedule. Little schedule impact, but residual risk remains.',
-        'On this project, roles were set so that the PM coordinates key decisions combining schedule, quality and customer impact, while technical leads propose solutions in their domain. The Bureau\'s auditor secured four conversations between PM Hong Gildong and the developers.',
-        'Every conversation sounds reasonable enough in practice. But one of them looks like empowering the team while the PM actually weakens Accountability and hands off the decision responsibility itself to the team.'
+        'Four weeks before mass production of a smart-device project, an intermittent communication fault was found.',
+        'The fault rate was low at about 0.8%, but when it occurred the user had to reboot the device.',
+        'The dev team proposed two options.',
+        '· Option 1: Fix the architecture to remove the root cause. The schedule may slip by up to one week.',
+        '· Option 2: Lower the occurrence with a software retry feature and ship on schedule. Little schedule impact, but residual risk remains.',
+        'On this project, roles were defined so that the PM coordinates key decisions by weighing schedule, quality and customer impact together, while technical leads provide analysis and alternatives in their own domain.',
+        'The Bureau\'s auditor secured four conversations between PM Hong Gildong and the developers.',
+        'Every conversation sounds reasonable enough in practice.',
+        'Yet one of them, while appearing to respect the team\'s autonomy, failed to fully carry out the role of the Accountable Leader that PMBOK® Guide 8th Edition emphasizes.'
       ].join('\n'),
-      prompt: 'Among the following conversations (recordings), find the one that is most problematic from the standpoint of Accountability and the Empowered Mindset of PMBOK® 8th Edition.',
+      prompt: 'Among the following conversations, which one appears to support the team\'s autonomy but is the most inappropriate from the standpoint of PMBOK® Guide 8th Edition?',
       evidence: {
         caption: 'EVIDENCE · scene material + 4 recordings',
-        images: [{ src: ASSETS.questions.q3, alt: 'Case #021 scene material' }],
+        images: [{ src: ASSETS.questions.q2, alt: 'Case #002 scene — project status board (schedule delay D-28, 27 open issues, quality risk HIGH) with the PM and a developer talking' }],
+        // 영문 녹취 도착(2026-08-06) → 국문 음성 대신 _en 을 쓴다.
         audios: [
-          { src: ASSETS.questionAudio.q3_1, label: 'Recording A' },
-          { src: ASSETS.questionAudio.q3_2, label: 'Recording B' },
-          { src: ASSETS.questionAudio.q3_3, label: 'Recording C' },
-          { src: ASSETS.questionAudio.q3_4, label: 'Recording D' }
+          { src: ASSETS.questionAudio.q2_1_en, label: 'Recording A' },
+          { src: ASSETS.questionAudio.q2_2_en, label: 'Recording B' },
+          { src: ASSETS.questionAudio.q2_3_en, label: 'Recording C' },
+          { src: ASSETS.questionAudio.q2_4_en, label: 'Recording D' }
         ]
       },
       choices: ['Recording A', 'Recording B', 'Recording C', 'Recording D']
@@ -123,18 +144,25 @@ export const CASES = [
     caseNo: 3,
     fileNo: '#003',
     title: '성공한 프로젝트, 진짜 가치는 어디에 있었나',
+    // 확정 콘텐츠(2026-08-06) — 사건 맥락은 브리핑 음성(question3.mp3)에만 담는다. 개요에 텍스트로
+    // 옮겨 적지 않는다는 운영 결정이라 en.brief 도 같은 두 줄로 맞췄다(이전 en 판에는 프로젝트 성과
+    // 5항목이 텍스트로 있어 국문보다 정보가 많았다).
     brief: [
       '다음은 PM보호국 감독관이 사건을 브리핑하는 음성 기록이다.',
       '음성을 듣고, 제공된 4개의 확보 단서를 분석하여 물음에 답하시오.'
     ].join('\n'),
     prompt: '다음 4개의 확보 증거물 중, 홍길동 PM이 PMBOK® Guide 8판의 Value-Driven Mindset에 기반하여 의사결정했음을 보여주는 결정적 단서는 무엇인가?',
     evidence: {
-      caption: 'EVIDENCE · 길동 책임 다이어리 4',
+      caption: 'EVIDENCE · 감독관 브리핑 + 길동 책임 다이어리 4',
+      audioFirst: true, // 브리핑 음성을 먼저 듣고 증거물을 판독하는 사건 → 오디오가 이미지 위
       images: [
-        { src: ASSETS.questions.q2_1, alt: '증거물 A 다이어리 기록', label: '증거물 A' },
-        { src: ASSETS.questions.q2_2, alt: '증거물 B 다이어리 기록', label: '증거물 B' },
-        { src: ASSETS.questions.q2_3, alt: '증거물 C 다이어리 기록', label: '증거물 C' },
-        { src: ASSETS.questions.q2_4, alt: '증거물 D 다이어리 기록', label: '증거물 D' }
+        { src: ASSETS.questions.q3_1, alt: '증거물 A 다이어리 기록', label: '증거물 A' },
+        { src: ASSETS.questions.q3_2, alt: '증거물 B 다이어리 기록', label: '증거물 B' },
+        { src: ASSETS.questions.q3_3, alt: '증거물 C 다이어리 기록', label: '증거물 C' },
+        { src: ASSETS.questions.q3_4, alt: '증거물 D 다이어리 기록', label: '증거물 D' }
+      ],
+      audios: [
+        { src: ASSETS.questionAudio.q3, label: '사건 브리핑' }
       ]
     },
     // 보기 = 증거물 A~D (순서 = 화면 번호 1~4)
@@ -147,286 +175,442 @@ export const CASES = [
     en: {
       title: 'A Successful Project — Where Was the Real Value?',
       brief: [
-        'The Bureau is examining the outcomes of a recently completed smart-home control platform project. The project achieved the following results.',
-        '· Met the planned mass-production schedule\n· Completed within the approved budget\n· 100% of key features implemented\n· 35% drop in customer complaints after launch\n· 18% higher service usage than expected',
-        'By results alone it looks like a perfect project. Yet right after closure, Lead Gildong said: "Keeping the schedule and scope is not the whole of success. What we had to protect was not features, but the outcome the customer gains."',
-        'The Bureau secured four entries from Lead Gildong\'s work diary. All four look like the acts of a capable PM. But only one most clearly shows the Value-Driven Mindset of PMBOK® 8th Edition.'
+        'The following is an audio record of a Bureau auditor briefing the case.',
+        'Listen to it, analyse the four secured clues, and answer the question.'
       ].join('\n'),
-      prompt: 'Among the four diary entries, find the record where Lead Gildong prioritized value and outcome over the project\'s outputs.',
+      prompt: 'Among the four secured pieces of evidence, which is the decisive clue showing that PM Hong Gildong decided on the basis of the Value-Driven Mindset of PMBOK® Guide 8th Edition?',
+      // 이 사건만 국문·영문 단서 이미지가 따로 있다(2026-08-06 영문판 도착) — 그래서 en.evidence의 src를 교체한다.
       evidence: {
-        caption: 'EVIDENCE · 4 diary entries',
+        caption: 'EVIDENCE · auditor briefing + 4 diary entries',
+        audioFirst: true,
         images: [
-          { src: ASSETS.questions.q2_1, alt: 'Evidence A diary entry', label: 'Evidence A' },
-          { src: ASSETS.questions.q2_2, alt: 'Evidence B diary entry', label: 'Evidence B' },
-          { src: ASSETS.questions.q2_3, alt: 'Evidence C diary entry', label: 'Evidence C' },
-          { src: ASSETS.questions.q2_4, alt: 'Evidence D diary entry', label: 'Evidence D' }
+          { src: ASSETS.questions.q3_1_en, alt: 'Evidence A diary entry', label: 'Evidence A' },
+          { src: ASSETS.questions.q3_2_en, alt: 'Evidence B diary entry', label: 'Evidence B' },
+          { src: ASSETS.questions.q3_3_en, alt: 'Evidence C diary entry', label: 'Evidence C' },
+          { src: ASSETS.questions.q3_4_en, alt: 'Evidence D diary entry', label: 'Evidence D' }
+        ],
+        audios: [
+          { src: ASSETS.questionAudio.q3_en, label: 'Case briefing' }
         ]
       },
       choices: ['Evidence A', 'Evidence B', 'Evidence C', 'Evidence D']
     }
   },
- 
+
   // ════════════════════════════════════════════════════════════════════════
-  // ⏳ STAGE 2 · 임시 데이터 (PLACEHOLDER) — 여기부터 case-s2-10 까지가 교체 대상이다.
-  //    Stage 2 콘텐츠(7사건)는 아직 확정되지 않았다. 전체 흐름(Stage 1 → 2 → 3 → Final Raid → 엔딩)을
-  //    끊김 없이 테스트·시연하기 위한 최소 Mock이며, 다음 규칙만 지키면 확정 콘텐츠로 그대로 교체된다.
-  //      · 데이터 구조·게임 엔진은 손대지 않는다 — 이 배열 항목과 SOLUTIONS 항목만 바꾼다.
-  //      · placeholder: true 를 지우면 화면의 '임시 데이터' 표시가 사라진다(case.js가 이 필드만 본다).
-  //      · 사건 수 7개 = STAGE_TOTALS[2] 유지 (Stage 2 만점 49점 = 7점 × 7사건 · 총 100점 · constants/scoring.js).
-  //      · 단서 미디어가 준비되면 evidence(images/audios)를 추가한다 — 지금은 텍스트 단서만 사건 개요에 있다.
-  //    주제는 docs/game-flow.md §9.2의 Q4~Q10(Governance·Financial·Scope·Stakeholders·Risk·Schedule·Resources)을 따른다.
-  //    fileNo(#T04~#T10)는 임시 번호다 — 확정 시 실제 사건 파일 번호로 바꾼다.
+  // STAGE 2 · Performance Domain — 확정 콘텐츠 7사건 (2026-08-06)
+  //   주제 매핑(docs/game-flow.md §9.2): #004 Governance · #005 Scope · #006 Schedule · #007 Financial ·
+  //      #008 Stakeholders · #009 Resources · #010 Risk
+  //   ⚠️ /images/questions/question4.webp 는 **이 스테이지의 어느 사건도 쓰지 않는다.** 내용이 '출시 17분 후
+  //      AUTH ERROR · 성능시험이 보안 우회 시나리오 미포함'이라 #004(플랫폼 변경 거버넌스)와 맞지 않는다.
+  //      쓰는 사건이 없으므로 assets.js 에 등록하지 않았다(CLAUDE.md §16.1).
   // ════════════════════════════════════════════════════════════════════════
   {
-    id: 'case-s2-04',
-    stage: 2,
+    id: 'case-004',
+    stage: 2, // Stage 2 · Performance Domain (Governance — 의사결정 체계·이해관계자 참여)
     caseNo: 1,
-    fileNo: '#T04',
-    placeholder: true,
-    title: '완료된 프로젝트, 사라진 편익',
+    fileNo: '#004',
+    title: '그 결정은 왜 회의실을 벗어나지 못했는가',
     brief: [
-      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
-      '통합 물류 플랫폼 프로젝트가 일정과 예산을 지켜 종료되었다. 그러나 6개월 후 경영진은 "약속된 물류비 12% 절감이 확인되지 않는다"며 감사를 요청했다.',
-      'PM보호국은 프로젝트 종료 보고서를 확보했다. 보고서에는 산출물 인수 확인과 잔여 예산 반납 내역은 있었지만, 편익이 언제·누구에 의해 측정되는지에 대한 기록은 없었다.'
-    ].join('\n\n'),
-    prompt: 'PMBOK® 8판의 Governance 관점에서, 이 프로젝트가 놓친 가장 핵심적인 활동은 무엇인가?',
+      '스마트 물류 플랫폼 프로젝트는 출시 6주 전 핵심 기술 플랫폼을 변경하였다.',
+      '프로젝트 팀은 해당 변경이 시스템 안정성 향상에 도움이 될 것으로 기대하였으며, 개발 일정에도 큰 영향은 없을 것으로 판단하였다.',
+      '그러나 실제 적용 과정에서 추가 검증 작업과 협력사 연계 수정이 예상보다 크게 증가하였고, 운영 프로세스와 유지보수 체계에도 변화가 필요해졌다.',
+      '결국 프로젝트는 출시가 2개월 연기되었으며 추가 비용도 발생하였다.',
+      '사건 발생 후 PM보호국은 당시 상황을 확인하기 위해 프로젝트 관계자들을 인터뷰하였다.',
+      '다음은 PM보호국 감독관이 프로젝트 관계자들을 인터뷰한 내용이다.'
+    ].join('\n'),
+    prompt: '인터뷰 내용을 종합적으로 분석할 때, 프로젝트 지연의 원인이 된 PM의 판단 방식으로 가장 적절한 것은 무엇인가?',
+    evidence: {
+      caption: 'EVIDENCE · 관계자 인터뷰 녹취',
+      audioFirst: true, // 인터뷰가 판단 근거다 → 오디오를 먼저 듣게 한다
+      audios: [
+        { src: ASSETS.questionAudio.q4, label: '관계자 인터뷰 녹취 (인터뷰 1~4)' }
+      ]
+    },
     choices: [
-      '프로젝트 종료 시 산출물 인수 확인 절차를 강화한다',
-      '편익 실현 계획을 수립하고 종료 이후의 측정 책임자와 시점을 정한다',
-      '잔여 예산을 조기에 반납해 재무 성과를 개선한다',
-      '프로젝트 종료 보고서의 승인 단계를 한 단계 추가한다'
+      '기술적 위험이 관리 가능하다고 판단된 만큼, 변경 이후 발생 가능한 영향을 더욱 지속적으로 추적하고 점검했어야 한다.',
+      '기술 전문가들의 의견을 참고하되, 변경이 여러 조직에 미치는 영향을 더욱 폭넓고 체계적으로 분석했어야 한다.',
+      '프로젝트 내부에서 판단할 사항과 주요 이해관계자가 함께 검토해야 할 사항을 구분하여 적절한 의사결정 체계를 적용했어야 한다.',
+      '일정 압박이 있는 상황일수록 변경으로 인한 추가 작업과 검증 부담을 더욱 보수적으로 산정했어야 한다.'
     ],
     en: {
-      title: 'A Completed Project, a Missing Benefit',
+      title: 'Why That Decision Never Left the Meeting Room',
       brief: [
-        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
-        'An integrated logistics platform project closed on schedule and on budget. Six months later, executives requested an audit: "the promised 12% cut in logistics cost cannot be confirmed."',
-        'The Bureau obtained the closure report. It recorded deliverable acceptance and the return of remaining budget, but nothing about when the benefits would be measured, or by whom.'
-      ].join('\n\n'),
-      prompt: 'From the Governance standpoint of PMBOK® 8th Edition, what is the most essential activity this project missed?',
+        'Six weeks before launch, the smart logistics platform project changed its core technology platform.',
+        'The project team expected the change to improve system stability and judged that it would not greatly affect the development schedule.',
+        'In practice, however, the additional verification work and the partner-integration rework grew far more than expected, and the operating process and maintenance structure needed to change as well.',
+        'The launch was ultimately postponed by two months and additional cost was incurred.',
+        'After the incident the Bureau interviewed the project stakeholders to establish what had happened.',
+        'The following are the Bureau auditor\'s interviews with the project stakeholders.'
+      ].join('\n'),
+      prompt: 'Analysing the interviews as a whole, which best describes the PM\'s way of deciding that caused the project delay?',
+      evidence: {
+        caption: 'EVIDENCE · stakeholder interview recording',
+        audioFirst: true,
+        audios: [
+          { src: ASSETS.questionAudio.q4_en, label: 'Stakeholder interview recording (interviews 1-4)' }
+        ]
+      },
       choices: [
-        'Strengthen the deliverable acceptance procedure at project closure',
-        'Establish a benefits realization plan and assign the owner and timing of post-closure measurement',
-        'Return the remaining budget early to improve financial performance',
-        'Add one more approval step to the closure report'
+        'Since the technical risk was judged manageable, the possible effects after the change should have been tracked and checked more continuously.',
+        'While drawing on the technical experts\' opinions, the impact of the change across multiple organizations should have been analysed more broadly and systematically.',
+        'Matters to be decided inside the project should have been separated from matters requiring review with key stakeholders, applying the appropriate decision-making structure.',
+        'The tighter the schedule pressure, the more conservatively the extra work and verification burden from the change should have been estimated.'
       ]
     }
   },
   {
-    id: 'case-s2-05',
-    stage: 2,
+    id: 'case-005',
+    stage: 2, // Stage 2 · Performance Domain (Scope — Scope Creep 조기 경고 신호)
     caseNo: 2,
-    fileNo: '#T05',
-    placeholder: true,
-    title: '숫자는 정상이라고 말했다',
+    fileNo: '#005',
+    // ⚠️ 이 사건만 **복수 정답**이다 — 5개 중 3개를 고른다. 엔진은 multi/selectCount 로 판단하고
+    //    정답은 solutions.js 의 answerIndexes(배열)에 있다. 채점은 전부 일치해야 정답(부분 점수 없음).
+    multi: true,
+    selectCount: 3,
+    title: '사라진 두 달',
     brief: [
-      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
-      '스마트 홈 허브 프로젝트의 6개월차 성과 지표가 보고되었다.',
-      '· 계획 대비 진척(SPI): 1.03\n· 원가 효율(CPI): 0.82\n· 누적 실제원가: 계획의 128%\n· 남은 기간: 4개월',
-      'PM은 임원회의에서 "일정은 오히려 앞서 있으므로 프로젝트는 정상"이라고 보고했다.'
-    ].join('\n\n'),
-    prompt: '이 지표에 대한 PMBOK® 8판 Financial 관점의 가장 적절한 해석은 무엇인가?',
+      '차량용 인포테인먼트 플랫폼 Project Orion은 양산 직전 단계에 있었다.',
+      '프로젝트는 예정된 출시일보다 정확히 2개월 늦게 종료되었다.',
+      '그러나 프로젝트 종료 후 진행된 감사 결과는 이상했다.',
+      '· 공식 승인된 변경 요청은 거의 없었다.\n· 예산 초과도 크지 않았다.\n· 주요 리스크도 모두 관리되고 있는 것으로 보고되어 있었다.',
+      '그런데도 프로젝트는 점점 늦어졌고, 팀원들은 출시 직전까지 과도한 업무에 시달렸다.',
+      '감사팀은 프로젝트 기록을 추적하던 중 일정 지연의 원인이 될 수 있는 다섯 건의 기록을 발견하였다.',
+      '기록 자체는 모두 사소해 보였지만, 감사팀은 이들 중 일부가 프로젝트 범위를 서서히 확장시켜 결국 두 달의 지연을 초래했을 가능성이 있다고 판단하였다.',
+      '현재 PM보호국은 해당 기록들을 증거물로 확보하여 분석 중이다.'
+    ].join('\n'),
+    prompt: 'PMBOK® Guide 8판 관점에서, Scope Creep이 발생하고 있다는 조기 경고 신호(Early Warning Sign)에 해당하는 증거물 3개를 고르시오.',
+    evidence: {
+      caption: 'EVIDENCE · 확보 증거물 5',
+      images: [
+        { src: ASSETS.questions.q5_1, alt: '증거물 A 기록', label: '증거물 A' },
+        { src: ASSETS.questions.q5_2, alt: '증거물 B 기록', label: '증거물 B' },
+        { src: ASSETS.questions.q5_3, alt: '증거물 C 기록', label: '증거물 C' },
+        { src: ASSETS.questions.q5_4, alt: '증거물 D 기록', label: '증거물 D' },
+        { src: ASSETS.questions.q5_5, alt: '증거물 E 기록', label: '증거물 E' }
+      ]
+    },
     choices: [
-      '일정이 앞서 있으므로 원가는 후속 기간에 자연히 회복된다',
-      '일정을 앞당기기 위해 원가를 초과 투입한 상태이며, 완료 시점 원가 초과가 예상되므로 EAC를 재산정해야 한다',
-      'SPI가 1을 넘었으므로 성과 기준선을 상향 조정해야 한다',
-      'CPI는 회계 마감 시점의 오차이므로 다음 분기까지 판단을 보류한다'
+      '증거물 A',
+      '증거물 B',
+      '증거물 C',
+      '증거물 D',
+      '증거물 E'
     ],
     en: {
-      title: 'The Numbers Said It Was Fine',
+      title: 'The Two Months That Vanished',
       brief: [
-        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
-        'Month-six performance indicators were reported for a smart-home hub project.',
-        '· Schedule performance (SPI): 1.03\n· Cost performance (CPI): 0.82\n· Cumulative actual cost: 128% of plan\n· Time remaining: 4 months',
-        'At the executive meeting the PM reported that "the schedule is in fact ahead, so the project is normal."'
-      ].join('\n\n'),
-      prompt: 'What is the most appropriate reading of these indicators from the Financial standpoint of PMBOK® 8th Edition?',
-      choices: [
-        'The schedule is ahead, so cost will naturally recover in the remaining periods',
-        'Cost was over-consumed to pull the schedule ahead; an overrun at completion is expected, so the EAC must be recalculated',
-        'SPI exceeded 1, so the performance baseline should be raised',
-        'CPI is an accounting cut-off error, so judgment should be deferred to next quarter'
-      ]
+        'Project Orion, an in-vehicle infotainment platform, was in its final stage before mass production.',
+        'The project closed exactly two months later than the planned launch date.',
+        'The audit run after closure, however, produced an odd result.',
+        '· Almost no change requests had been formally approved.\n· The budget overrun was not large either.\n· All key risks were reported as being under control.',
+        'Even so the project kept slipping, and the team was buried in excessive work right up to launch.',
+        'While tracing the project records, the audit team found five entries that could account for the schedule delay.',
+        'Each record looked trivial on its own, but the audit team judged that some of them may have gradually expanded the project scope and ultimately caused the two-month delay.',
+        'The Bureau has secured those records as evidence and is analysing them.'
+      ].join('\n'),
+      // 국문이 'Scope Creep'·'Early Warning Sign'을 고유 용어로 표기한다 — 영문도 대문자 표기를 유지한다
+      // (사건 #013의 보기 'Early Warning Signals'와 같은 용어라 표기가 흔들리면 참가자가 다른 개념으로 읽는다).
+      prompt: 'From the standpoint of PMBOK® Guide 8th Edition, choose the three pieces of evidence that are Early Warning Signs of Scope Creep.',
+      evidence: {
+        caption: 'EVIDENCE · 5 secured records',
+        images: [
+          { src: ASSETS.questions.q5_1, alt: 'Evidence A record', label: 'Evidence A' },
+          { src: ASSETS.questions.q5_2, alt: 'Evidence B record', label: 'Evidence B' },
+          { src: ASSETS.questions.q5_3, alt: 'Evidence C record', label: 'Evidence C' },
+          { src: ASSETS.questions.q5_4, alt: 'Evidence D record', label: 'Evidence D' },
+          { src: ASSETS.questions.q5_5, alt: 'Evidence E record', label: 'Evidence E' }
+        ]
+      },
+      choices: ['Evidence A', 'Evidence B', 'Evidence C', 'Evidence D', 'Evidence E']
     }
   },
   {
-    id: 'case-s2-06',
-    stage: 2,
+    id: 'case-006',
+    stage: 2, // Stage 2 · Performance Domain (Schedule — 추세 기반 예측)
     caseNo: 3,
-    fileNo: '#T06',
-    placeholder: true,
-    title: '작은 요청 열일곱 개',
+    fileNo: '#006',
+    title: '초록색 경고등',
     brief: [
-      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
-      '결제 서비스 개편 프로젝트에서 사업부는 3개월간 17건의 "간단한 화면 수정"을 요청했다. 각 요청은 2일 이내 작업으로 판단되어 담당 개발자가 즉시 반영했다.',
-      '변경 요청서는 작성되지 않았고, 일정과 예산 기준선도 그대로 유지되었다. 통합 시험 단계에서 회귀 결함 44건이 발생하며 출시가 3주 지연되었다.'
-    ].join('\n\n'),
-    prompt: 'PMBOK® 8판 Scope 관점에서 이 사건의 근본 원인은 무엇인가?',
+      'PM보호국은 전사 프로젝트를 실시간 분석하는 AI 기반 감시 시스템 PMS(Project Monitoring System)를 운영하고 있다.',
+      'PMS는 프로젝트의 일정, 범위, 품질, 리스크 관련 데이터를 지속적으로 분석하여 프로젝트 실패 가능성이 높아지는 징후를 조기에 탐지한다.',
+      '2026년 8월 6일 오전 02:17. PMS는 전략 프로젝트인 MediaSphere에 대해 예상치 못한 경고를 발생시켰다.',
+      '[PMS 자동 알림]\n· Project: MediaSphere\n· Current Status: GREEN\n· Alert Level: YELLOW\n· Analysis Result: Future Schedule Risk Detected / Schedule Predictability Degrading / Trend-Based Review Recommended',
+      '문제는 프로젝트 공식 상태가 GREEN이라는 점이었다. 프로젝트 PM은 즉시 다음과 같은 의견을 제출했다.',
+      '"전체 진행률은 이미 85%입니다. 일정 버퍼도 아직 5일 남아 있습니다. 현재 일정 상태는 GREEN이며 특별한 문제는 없습니다."',
+      '그러나 PMS는 경고를 철회하지 않았다. PM보호국은 PMS가 경고를 발생시킨 이유를 조사하기 위해 Week 4 시점의 Schedule Health Board를 확보하였다.'
+    ].join('\n'),
+    prompt: '다음 중 PMBOK® Guide 8판의 Schedule Performance Domain 관점에서 가장 부적절한 해석은 무엇인가?',
+    evidence: {
+      caption: 'EVIDENCE · Week 4 Schedule Health Board',
+      images: [
+        { src: ASSETS.questions.q6, alt: 'MediaSphere 프로젝트의 Week 4 Schedule Health Board — 진행률 85%, 일정 버퍼 15일→5일 감소, Validation Scope 20→38건 증가, 미해결 결함 31건, 상태 GREEN' }
+      ]
+    },
     choices: [
-      '개발자의 작업 속도가 요청량을 따라가지 못했다',
-      '통합 시험 계획에 회귀 시험 범위가 정의되지 않았다',
-      '작은 변경이 통제 절차를 거치지 않고 누적되어 범위가 잠식(Scope Creep)되었다',
-      '사업부가 요청 우선순위를 제시하지 않았다'
+      'Validation Scope가 지속적으로 증가하고 있으므로 프로젝트 일정 예측은 최신 정보를 반영하여 갱신될 필요가 있다.',
+      '현재 시점에서 프로젝트 상태는 GREEN이며 일정 버퍼도 남아 있으므로, 우선은 기존 일정 기준선을 유지하면서 향후 몇 주간의 추세를 추가 관찰하는 것이 적절하다.',
+      '일정 버퍼가 15일에서 5일로 감소하고 있으므로 일정 유연성이 감소하고 있다고 볼 수 있다. 따라서 일정 위험 요인을 추가로 분석할 필요가 있다.',
+      '진행률이 85%라는 정보만으로 프로젝트가 계획된 일정 내에 완료될 것이라고 결론 내릴 수는 없다. 향후 완료 시점은 현재 성과와 최근 추세를 함께 고려하여 예측해야 한다.'
     ],
     en: {
-      title: 'Seventeen Small Requests',
+      title: 'The Green Warning Light',
       brief: [
-        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
-        'On a payment-service redesign project, the business unit made 17 requests for "simple screen tweaks" over three months. Each was judged to be under two days of work, so the assigned developer applied it immediately.',
-        'No change requests were written and the schedule and cost baselines were left untouched. During integration testing 44 regression defects surfaced and the launch slipped three weeks.'
-      ].join('\n\n'),
-      prompt: 'From the Scope standpoint of PMBOK® 8th Edition, what is the root cause of this case?',
+        'The Bureau operates PMS (Project Monitoring System), an AI-based watch system that analyses every project in the company in real time.',
+        'PMS continuously analyses schedule, scope, quality and risk data to detect early signs that a project\'s probability of failure is rising.',
+        '6 August 2026, 02:17. PMS raised an unexpected alert on the strategic project MediaSphere.',
+        '[PMS automatic alert]\n· Project: MediaSphere\n· Current Status: GREEN\n· Alert Level: YELLOW\n· Analysis Result: Future Schedule Risk Detected / Schedule Predictability Degrading / Trend-Based Review Recommended',
+        'The problem was that the project\'s official status was GREEN. The project PM submitted this opinion at once:',
+        '"Overall progress is already 85%. There are still five days of schedule buffer left. The current schedule status is GREEN and there is no particular problem."',
+        'PMS did not withdraw the alert. To investigate why it fired, the Bureau secured the Schedule Health Board as of Week 4.'
+      ].join('\n'),
+      prompt: 'Which of the following is the least appropriate interpretation from the standpoint of the Schedule Performance Domain in PMBOK® Guide 8th Edition?',
+      evidence: {
+        caption: 'EVIDENCE · Week 4 Schedule Health Board',
+        images: [
+          { src: ASSETS.questions.q6, alt: 'Week 4 Schedule Health Board for MediaSphere — 85% progress, schedule buffer falling from 15 to 5 days, validation scope rising from 20 to 38 cases, 31 open defects, status GREEN' }
+        ]
+      },
       choices: [
-        'The developers could not keep pace with the volume of requests',
-        'The integration test plan did not define the regression test scope',
-        'Small changes bypassed the control procedure and accumulated, letting scope creep in',
-        'The business unit did not provide a priority order for its requests'
+        'Validation scope keeps increasing, so the project schedule forecast needs to be updated to reflect the latest information.',
+        'The project status is GREEN at present and schedule buffer remains, so it is appropriate to hold the existing schedule baseline for now and observe the trend for a few more weeks.',
+        'Schedule buffer is falling from 15 days to 5 days, so schedule flexibility is decreasing. The schedule risk factors therefore need further analysis.',
+        'Progress of 85% alone cannot support the conclusion that the project will finish within the planned schedule. The completion date must be forecast from current performance together with the recent trend.'
       ]
     }
   },
   {
-    id: 'case-s2-07',
-    stage: 2,
+    id: 'case-007',
+    stage: 2, // Stage 2 · Performance Domain (Financial — 매몰비용 오류)
     caseNo: 4,
-    fileNo: '#T07',
-    placeholder: true,
-    title: '세 개의 진행률',
+    // ⚠️ 표시 번호 #007 이 Stage 1 의 case-001 과 겹친다 — case-001 은 단서 이미지에 'CASE FILE #007' 이
+    //    인쇄돼 있어 화면도 #007 로 맞춰 둔 상태다(2026-08-05 운영 결정). id 는 서로 달라 제출·점수는
+    //    안전하지만, 참가자에게는 같은 번호가 두 번 보인다. 정리하려면 둘 중 하나의 fileNo 를 바꿔야 한다.
+    fileNo: '#007',
+    title: '1,500억의 선택',
     brief: [
-      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
-      'PM보호국은 같은 날 작성된 세 개의 보고 자료를 확보했다.',
-      '· 개발팀 주간 보고: 진행률 78%\n· PMO 대시보드: 진행률 64%\n· 고객사 제출 보고서: 진행률 85%',
-      '세 자료는 모두 각 조직이 관리하는 별도 문서에서 산출되었고, 산정 기준도 서로 달랐다. 고객사는 이후 "보고가 신뢰되지 않는다"며 주간 회의 참석을 중단했다.'
-    ].join('\n\n'),
-    prompt: 'PMBOK® 8판 Stakeholders 관점에서 가장 먼저 확보해야 할 것은 무엇인가?',
+      '회사는 미래 사업 경쟁력을 좌우할 차세대 AI Mobility Platform 프로젝트를 추진하기로 했다.',
+      '총 투자 규모는 1,500억 원. 프로젝트의 성공 여부가 회사의 향후 성장에 큰 영향을 미치는 만큼, 경영진은 PM 선발을 가장 중요한 과제로 판단했다.',
+      '이에 PM보호국은 핵심 전략 프로젝트를 맡길 PM 후보들의 의사결정 역량을 검증하기 위해 긴급 심사에 착수했다.',
+      '특히 대규모 투자가 필요한 프로젝트인 만큼, Finance Performance Domain에 대한 이해를 집중적으로 확인하기로 했다.',
+      '감독관은 네 후보에게 동일한 질문을 던졌다.',
+      '"당신이 이 프로젝트의 PM이라면 Finance를 어떤 원칙으로 관리하시겠습니까?"',
+      '네 명의 후보자 음성 답변을 모두 청취한 후 물음에 답하시오.'
+    ].join('\n'),
+    prompt: '다음 PM 후보들의 발언 중 PMBOK® Guide 8판의 Finance Performance Domain을 가장 잘못 이해하고 있어, 이 프로젝트에 투입해서는 안 될 후보는 누구인가?',
+    evidence: {
+      caption: 'EVIDENCE · PM 후보 답변 녹취 4',
+      audioFirst: true, // 음성이 보기 그 자체다 → 오디오를 먼저 듣게 한다
+      audios: [
+        { src: ASSETS.questionAudio.q7_1, label: 'PM 후보 A' },
+        { src: ASSETS.questionAudio.q7_2, label: 'PM 후보 B' },
+        { src: ASSETS.questionAudio.q7_3, label: 'PM 후보 C' },
+        { src: ASSETS.questionAudio.q7_4, label: 'PM 후보 D' }
+      ]
+    },
     choices: [
-      '보고 주기를 주간에서 격주로 조정해 자료 작성 부담을 줄인다',
-      '고객사 전용 보고 양식을 새로 만들어 별도 관리한다',
-      '진행률의 단일 진실 공급원(Single Source of Truth)과 공통 산정 기준을 정의한다',
-      '조직별 진행률을 평균해 대표값으로 보고한다'
+      'PM 후보 A',
+      'PM 후보 B',
+      'PM 후보 C',
+      'PM 후보 D'
     ],
     en: {
-      title: 'Three Different Progress Rates',
+      title: 'A 150 Billion Won Decision',
       brief: [
-        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
-        'The Bureau secured three reports written on the same day.',
-        '· Dev team weekly report: 78% complete\n· PMO dashboard: 64% complete\n· Report submitted to the client: 85% complete',
-        'All three came from separate documents maintained by separate organizations, each using a different calculation basis. The client later stopped attending the weekly meeting, saying "the reporting cannot be trusted."'
-      ].join('\n\n'),
-      prompt: 'From the Stakeholders standpoint of PMBOK® 8th Edition, what must be secured first?',
-      choices: [
-        'Change the reporting cycle from weekly to biweekly to reduce the reporting burden',
-        'Create a separate report format dedicated to the client',
-        'Define a single source of truth for progress along with a common calculation basis',
-        'Average the per-organization progress rates and report the result as representative'
-      ]
+        'The company decided to launch a next-generation AI Mobility Platform project that would shape its future competitiveness.',
+        'Total investment: 150 billion won. Because the project\'s success would weigh heavily on the company\'s growth, the executives treated selecting the PM as the single most important task.',
+        'The Bureau therefore opened an urgent review to verify the decision-making capability of the PM candidates for this key strategic project.',
+        'Given the scale of investment required, the review focused on their understanding of the Finance Performance Domain.',
+        'The auditor put the same question to all four candidates:',
+        '"If you were the PM of this project, on what principles would you manage finance?"',
+        'Listen to all four recorded answers, then answer the question.'
+      ].join('\n'),
+      prompt: 'Among these PM candidates, who misunderstands the Finance Performance Domain of PMBOK® Guide 8th Edition most badly and must not be assigned to this project?',
+      evidence: {
+        caption: 'EVIDENCE · 4 PM candidate answer recordings',
+        audioFirst: true,
+        audios: [
+          { src: ASSETS.questionAudio.q7_1_en, label: 'PM candidate A' },
+          { src: ASSETS.questionAudio.q7_2_en, label: 'PM candidate B' },
+          { src: ASSETS.questionAudio.q7_3_en, label: 'PM candidate C' },
+          { src: ASSETS.questionAudio.q7_4_en, label: 'PM candidate D' }
+        ]
+      },
+      choices: ['PM candidate A', 'PM candidate B', 'PM candidate C', 'PM candidate D']
     }
   },
   {
-    id: 'case-s2-08',
-    stage: 2,
+    id: 'case-008',
+    stage: 2, // Stage 2 · Performance Domain (Stakeholders — 성공 기준 정렬)
     caseNo: 5,
-    fileNo: '#T08',
-    placeholder: true,
-    title: '한 사람만 아는 모듈',
+    fileNo: '#008',
+    title: '회의실에 남겨진 다섯 장의 메모',
     brief: [
-      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
-      '차량용 제어 소프트웨어 프로젝트의 통신 스택은 입사 9년차 A책임이 혼자 설계·구현했다. 문서는 최신화되지 않았고, 코드 리뷰도 형식적으로만 수행되었다.',
-      '리스크 관리대장에는 "핵심 인력 이탈 가능성"이 프로젝트 착수 시점에 한 번 등록된 뒤 8개월간 갱신되지 않았다. 양산 5주 전, A책임이 4주간 병가에 들어갔다.'
-    ].join('\n\n'),
-    prompt: 'PMBOK® 8판 Risk 관점에서 PM이 사전에 수행해야 했던 조치로 가장 적절한 것은 무엇인가?',
+      '차세대 Smart Mobility Platform 프로젝트는 회사의 핵심 전략 프로젝트였다.',
+      '프로젝트는 계획된 일정과 예산 안에서 완료되었고, 계약된 기능과 품질 기준도 모두 충족하였다. 최종 Gate Review에서도 "Project Completed"로 승인되었다.',
+      '그러나 프로젝트 종료 이후 실시된 Portfolio Review에서는 다음 안건이 모두 보류되었다.',
+      '· Follow-up Investment\n· Additional Features\n· Service Expansion\n· Customer Rollout',
+      '감사 결과 기술적 결함이나 프로젝트 관리 절차상의 문제는 발견되지 않았다. 조사 과정에서 프로젝트에 참여했던 주요 조직들은 모두 프로젝트가 성공적으로 완료되었다는 점에는 동의하였다.',
+      '그러나 Portfolio Review 참석자들은 프로젝트 결과에 대해 서로 다른 해석을 제시한 것으로 확인되었다.',
+      '경영진은 이러한 상황이 프로젝트 수행 과정과 어떤 관련이 있었는지 확인하기 위해 PM보호국에 조사를 의뢰하였다. PM보호국은 봉인된 회의실에서 발견된 다섯 장의 수기 메모를 확보하였다.'
+    ].join('\n'),
+    prompt: '메모의 내용을 종합적으로 검토할 때, PM보호국 감독관이 조사보고서에 기록할 결론으로 가장 적절한 것은 무엇인가?',
+    evidence: {
+      caption: 'EVIDENCE · 봉인된 회의실의 수기 메모 5',
+      images: [
+        { src: ASSETS.questions.q8_1, alt: '수기 메모 1 — PM 관점', label: '메모 1' },
+        { src: ASSETS.questions.q8_2, alt: '수기 메모 2 — 개발팀 관점', label: '메모 2' },
+        { src: ASSETS.questions.q8_3, alt: '수기 메모 3 — 고객 관점', label: '메모 3' },
+        { src: ASSETS.questions.q8_4, alt: '수기 메모 4 — 운영조직 관점', label: '메모 4' },
+        { src: ASSETS.questions.q8_5, alt: '수기 메모 5 — 사업부 관점', label: '메모 5' }
+      ]
+    },
     choices: [
-      '리스크 관리대장을 상시 갱신하며 단일 실패점(SPOF)에 대해 백업 인력·문서화 등 대응책을 실행한다',
-      '핵심 인력에게 추가 보상을 지급해 이탈 가능성을 낮춘다',
-      '리스크가 실제로 발생한 시점에 신속하게 대체 인력을 투입한다',
-      '통신 스택 개발 일정을 앞당겨 리스크 노출 기간을 줄인다'
+      '프로젝트는 계획된 범위와 요구사항을 충실히 수행하였다. 향후 유사 프로젝트에서는 사업 환경 변화에 맞추어 제품 기능과 제공 범위를 주기적으로 재검토하는 관리 활동을 강화할 필요가 있다.',
+      '프로젝트는 승인된 계획에 따라 안정적으로 수행되었다. 향후 유사 프로젝트에서는 프로젝트 운영 과정에서 각 조직이 프로젝트를 바라보는 관점과 판단 기준을 지속적으로 확인하고, 필요한 경우 프로젝트 운영과 주요 의사결정에 함께 반영하는 관리 활동을 강화할 필요가 있다.',
+      '프로젝트는 계획된 산출물을 성공적으로 제공하였다. 향후 유사 프로젝트에서는 프로젝트 종료 이후의 활용성과 사업효과를 예측·관리할 수 있는 성과지표를 프로젝트 수행 기간부터 함께 운영할 필요가 있다.',
+      '프로젝트는 승인 절차와 주요 의사결정을 계획에 따라 수행하였다. 향후 유사 프로젝트에서는 사업 전략과 조직 운영 방향을 반영하여 주요 관리기준과 의사결정 기준을 정기적으로 재검토하는 활동을 강화할 필요가 있다.'
     ],
     en: {
-      title: 'The Module Only One Person Knows',
+      title: 'Five Notes Left in the Meeting Room',
       brief: [
-        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
-        'On an automotive control software project, the communication stack was designed and built single-handedly by Lead A, a nine-year veteran. The documentation was not kept current and code review was performed only as a formality.',
-        'The risk register listed "possible departure of key personnel" once at project start and was not updated for eight months. Five weeks before mass production, Lead A went on four weeks of sick leave.'
-      ].join('\n\n'),
-      prompt: 'From the Risk standpoint of PMBOK® 8th Edition, what should the PM have done in advance?',
+        'The next-generation Smart Mobility Platform project was a key strategic project for the company.',
+        'It completed within the planned schedule and budget, and met every contracted feature and quality criterion. The final Gate Review approved it as "Project Completed".',
+        'Yet at the Portfolio Review held after closure, all of the following items were put on hold.',
+        '· Follow-up Investment\n· Additional Features\n· Service Expansion\n· Customer Rollout',
+        'The audit found no technical defect and no flaw in the project management process. During the investigation every organization that had taken part agreed that the project had completed successfully.',
+        'The Portfolio Review attendees, however, turned out to have offered conflicting interpretations of the project outcome.',
+        'To understand how this related to the way the project had been run, the executives asked the Bureau to investigate. The Bureau secured five handwritten notes found in the sealed meeting room.'
+      ].join('\n'),
+      prompt: 'Taking the notes as a whole, which conclusion is the most appropriate for the Bureau auditor to record in the investigation report?',
+      evidence: {
+        caption: 'EVIDENCE · 5 handwritten notes from the sealed meeting room',
+        images: [
+          { src: ASSETS.questions.q8_1, alt: 'Handwritten note 1 — the PM\'s view', label: 'Note 1' },
+          { src: ASSETS.questions.q8_2, alt: 'Handwritten note 2 — the dev team\'s view', label: 'Note 2' },
+          { src: ASSETS.questions.q8_3, alt: 'Handwritten note 3 — the customer\'s view', label: 'Note 3' },
+          { src: ASSETS.questions.q8_4, alt: 'Handwritten note 4 — the operations organization\'s view', label: 'Note 4' },
+          { src: ASSETS.questions.q8_5, alt: 'Handwritten note 5 — the business unit\'s view', label: 'Note 5' }
+        ]
+      },
       choices: [
-        'Keep the risk register continuously updated and execute responses for the single point of failure — backup staffing, documentation',
-        'Pay the key person extra compensation to lower the chance of departure',
-        'Bring in a replacement quickly at the moment the risk actually materializes',
-        'Pull the communication stack schedule forward to shorten the risk exposure window'
+        'The project faithfully delivered the planned scope and requirements. Similar projects should strengthen the practice of periodically re-examining product features and delivery scope against changes in the business environment.',
+        'The project ran steadily according to the approved plan. Similar projects should strengthen the practice of continuously checking how each organization views the project and what criteria it judges by, and of feeding that into project operation and key decisions where needed.',
+        'The project successfully delivered the planned outputs. Similar projects should run performance indicators that forecast and manage post-closure adoption and business effect, starting during project execution.',
+        'The project carried out its approval process and key decisions according to plan. Similar projects should strengthen the practice of periodically re-examining key management and decision criteria against business strategy and organizational direction.'
       ]
     }
   },
   {
-    id: 'case-s2-09',
-    stage: 2,
+    id: 'case-009',
+    stage: 2, // Stage 2 · Performance Domain (Resources — 특정 개인 의존 구조)
     caseNo: 6,
-    fileNo: '#T09',
-    placeholder: true,
-    title: '90%에서 멈춘 일정',
+    fileNo: '#009',
+    title: 'PM을 무너뜨린 사람',
     brief: [
-      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
-      '가전 진단 서비스 프로젝트의 주요 기능들이 7주 연속 "진행률 90%"로 보고되었다. 담당자들은 "코드는 다 됐고 마무리만 남았다"고 설명했다.',
-      '실제로는 어느 기능도 통합 시험을 통과하지 못한 상태였다. 출시 4주 전, 완료로 보고된 기능 중 실제 인수 가능한 것은 절반에 미치지 못했다.'
-    ].join('\n\n'),
-    prompt: 'PMBOK® 8판 Schedule 관점에서 이런 진척률 과장을 막는 가장 효과적인 방법은 무엇인가?',
+      '프로젝트명: AI Connected Mobility Platform',
+      '참여 조직: 상품기획, 개발1, 개발2, AI, Cloud, 품질, 보안, UX, 해외법인, ODM · 참여 인원: 96명',
+      '프로젝트는 양산 6주 전까지 일정, 품질 모두 정상으로 보고되었다.',
+      '그러나 프로젝트 PM은 갑작스럽게 휴직계를 제출했다. PM의 책상에서는 메모 한 장이 발견되었다.',
+      '"사람은 충분했다. 그런데도 항상 사람이 부족했다."',
+      'PM보호국은 프로젝트 관계자 4명을 조사했다. 다음은 조사 과정에서 확보된 관계자 4명의 인터뷰 녹취다.',
+      'PMBOK® Guide 8판의 Resource Performance Domain은 프로젝트 수행에 필요한 자원을 확보하는 것뿐 아니라, 자원이 효과적으로 활용되고 특정 개인에게 과도하게 의존하지 않는 운영 체계를 구축하는 것을 중요하게 본다.'
+    ].join('\n'),
+    prompt: '위 인터뷰를 종합적으로 검토할 때, PM이 지속적으로 과도한 업무를 떠안게 되는 환경을 만드는 데 가장 큰 영향을 준 인물은 누구인가?',
+    evidence: {
+      caption: 'EVIDENCE · 관계자 인터뷰 녹취 4',
+      audioFirst: true, // 인터뷰 음성이 보기 그 자체다
+      audios: [
+        { src: ASSETS.questionAudio.q9_1, label: '인터뷰 A · 개발조직장' },
+        { src: ASSETS.questionAudio.q9_2, label: '인터뷰 B · 사업부 임원' },
+        { src: ASSETS.questionAudio.q9_3, label: '인터뷰 C · HR Resource Manager' },
+        { src: ASSETS.questionAudio.q9_4, label: '인터뷰 D · Chief Architect' }
+      ]
+    },
     choices: [
-      '주간 보고 횟수를 늘려 진행 상황을 더 자주 확인한다',
-      '완료 정의(DoD)를 인수 가능한 가치 단위로 정하고, 검증된 산출물 기준으로만 진척을 인정한다',
-      '진행률 보고를 담당자 대신 PM이 직접 산정한다',
-      '90%를 초과한 항목은 자동으로 100%로 처리해 보고를 단순화한다'
+      '개발조직장',
+      '사업부 임원',
+      'HR Resource Manager',
+      'Chief Architect'
     ],
     en: {
-      title: 'A Schedule Stuck at 90%',
+      title: 'The Person Who Broke the PM',
       brief: [
-        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
-        'Key features of an appliance diagnostics project were reported at "90% complete" for seven consecutive weeks. The owners explained that "the code is done, only wrap-up remains."',
-        'In reality not one feature had passed integration testing. Four weeks before launch, fewer than half of the features reported as complete were actually acceptable.'
-      ].join('\n\n'),
-      prompt: 'From the Schedule standpoint of PMBOK® 8th Edition, what most effectively prevents this kind of inflated progress?',
-      choices: [
-        'Increase the frequency of weekly reporting to check progress more often',
-        'Define done (DoD) as an acceptable unit of value and credit progress only against verified deliverables',
-        'Have the PM calculate the progress rate personally instead of the owners',
-        'Automatically round anything above 90% to 100% to simplify reporting'
-      ]
+        'Project: AI Connected Mobility Platform',
+        'Participating organizations: product planning, Dev 1, Dev 2, AI, Cloud, quality, security, UX, overseas subsidiary, ODM · Headcount: 96',
+        'Until six weeks before mass production, both schedule and quality were reported as normal.',
+        'Then the project PM abruptly filed for leave of absence. A note was found on the PM\'s desk.',
+        '"We had enough people. And yet we were always short of people."',
+        'The Bureau interviewed four people connected to the project. The following are the interview recordings secured during that investigation.',
+        'The Resource Performance Domain of PMBOK® Guide 8th Edition treats as important not only securing the resources a project needs, but also building an operating structure in which resources are used effectively and no single individual is depended on excessively.'
+      ].join('\n'),
+      prompt: 'Taking the interviews as a whole, who had the greatest influence in creating an environment where the PM continually absorbed excessive work?',
+      evidence: {
+        caption: 'EVIDENCE · 4 stakeholder interview recordings',
+        audioFirst: true,
+        audios: [
+          { src: ASSETS.questionAudio.q9_1_en, label: 'Interview A · Development organization head' },
+          { src: ASSETS.questionAudio.q9_2_en, label: 'Interview B · Business unit executive' },
+          { src: ASSETS.questionAudio.q9_3_en, label: 'Interview C · HR Resource Manager' },
+          { src: ASSETS.questionAudio.q9_4_en, label: 'Interview D · Chief Architect' }
+        ]
+      },
+      choices: ['Development organization head', 'Business unit executive', 'HR Resource Manager', 'Chief Architect']
     }
   },
   {
-    id: 'case-s2-10',
-    stage: 2,
+    id: 'case-010',
+    stage: 2, // Stage 2 · Performance Domain (Risk — 리스크를 의사결정으로 연결)
     caseNo: 7,
-    fileNo: '#T10',
-    placeholder: true,
-    title: '한 곳에 걸린 공급망',
+    fileNo: '#010',
+    title: '회고 보고서',
     brief: [
-      '[임시 사건 — Stage 2 콘텐츠 확정 시 교체]',
-      '웨어러블 신제품 프로젝트는 핵심 센서를 단일 공급사에서만 조달했다. 단가가 가장 낮고 기존 검증 이력이 있다는 이유였다.',
-      '동시에 개발팀 6명 중 3명은 다른 두 프로젝트에 60%씩 겸직 배정되어 실제 가용 공수가 계획의 70% 수준이었다. 양산 3주 전 공급사 화재로 센서 납기가 6주 지연되었고, 대체 검증을 수행할 인력도 남아 있지 않았다.'
-    ].join('\n\n'),
-    prompt: 'PMBOK® 8판 Resources 관점에서 이 프로젝트가 사전에 확보해야 했던 것은 무엇인가?',
+      'PM보호국은 핵심 전략 프로젝트에 투입될 PM들의 프로젝트 회고 보고서(Closing Report)를 정기적으로 분석한다.',
+      '감독관들은 회고를 단순한 프로젝트 기록이 아니라, PM이 프로젝트를 어떤 관점으로 운영하고 의사결정하는지를 보여주는 \'행동 패턴의 증거\'로 판단한다.',
+      '최근 한 PM의 회고 보고서를 검토하던 중, 담당 감독관은 보고서 일부를 읽자마자 분석을 중단하고 즉시 「주의 대상 PM」으로 분류하였다.',
+      '감독관의 메모에는 다음과 같은 내용만 남아 있었다.',
+      '"이 PM이 다음 프로젝트를 맡는다면, 같은 유형의 리스크가 반복될 가능성이 높다."',
+      'PM보호국은 해당 회고 보고서를 사건 파일로 등록하고, 다음 프로젝트에서 가장 우려되는 위험이 무엇인지 분석하기 시작했다.'
+    ].join('\n'),
+    prompt: 'PM보호국 감독관은 이 회고 보고서를 근거로 다음 프로젝트에서 가장 우려되는 리스크 관리상의 문제를 예측하였다. PMBOK® Guide 8판의 Risk Performance Domain 관점에서 가장 적절한 판단은 무엇인가?',
+    evidence: {
+      caption: 'EVIDENCE · 확보된 프로젝트 회고 보고서(발췌)',
+      images: [
+        { src: ASSETS.questions.q10, alt: '프로젝트 회고 보고서 발췌 — 운영 원칙, 진행 중 대응, 핵심 교훈' }
+      ]
+    },
     choices: [
-      '센서 단가를 더 낮춰 예산 여유를 확보한다',
-      '공급사 계약에 지연 배상 조항을 강화한다',
-      '이원화 공급 등 대체 조달 경로와, 과부하 없는 실가용 공수 기준의 자원 계획을 확보한다',
-      '개발팀 인원을 6명에서 8명으로 늘려 총 공수를 키운다'
+      '프로젝트 진행 중 새롭게 발생하는 위험과 기회를 지속적으로 탐색하기보다, 최초에 식별한 리스크를 중심으로 관리할 가능성이 높다.',
+      '리스크를 기록하고 대응하는 데는 충실하지만, 변화하는 리스크를 근거로 범위·일정·릴리즈·우선순위 등 프로젝트 계획을 적시에 조정하지 않을 가능성이 높다.',
+      '실제 문제가 발생한 이후 대응하는 방식에 익숙하여, 선행 위험 신호를 활용한 예방 중심의 리스크 관리가 부족할 가능성이 높다.',
+      '리스크를 공유하고 Risk Register를 관리하는 데 집중하여, 리스크의 중요도 변화와 잔여 리스크를 지속적으로 재평가하지 않을 가능성이 높다.'
     ],
     en: {
-      title: 'A Supply Chain Hanging on One Hook',
+      title: 'The Retrospective Report',
       brief: [
-        '[Temporary case — to be replaced when Stage 2 content is confirmed]',
-        'A new wearable project sourced its core sensor from a single supplier — lowest unit price, and an existing qualification history.',
-        'At the same time, three of the six developers were assigned 60% each to two other projects, leaving actual available effort at about 70% of plan. Three weeks before mass production a fire at the supplier delayed sensor delivery by six weeks, and no one was left to qualify an alternative.'
-      ].join('\n\n'),
-      prompt: 'From the Resources standpoint of PMBOK® 8th Edition, what should this project have secured in advance?',
+        'The Bureau regularly analyses the project closing reports of PMs who may be assigned to key strategic projects.',
+        'Auditors treat a retrospective not as a mere project record but as evidence of behavioural pattern — showing how a PM runs a project and makes decisions.',
+        'While reviewing one PM\'s retrospective recently, the assigned auditor stopped the analysis partway through the report and immediately classified the PM as one "to watch".',
+        'The auditor\'s memo contained only this:',
+        '"If this PM takes the next project, the same type of risk is likely to repeat."',
+        'The Bureau registered the retrospective as a case file and began analysing what is most concerning about the next project.'
+      ].join('\n'),
+      prompt: 'The Bureau auditor forecast the most concerning risk-management problem for the next project from this retrospective. Which judgment is the most appropriate from the standpoint of the Risk Performance Domain in PMBOK® Guide 8th Edition?',
+      evidence: {
+        caption: 'EVIDENCE · secured project retrospective report (excerpt)',
+        images: [
+          { src: ASSETS.questions.q10_en, alt: 'Project retrospective report excerpt — operating principles, in-flight response, key lessons' }
+        ]
+      },
       choices: [
-        'A lower sensor unit price to create budget headroom',
-        'Stronger delay-penalty clauses in the supplier contract',
-        'An alternative sourcing route such as dual supply, plus a resource plan based on realistic available effort without overload',
-        'Two more developers, growing the team from six to eight to increase total effort'
+        'Rather than continuously scanning for risks and opportunities that emerge during the project, the PM is likely to manage around the risks identified at the outset.',
+        'The PM is diligent about recording and responding to risks, but is likely to fail to adjust the project plan — scope, schedule, release, priority — in time on the basis of changing risk.',
+        'Being used to responding after a problem has actually occurred, the PM is likely to be weak at prevention-oriented risk management using leading risk signals.',
+        'Focusing on sharing risks and maintaining the risk register, the PM is likely to fail to continuously re-assess shifts in risk significance and residual risk.'
       ]
     }
   },
-  // ══════════════ STAGE 2 임시 데이터 끝 ══════════════
+
   {
     id: 'case-011',
     stage: 3, // Stage 3 · AI Use Case (Strategies for AI Adoption — PMBOK 8판 Appendix X3.1.1)
@@ -462,14 +646,17 @@ export const CASES = [
         '"Make active use of AI to raise the project\'s productivity and quality, and deliver greater value to the customer."',
         'PM Hong Gildong accordingly drove AI-based project innovation from the very start. AI use spread quickly across the project — meeting minutes, schedule planning, requirements analysis, risk review.',
         'As the project progressed, however, some team members began to wonder:',
-        '"The PM keeps telling us to use AI actively… but does he really understand the AI principles of PMBOK 8th Edition?"',
+        // 홍길동 PM의 성별은 사양에 없다 — 국문에 없는 정보를 영문이 만들지 않도록 중성 대명사를 쓴다.
+        '"The PM tells us to make active use of AI… but do they really understand the AI principles PMBOK 8th Edition sets out?"',
         'The Bureau interviewed the project stakeholders and secured the following testimonies. All four aim to raise the project\'s productivity and quality with AI. But one of them contains a PM remark that misreads the AI adoption strategy of PMBOK® Guide 8th Edition, Appendix X3.1.1 (Strategies for AI Adoption).'
       ].join('\n'),
-      prompt: 'Among the testimonies, whose account shows that the single most important consideration in the PM\'s AI adoption strategy is missing?',
+      // 국문 '가장 중요한 고려사항'에 없는 강조(single)를 넣지 않는다.
+      prompt: 'Among the testimonies, whose account shows that the most important consideration in the PM\'s AI adoption strategy is missing?',
       evidence: {
         caption: 'EVIDENCE · recorded testimony of project participants',
+        // 영문 증언 도착(2026-08-06) → 국문 음성 대신 _en 을 쓴다.
         audios: [
-          { src: ASSETS.questionAudio.q11, label: 'Participant testimony recording' }
+          { src: ASSETS.questionAudio.q11_en, label: 'Participant testimony recording' }
         ]
       },
       choices: [
@@ -524,13 +711,14 @@ export const CASES = [
         'The Bureau concluded that the project\'s failure began with one specific decision, and secured four pieces of evidence from the emergency review meeting.'
       ].join('\n'),
       prompt: 'Among the secured clues, find the decision that failed to adequately examine the "long-term impact and feasibility of adopting an AI-based capability" emphasized by PMBOK® Guide 8th Edition.',
+      // 영문판 단서 이미지 도착(2026-08-06) → 국문 이미지 대신 _en 을 쓴다.
       evidence: {
         caption: 'EVIDENCE · 4 secured clues',
         images: [
-          { src: ASSETS.questions.q12_1, alt: 'Clue A', label: 'Clue A' },
-          { src: ASSETS.questions.q12_2, alt: 'Clue B', label: 'Clue B' },
-          { src: ASSETS.questions.q12_3, alt: 'Clue C', label: 'Clue C' },
-          { src: ASSETS.questions.q12_4, alt: 'Clue D', label: 'Clue D' }
+          { src: ASSETS.questions.q12_1_en, alt: 'Clue A', label: 'Clue A' },
+          { src: ASSETS.questions.q12_2_en, alt: 'Clue B', label: 'Clue B' },
+          { src: ASSETS.questions.q12_3_en, alt: 'Clue C', label: 'Clue C' },
+          { src: ASSETS.questions.q12_4_en, alt: 'Clue D', label: 'Clue D' }
         ]
       },
       choices: ['Clue A', 'Clue B', 'Clue C', 'Clue D']
@@ -637,11 +825,12 @@ export const CASES = [
       prompt: 'Among the interview responses, which PM appears to make the fullest use of the PMBOK® Guide 8th Edition AI use case "Risk Identification and Assessment"?',
       evidence: {
         caption: 'EVIDENCE · 4 candidate PM interview recordings',
+        // 영문 녹취 도착(2026-08-06) → 국문 음성 대신 _en 을 쓴다.
         audios: [
-          { src: ASSETS.questionAudio.q14_1, label: 'PM Lee interview' },
-          { src: ASSETS.questionAudio.q14_2, label: 'PM Choi interview' },
-          { src: ASSETS.questionAudio.q14_3, label: 'PM Han interview' },
-          { src: ASSETS.questionAudio.q14_4, label: 'PM Park interview' }
+          { src: ASSETS.questionAudio.q14_1_en, label: 'PM Lee interview' },
+          { src: ASSETS.questionAudio.q14_2_en, label: 'PM Choi interview' },
+          { src: ASSETS.questionAudio.q14_3_en, label: 'PM Han interview' },
+          { src: ASSETS.questionAudio.q14_4_en, label: 'PM Park interview' }
         ]
       },
       choices: ['PM Lee', 'PM Choi', 'PM Han', 'PM Park']
@@ -685,13 +874,14 @@ export const CASES = [
         'The Bureau intends to identify the AI use case the PM applied from what is left.'
       ].join('\n'),
       prompt: 'Which AI use case from PMBOK® Guide 8th Edition best fits this project situation?',
+      // 영문판 로그 이미지 도착(2026-08-06) → 국문 이미지 대신 _en 을 쓴다.
       evidence: {
         caption: 'EVIDENCE · 4 recovered logs (partially damaged)',
         images: [
-          { src: ASSETS.questions.q15_a, alt: 'Recovered log A', label: 'Log A' },
-          { src: ASSETS.questions.q15_b, alt: 'Recovered log B', label: 'Log B' },
-          { src: ASSETS.questions.q15_c, alt: 'Recovered log C', label: 'Log C' },
-          { src: ASSETS.questions.q15_d, alt: 'Recovered log D', label: 'Log D' }
+          { src: ASSETS.questions.q15_a_en, alt: 'Recovered log A', label: 'Log A' },
+          { src: ASSETS.questions.q15_b_en, alt: 'Recovered log B', label: 'Log B' },
+          { src: ASSETS.questions.q15_c_en, alt: 'Recovered log C', label: 'Log C' },
+          { src: ASSETS.questions.q15_d_en, alt: 'Recovered log D', label: 'Log D' }
         ]
       },
       choices: [
