@@ -21,7 +21,7 @@ create table if not exists public.games (
   id                integer primary key default 1 check (id = 1),
   status            text    not null default 'scheduled'
                     check (status in ('scheduled','started','ended')),
-  duration_minutes  integer not null default 60,
+  duration_minutes  integer not null default 80,  -- 운영 결정 2026-08-06: 60 → 80분 (0010 참조)
   started_at        timestamptz,
   ends_at           timestamptz,
   updated_at        timestamptz not null default now()
@@ -538,7 +538,8 @@ create or replace view public.admin_team_status with (security_invoker = true) a
          (t.entered_at is not null) as is_claimed,
          t.member_emails, t.entered_at, t.transferred_at, t.flags,
          coalesce(p.submitted_count,0) as submitted_count,
-         coalesce(p.score,0)           as score
+         coalesce(p.score,0)           as score,
+         p.last_submit_at              -- 마지막 답안 제출 시각 (0011 에서 추가)
     from public.teams t
     left join public.team_progress p on p.team_id = t.id;
 
