@@ -99,7 +99,7 @@ create table public.games (
   id                integer primary key default 1 check (id = 1), -- 단일 로우 강제
   status            text    not null default 'scheduled'
                     check (status in ('scheduled','started','ended')),
-  duration_minutes  integer not null default 60,
+  duration_minutes  integer not null default 80,   -- 2026-08-06: 60 → 80분 (0010_duration_80min.sql)
   started_at        timestamptz,
   ends_at           timestamptz,
   updated_at        timestamptz not null default now()

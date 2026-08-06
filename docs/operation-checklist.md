@@ -2,7 +2,7 @@
 
 > 배포는 `docs/deployment-checklist.md`. 이 문서는 **당일 진행 담당자(감독관)** 용이다.
 > 참가자 URL `https://pmc-round2.vercel.app` · 관리자 `https://pmc-round2.vercel.app/?admin`
-> 32팀 + 테스트 팀 1 · 사건 15개 · 제한 시간 60분
+> 32팀 + 테스트 팀 1 · 사건 15개 · 제한 시간 80분
 
 ---
 
@@ -12,7 +12,7 @@
 T-60  관리자 로그인 → 상태 SCHEDULED 확인 → 진행 데이터 초기화
 T-30  참가자 입장 시작 (팀 선택 → 수사관 3명 이메일 → 서약 → 대기실)
 T-10  [팀 현황] 으로 32팀 입장·이메일 중복 확인 → 오선택 정정
-T-0   [게임 시작]  ← 이 순간부터 60분, 서버 시각 기준
+T-0   [게임 시작]  ← 이 순간부터 80분, 서버 시각 기준
       진행 중: [팀 현황] 5초 갱신으로 모니터링
 T+60  자동 종료(ends_at) 또는 [게임 종료]
       → [최종 랭킹 발표] 로 순위 공개
@@ -98,7 +98,7 @@ T+60  자동 종료(ends_at) 또는 [게임 종료]
 
 ## 7. 종료와 발표
 
-- [ ] 60분이 지나면 자동으로 제출이 차단된다(서버 판정). 조기 종료는 **[게임 종료]**
+- [ ] 80분이 지나면 자동으로 제출이 차단된다(서버 판정). 조기 종료는 **[게임 종료]**
 - [ ] 종료 후 참가자가 제출을 시도하면 안내가 뜬다
       ⚠️ `0007` 마이그레이션 미적용 시 **"아직 게임이 시작되지 않았습니다"** 라는 잘못된 문구가 나온다.
       배포 전 적용을 확인할 것(`deployment-checklist.md §2`)
@@ -147,9 +147,9 @@ select public.recalc_team_progress('team07');
 ### 8.8 최후의 수단 — SQL 로 직접 제어
 관리자 콘솔을 못 쓸 때만. SQL Editor 는 `postgres` 권한이라 `is_admin()` 검사를 타지 않는다.
 ```sql
--- 시작 (60분)
+-- 시작 (80분)
 update public.games set status='started', started_at=now(),
-       ends_at=now()+interval '60 min', updated_at=now() where id=1;
+       ends_at=now()+interval '80 min', updated_at=now() where id=1;
 -- 종료
 update public.games set status='ended', ends_at=now(), updated_at=now() where id=1;
 -- 대기로 되돌리기

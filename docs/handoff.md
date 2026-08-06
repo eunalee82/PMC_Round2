@@ -1,6 +1,9 @@
-# 세션 핸드오프 (2026-08-04)
+# 세션 핸드오프 (최신: 2026-08-06)
 
 새 창(새 세션)에서 이어서 작업하기 위한 인수인계 기록. **먼저 `CLAUDE.md`와 이 문서를 읽고 시작할 것.**
+
+> **다른 환경에서 이어받는 사람은 §10 부터 읽으면 된다.** 오늘(2026-08-06) 무엇을 했고 무엇이 남았는지가 거기 있다.
+> 가장 급한 것: **서버 마이그레이션 `0009` → `0010` → `0011` → `0003` 순서 적용 (§10.1)** — 적용 전 배포하면 사건 #005 가 통과 불가다.
 
 ---
 
@@ -56,12 +59,13 @@
   - **Stage 3 이후 흐름 구현 완료** → 아래 §6 참고.
 - **채점**: `src/js/lib/grade.js` (MOCK, 서버 이관 대상).
 - **진행/점수**: `src/js/lib/progress.js` (MOCK, localStorage). 정답수·제출수(스테이지별)·점수·마지막 제출 시각. 랭킹: 점수 내림차순, 동점 시 제출 빠른 순. EVIDENCE 아이템 = 스테이지 전체 제출 시 해제.
-- **게임 상태**: `src/js/lib/game.js` (MOCK, localStorage). `scheduled|started` + `startedAt`. `startGame/resetGame/ensureStarted`, `remainingSeconds`(60분). 대기실이 구독 → started면 자동 전환.
-- **셸/좌측 패널**: `src/components/shell/{app-shell,app-header,left-sidebar}.js`. 게임플레이만 셸 사용. 헤더: 미션 타이머(진입 시 60분 카운트다운) + 소리 볼륨/음소거 팝오버. (종·설정 아이콘 제거됨)
+- **게임 상태**: `src/js/lib/game.js` (MOCK, localStorage). `scheduled|started` + `startedAt`. `startGame/resetGame/ensureStarted`, `remainingSeconds`. 대기실이 구독 → started면 자동 전환.
+- **셸/좌측 패널**: `src/components/shell/{app-shell,app-header,left-sidebar}.js`. 게임플레이만 셸 사용. 헤더: 미션 타이머 + 소리 볼륨/음소거 팝오버. (종·설정 아이콘 제거됨)
+- **제한 시간 = 80분**(운영 결정 2026-08-06, 이전 60분). 값이 **세 곳**에 있다 — 서버 `games.duration_minutes`(권위 · `0010_duration_80min.sql`) · `lib/game-mock.js` `DURATION_MS` · `lib/game-server.js` 조회 전 기본값. 항상 같이 고친다.
 - **캡처 억제**: `src/components/game/capture-guard.js` — 워터마크(팀명·시각) + 전체화면 게이트(벗어나면 가림) + 복사/우클릭 차단 + PrtScn 경고. (원천 차단 아님, 억제 수준)
 - **관리자**: `src/js/screens/admin/admin.js` — `?admin` 진입, 비번 `2026`, 게임 시작/대기 되돌리기. ⚠️ mock이라 **같은 브라우저 탭 사이에서만** 전파(다른 기기 X → Supabase 필요).
 - **i18n**: `src/js/lib/i18n.js`(로케일 ko/en) + `constants/copy.js`(`COPY={ko,en}`, en 없으면 ko 폴백) + `lib/copy.js`(로케일 대응 t). 전환: `?lang=en` / 입장 화면 국문·영문 선택 / DEV 언어 토글(reload).
-- **오프닝**: `src/js/screens/participant/opening.js` — 로컬 영상 대신 **YouTube 임베드**(`ASSETS.videos.openingEmbedId = 'Hm13qr-_0yI'`).
+- **오프닝**: `src/js/screens/participant/opening.js` — 로컬 영상 대신 **YouTube 임베드**(`ASSETS.videos.openingEmbedId`). 영상 교체는 이 상수만 바꾼다 — 2026-08-06 현재 `BLitSGtLXHY`.
 
 ---
 
@@ -253,6 +257,218 @@ Stage 3 아이템(배째 마스터)
 
 ### 7.6 다음 세션에서 바로 해야 할 일
 
-1. **`case-003` 확정 콘텐츠 반영** — 사용자가 2026-08-06에 재작성해 전달할 예정(§7.3). 교체 후 `node scripts/export-seed.mjs` → `0003` 재적용 → 파일 삭제.
-2. Stage 2 확정 콘텐츠 7사건 교체(`⏳ STAGE 2 · 임시 데이터` 블록 + `SOLUTIONS` 같은 구간). 단서 이미지 `question4.webp`는 이미 확보돼 있다(§7.3).
+1. ~~`case-003` 확정 콘텐츠 반영~~ → **완료 (§8)**. 사건 #002도 함께 확정됐다.
+2. ~~Stage 2 확정 콘텐츠 7사건 교체~~ → **완료 (§9)**. 15사건 전부 확정 콘텐츠가 되어 `임시 데이터` 배지가 남은 사건이 없다.
 3. 콘텐츠를 바꾼 뒤에는 항상 `npm run validate`(만점 100점 정합 자동 검사) → `npm run build` → `npx vercel --prod --yes`.
+
+---
+
+## 9. 2026-08-06 세션 기록 — Stage 2 확정 7사건 + 복수 정답 엔진
+
+### 9.1 임시 데이터를 지우고 확정 콘텐츠 7사건을 넣었다
+
+`case-s2-04`~`case-s2-10`(임시 7사건 · 260줄)과 그 정답·해설(121줄)을 삭제하고 아래로 교체했다. **이제 15사건 전부 확정 콘텐츠**이며 `placeholder: true`가 남은 사건이 없다.
+
+| id | fileNo | 제목 | Domain | 단서 | 정답 |
+|---|---|---|---|---|---|
+| case-004 | #004 | 그 결정은 왜 회의실을 벗어나지 못했는가 | Governance | 음성 1(인터뷰 1~4 합본) ko/en | ③ |
+| case-005 | #005 | 사라진 두 달 | Scope | 이미지 5 | **B·C·E (복수)** |
+| case-006 | #006 | 초록색 경고등 | Schedule | 이미지 1 | ② |
+| case-007 | #007 | 1,500억의 선택 | Financial | 음성 4 ko/en | ③ |
+| case-008 | #008 | 회의실에 남겨진 다섯 장의 메모 | Stakeholders | 이미지 5 | ② |
+| case-009 | #009 | PM을 무너뜨린 사람 | Resources | 음성 4 ko/en | ④ |
+| case-010 | #010 | 회고 보고서 | Risk | 이미지 1 ko/en | ② |
+
+- 이미지 13장을 WebP로 변환: **16.2MB → 4.0MB (-75%)**. 평면 텍스트=무손실 / 사진·일러스트=q90 / 회고 보고서=q96(무손실은 1.2MB로 너무 무거웠다). 원본 PNG는 `img/questions/`.
+- **⚠️ 표시 번호 `#007`이 Stage 1 `case-001`과 겹친다.** `case-001`은 단서 이미지에 `CASE FILE #007`이 인쇄돼 화면도 #007로 맞춰 둔 상태(2026-08-05 결정)다. id는 달라 제출·점수는 안전하지만 참가자에게 같은 번호가 두 번 보인다 → 둘 중 하나의 `fileNo`를 바꿔야 정리된다.
+- **⚠️ `question4.webp`는 어느 사건도 쓰지 않는다.** '출시 17분 후 AUTH ERROR · 성능시험이 보안 우회 시나리오 미포함' 장면으로 #004(플랫폼 변경 거버넌스)와 내용이 맞지 않아 `assets.js`에 등록하지 않았다.
+- 사건 #004 음성은 **인터뷰 1~4가 한 파일**이다(사건 #011과 같은 형태). 인터뷰별로 나누려면 `question4-1~4.mp3` 분할 파일이 필요하다.
+
+### 9.2 복수 정답 엔진을 새로 만들었다 (사건 #005)
+
+사건 #005는 증거물 5개 중 **3개**를 고른다. 기존 엔진은 단일 인덱스만 다뤘다.
+
+- **데이터**: 사건에 `multi: true, selectCount: 3`, 정답은 `SOLUTIONS.answerIndexes: [1,2,4]`(배열). 단일 사건은 그대로 `answerIndex`.
+- **채점 규칙(결정)**: **집합 일치 · 부분 점수 없음** — 3개를 정확히 맞히면 스테이지 배점 7점, 하나라도 틀리면 0점. 총점 100점 설계를 유지하려고 이 방식을 택했다.
+- **UI**: `question-choice.js`가 `multi`면 체크박스 semantics로 바뀌고, 정원이 차면 미선택 보기를 흐리게 해서 왜 눌리지 않는지 보이게 한다.
+- **서버**: `supabase/migrations/0009_multi_answer.sql` — `case_answers.answer_indexes`·`answers.choice_indexes` 배열 컬럼, 집합 비교 함수 `same_index_set()`, `submit_answer` 교체(인자가 늘어 오버로드가 되면 PostgREST가 모호해지므로 옛 함수를 `drop` 한다).
+- **호환성 함정**: 클라이언트가 `p_choice_indexes`를 **항상** 보내면 0009 미적용 서버에서 PostgREST가 함수 시그니처를 못 찾아 **단일 선택 사건의 제출까지 전부 실패**한다. 그래서 복수 정답일 때만 이 인자를 넣는다(`lib/grade.js`).
+
+### 9.3 `validate.mjs` 검사 2종 추가
+
+- **복수 정답 정합**: `multi`인데 `answerIndexes`가 없거나, 정답 수 ≠ `selectCount`(아무도 못 맞힌다)거나, 중복·범위 초과거나, `answerIndex`가 함께 남아 있으면(채점 기준이 둘) 오류.
+- **prompt 숫자 정합**: prompt의 수사(`4가지`·`three`·`3개`)가 보기 수·선택 수와 다르면 오류. 사건 #001 영문 초안의 "five clues"(실제 4개) 같은 번역 드리프트를 자동으로 잡는다. 15사건 전부 오탐 없이 통과.
+
+### 9.4 검증
+
+| 항목 | 결과 |
+|---|---|
+| `npm run validate` | **오류 0 · 경고 0** (임시 사건이 없어져 경고까지 사라졌다) |
+| `npm run build` | 통과 (JS 381KB / gzip 112KB · CSS 78KB / gzip 13.7KB) |
+| 프로덕션 번들 정답 노출 | `answerIndex`·`정답은`·해설 문구 전부 0건 |
+| 시드 재생성 | 정답 15개(복수 정답 1개) · `delete` 절로 `case-s2-*` 유령 행 자동 정리 |
+
+**서버 적용 순서**: ① `0009_multi_answer.sql` → ② `node scripts/export-seed.mjs` 로 만든 `0003_seed_answers.sql` → ③ `0003` 파일 삭제. 순서를 지켜야 한다 — `0003`이 `answer_indexes` 컬럼을 쓰므로 `0009`가 먼저다.
+
+---
+
+## 8. 2026-08-06 세션 기록 — Stage 1 사건 #002·#003 확정 + 에셋 번호 정합
+
+### 8.1 에셋 번호가 사건 순번과 맞아졌다 (§7.3의 "2↔3 교체 잔재" 해소)
+
+사용자가 파일을 재정리해 이제 **`questionN*` = 사건 순번 N** 규칙이 전부 성립한다.
+
+| 변경 | 내용 |
+|---|---|
+| 신규 | `question2.webp` — 사건 #002 현장 자료(**영문판 1종 운영**, 1.9MB PNG → **151KB** q90 · PSNR 42.0dB) |
+| 신규 | `audio/sfx/question2/question2-1~4.mp3` — 사건 #002 녹취 A~D |
+| 신규 | `audio/sfx/question3/question3.mp3` · `question3_en.mp3` — 사건 #003 감독관 브리핑(국문·영문) |
+| 리네임 | `question2-1~4.webp` → `question3-1~4.webp` (사건 #003 다이어리 · 국문) |
+| 신규 | `question3-1~4_en.webp` — 같은 다이어리 **영문판** (1.3MB PNG ×4 → 121~150KB · PSNR 40dB+) |
+| 삭제 | `question3.webp`(사건 #002 국문 배경 — 워터마크 박힌 저해상도 초안), `question3/question3-1~4.mp3`(옛 녹취) |
+
+- 원본 PNG는 서빙되지 않는 `img/questions/`로 옮겼다(`.gitignore` `/img/`). `.PNG` 대문자로 받은 파일은 반드시 소문자 `.webp`로 변환해서 넣는다 — Vercel/Linux는 대소문자를 구분한다.
+- **사건 #003은 국문·영문 단서 이미지가 따로 있는 유일한 사건**이다 → `cases.js`의 `en.evidence.images[].src`가 `_en` 키를 가리킨다. 다른 사건은 여전히 en도 국문 이미지를 쓴다.
+
+### 8.2 사건 #002 — ⚠️ **정답이 바뀌었다**
+
+녹취 음성이 새 파일로 교체되면서 **대화 순서가 바뀌어, 정답이 녹취 D(인덱스 3) → 녹취 B(인덱스 1)** 가 되었다. 확정 해설도 교체했다(Empowered Culture는 장려하지만 최종 의사결정·결과 책임은 Accountable Leader가 진다 → 녹취 B는 이해가 충돌하는 결정을 팀에 넘기고 PM은 결과만 반영).
+
+> **정답 인덱스가 바뀌었으므로 서버 시드 재적용이 필수다.** 재적용 전에 제출된 답안은 옛 정답으로 채점된 상태로 남는다.
+
+함께 정리한 것:
+- 국문 개요를 확정본으로 교체하고, 문자열 안 `\n` + `join('\n')`이 섞여 줄 간격이 불규칙했던 문제를 해결했다(§7.3).
+- **영문 brief·prompt가 국문보다 힌트를 더 주던 문제**(§7.3)를 해소 — "PM이 의사결정 책임을 팀에 넘겼다"까지 밝히던 문장을 국문과 같은 수준으로 맞췄다.
+- `en.evidence` alt 텍스트의 사건 번호 오기(`Case #021` → `#002`)를 고쳤다.
+
+### 8.3 사건 #003 — 정답 인덱스는 그대로, 해설만 확정본
+
+정답은 **③ 증거물 C(인덱스 2)** 로 기존과 같다 → 기존 제출 채점 결과에 영향 없다. 해설을 확정본(더 간결한 Output vs Outcome 구조)으로 교체했다.
+
+- **§7.3에서 막혀 있던 "음성 소스 없음"이 해결됐다** — 국문 개요가 "음성을 듣고"라고 지시하는데 음원이 없었다. 이제 `question3.mp3`(국문)·`question3_en.mp3`(영문)를 `evidence.audios`에 배선했다.
+- **결정(2026-08-06): 사건 맥락은 브리핑 음성에만 담고 개요에 텍스트로 옮겨 적지 않는다.** 그래서 국문보다 정보가 많았던 영문 개요(프로젝트 성과 5항목·길동 책임 발언)를 **삭제하고 국문과 같은 두 줄로 맞췄다**. 영문 prompt도 국문과 같이 Value-Driven Mindset을 명시하는 문장으로 교체했다(이전 영문 prompt는 "가치·성과를 산출물보다 우선한 기록을 찾아라"로 정답 성격을 설명해 힌트가 더 컸다).
+- ⚠️ **남은 접근성 부채**: 이 사건은 판단 근거가 음성에만 있고 **자막·녹취록이 없다** — `CLAUDE.md §13`(오디오 단서에 자막/녹취록 제공)을 아직 못 지킨다. 재생·일시정지·다시듣기·볼륨은 네이티브 컨트롤로 제공된다. 운영상 감독관이 음성을 현장에서 함께 재생하는 방식이면 실무 문제는 없지만, 청각 접근성이 필요한 참가자가 있으면 녹취록을 준비해야 한다.
+
+### 8.4 검증
+
+| 항목 | 결과 |
+|---|---|
+| `npm run validate` | 오류 0 · 경고 1(Stage 2 임시 사건) |
+| `npm run build` | 통과 (JS 366KB / gzip 108KB · CSS 78KB / gzip 13.6KB) |
+| 프로덕션 번들 정답 노출 | `정답은`·`answerIndex`·확정 해설 문구 **전부 0건** |
+| 시드 재생성 | `case-002 → answer_index 1` · `case-003 → 2` · `delete` 절 포함 · 한글 UTF-8 정상 |
+
+**적용 절차**: `node scripts/export-seed.mjs` 로 만든 `supabase/migrations/0003_seed_answers.sql`을 Supabase SQL Editor에서 실행 → 파일 삭제(커밋 금지 · `.gitignore` 등록됨). `delete ... where case_id <> all(...)` 절이 있어 유령 행도 함께 정리된다(§7.5).
+
+### 9.5 에셋 최적화 — 배포 62.5MB → 35.8MB (-43%)
+
+`docs/assets-list.md`의 인코딩 규칙을 전 에셋에 적용했다. 원본은 서빙되지 않는 `img/`(gitignore)에 보관.
+
+| 대상 | 전 → 후 | 방식 |
+|---|---|---|
+| 단서 이미지 13장(Stage 2) | 16.2MB → 4.0MB | 평면 텍스트=무손실 · 사진/일러스트=q90 · 회고 보고서=q96 |
+| 배경·캐릭터·로고 11장 | 33.5MB → 9.5MB | q90. **투명도가 실제로 필요한 `badge-gold`만 알파 유지** |
+| BGM 3개 | 13.7MB → 7.1MB | 96kbps 스테레오 재인코딩 |
+| `one-pass.jpg` | 326KB → 211KB | q90 WebP |
+| 미사용 제거 | -5.7MB | `question-bg3` · `badge-gold2` · `question4.webp` |
+
+**함정 3개를 여기서 잡았다 — 다음 사람도 같은 실수를 할 수 있다.**
+1. **CSS가 경로 상수를 우회했다.** `base.css`·`gameplay.css`·`screens.css`(×2)가 `question-bg.png`·`opening.png`·`waiting.png`를 직접 참조하고 있었다. WebP로 바꾸면서 이걸 놓쳤다면 **배포 후 게임 배경이 전부 사라졌다.** → `validate` 가 이제 ASSETS 상수 + CSS `url()` 을 함께 대조한다.
+2. **Windows 의 `existsSync` 는 대소문자를 무시한다.** `question15-logA.webp` 같은 대문자 파일명은 로컬에선 통과하고 **Vercel/Linux 에서만 404** 가 난다. 소문자 kebab-case(`question15-log-a.webp`)로 리네임했고, 검사가 코드 경로와 디스크 파일명을 **글자 그대로** 비교한다.
+3. **`logo.webp` 가 알파 없이 나왔다.** 원본 `logo.png` 의 알파가 전부 불투명(min=max=255)이라 인코더가 버린 것이어서 문제가 없었지만, 확인 없이 넘기면 로고에 검은 사각형이 생기는 유형이다.
+
+`videos.ending`·`endingAvailable` 은 **코드가 읽지 않는 죽은 상수**여서 제거했다("영상이 오면 플래그만 true로"라는 옛 안내는 이미 무효였다). `videos/opening.mp4` 는 **YouTube 차단 시 대체 후보**로 남겨 뒀다(대체 배선은 아직 없다).
+
+### 9.6 운영 요청 반영 (2026-08-06)
+
+| 항목 | 내용 |
+|---|---|
+| 제한 시간 **80분** | 값이 **세 곳**에 있다 — 서버 `games.duration_minutes`(권위 · `0010`) · `lib/game-mock.js` `DURATION_MS` · `lib/game-server.js` 조회 전 기본값. 항상 같이 고친다 |
+| Final Raid **10타 격퇴** | `HIT_TARGET` 140 → 10. **`SKILL_EVERY` 도 14 → 3 으로 함께 낮췄다** — 그대로 두면 10타 안에 14타를 못 채워 장비 스킬 연출이 한 번도 안 나온다 |
+| 종료 안내에 **[팀 선택으로 돌아가기]** | 참가자 흐름 마지막 화면이 막다른 화면이 되지 않게. `endedAt` 은 남으므로 재진입하면 가드가 다시 이 화면으로 복구한다(재플레이·점수 초기화 아님) |
+| 관리자 [팀 현황]에 **마지막제출** 열 | 초까지 표시(동점 tie-break 기준이라 분 단위로는 구분 불가) · CSV 에 `last_submit_at` 추가 · 서버 뷰 확장은 `0011` |
+| 오프닝 영상 교체 | `openingEmbedId` → **`OTnd68QC0_8`** (oEmbed 200 확인 · "5. PMC2026 오프닝영상 최종수정버전") |
+| Raid 타격 효과음 | 프로젝트에 SFX 가 하나도 없어 **합성**해 만들었다(`raid-hit.mp3` 3KB·200ms). 연타 대비 최소 간격 60ms |
+
+### 9.7 검증 도구 강화 (`scripts/validate.mjs`)
+
+콘텐츠 교체가 잦은 프로젝트라, 사람이 놓치는 유형을 자동으로 잡게 했다. 새로 추가된 검사:
+
+- **복수 정답 정합** — `multi`인데 `answerIndexes`가 없거나, 정답 수 ≠ `selectCount`(아무도 못 맞힌다), 중복·범위 초과, `answerIndex`가 함께 남아 있음(채점 기준이 둘)
+- **prompt 숫자 정합** — prompt 의 수사(`4가지`·`three`·`3개`)가 보기 수·선택 수와 다르면 오류. 번역이 낡은 원본을 따라가 "five clues"(실제 4개)로 적히는 사고를 막는다
+- **단서 에셋 양방향 대조** — 참조했는데 파일 없음 / 파일이 있는데 아무도 안 씀(배포 용량) / **대소문자 불일치** / `public/`에 최적화 안 된 PNG·WAV 원본이 남음
+- 사건 단서만 본다 — `/audio/sfx/question*` 로 한정(연출용 `raid/` 는 제외)
+
+### 9.8 진행 집계를 파생값으로 바꿨다 (버그 수정)
+
+`p.stage[s]`·`p.score`가 localStorage 에 **쌓아둔 누적 카운터**였다. 사건 id가 바뀌거나 옛 테스트 기록이 남으면 카운터가 영구히 부풀어 **'해결 4/3'** 처럼 사건 수를 넘는 값이 나오고 총점도 스테이지 합과 어긋났다(실측). 이제 `solved`·`submitted` 목록만 저장하고 **현재 `CASES` 와 교차해 매번 다시 계산**한다 → 사라진 사건 id는 자동으로 빠지고, 총점은 항상 `Σ(스테이지 정답 수 × 배점)`이다. 사이드바·감독관 임명·최종 랭킹이 같은 파생 집계를 쓴다.
+
+### 9.9 DEV 메뉴가 실패를 삼키던 문제
+
+서버 모드에서 DEV `게임 시작`은 `admin_start_game`(`is_admin()` 검증)을 호출해 `forbidden`으로 거부되는데, `click: () => startGame()` 이 실패한 Promise를 그대로 버려서 **"눌러도 아무 일이 없다"** 로 보였다. 이제 버튼 라벨에 `권한 없음 — ?admin 로그인 필요` 를 띄운다. 서버 모드에서 DEV 로 진행하려면 `?admin` 로그인이 필요하고, 콘텐츠만 확인할 거면 **`VITE_BACKEND=mock` 으로 띄우는 게 맞다**(mock 은 새 정답으로 채점하고, 서버는 시드 적용 전까지 옛 정답으로 채점한다).
+
+---
+
+## 10. 이어서 할 일 (다른 환경에서 시작할 때)
+
+### 10.1 ⚠️ 서버 마이그레이션 — 배포보다 먼저, 이 순서로
+
+Supabase SQL Editor 에서:
+
+1. **`0009_multi_answer.sql`** — 복수 정답 컬럼·`same_index_set()`·`submit_answer` 교체
+2. **`0010_duration_80min.sql`** — 제한 시간 80분
+3. **`0011_team_status_last_submit.sql`** — 팀 현황에 마지막 제출 시각
+4. `node scripts/export-seed.mjs` 로 **`0003_seed_answers.sql` 재생성 후 실행** → **실행 뒤 파일 삭제**(커밋 금지 · gitignore)
+
+**순서가 중요하다**: `0003` 이 `answer_indexes` 컬럼에 값을 쓰므로 `0009` 가 먼저여야 한다.
+
+미적용 상태로 배포하면:
+
+| 증상 | 원인 |
+|---|---|
+| 사건 #005 제출이 **영구 실패** → Stage 2 통과 불가 → 종반부 진입 불가 | `0009` |
+| 타이머가 60분으로 동작 | `0010` |
+| [팀 현황] 표가 뜨지 않음 | `0011` |
+| 사건 #002 를 **옛 정답(녹취 D)** 으로 채점 | `0003` |
+
+적용 확인:
+```sql
+select status, duration_minutes from public.games where id = 1;           -- 80
+select count(*) from public.case_answers;                                 -- 15
+select case_id, answer_index, answer_indexes from public.case_answers
+ where case_id = 'case-005';                                              -- null, {1,2,4}
+select name, submitted_count, score, last_submit_at
+  from public.admin_team_status order by sort_order limit 3;
+```
+
+### 10.2 브라우저 실측 — 절반만 끝났다
+
+Claude 의 브라우저 확장이 연결되지 않아 대부분 사용자가 눈으로 확인했다.
+
+| 항목 | 상태 |
+|---|---|
+| 배경 표시(WebP 전환 후) | ✅ 확인 |
+| 금배지 투명도 | ✅ 확인 |
+| 오프닝 BGM | ✅ 확인 |
+| **Final Raid BGM 재생 안 됨** | ⏳ **미해결** — 파일은 정상(`kill-billian.mp3` 디코드 오류 없음 · 3:49 · 96kbps · 평균 -17.4dB, `opening.mp3` 와 거의 같은 음량). `raid.js` `mounted()` 의 `playBgm` 경로를 봐야 한다 |
+| Raid 타격 효과음 | ⏳ 미확인 |
+| 사건 #005 복수 선택 UI | ⏳ 미확인 |
+| 신규 7사건 화면(5장 갤러리·`audioFirst`) | ⏳ 미확인 |
+| 80분 타이머 표시 | ⏳ 미확인 |
+| `?lang=en` 전체 플레이 · 콘솔 오류 0 | ⏳ 미확인 |
+| 서버 모드에서 #005 제출 통과 | ⏳ **마이그레이션 적용 후 필수** |
+
+자동 검증은 통과 상태다: `npm run validate` 오류 0·경고 0 / `npm run build` 통과 / ASSETS+CSS 참조 95개 실물 존재 / dist 에 PNG·JPG·WAV 0개 / 프로덕션 번들에 정답·DEV 코드 0건.
+
+### 10.3 남은 판단·확인 사항
+
+- **행사장 YouTube 접속** — 가능하다고 확인됨(2026-08-06). 차단 시 `videos/opening.mp4` 를 대체로 배선하는 작업은 하지 않았다.
+- **표시 번호 중복** — `#007` 이 Stage 1(`case-001`)·Stage 2(`case-007`)에 동시 표시. `#013` 이미지에는 `CASE FILE #012` 가 인쇄돼 있다. **무시하기로 결정**(2026-08-06).
+- **사건 #004 음성은 인터뷰 1~4가 한 파일**이다. 인터뷰별 재생이 필요하면 `question4-1~4.mp3` 분할 파일이 필요하다.
+- **사건 #003 은 자막(녹취록)이 없다** — 판단 근거가 음성에만 있어 `CLAUDE.md §13` 을 못 지킨다. 청각 접근성이 필요한 참가자가 있으면 녹취록을 준비해야 한다.
+- 참가자 안내 메일(국문·영문) 초안은 `docs/participant-notice.md` 에 있다.
+- **정답표**는 `src/js/dev/solutions.js` 가 정본이다. Q번호(진행 순번) ↔ 정답 대조는 아래 명령으로 언제든 다시 뽑는다.
+
+```bash
+node -e "globalThis.localStorage={getItem:()=>null,setItem:()=>{}};const{pathToFileURL}=require('node:url');Promise.all([import(pathToFileURL('src/js/data/cases.js').href),import(pathToFileURL('src/js/dev/solutions.js').href)]).then(([{CASES},{SOLUTIONS}])=>{let q=0;for(const c of CASES){q++;const s=SOLUTIONS[c.id];const a=Array.isArray(s.answerIndexes)?s.answerIndexes.map(i=>i+1).join('·')+'번(복수)':(s.answerIndex+1)+'번';console.log('Q'+q+'. '+a+'  |  '+c.fileNo+' '+c.title)}})"
+```
