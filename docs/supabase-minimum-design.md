@@ -396,10 +396,19 @@ alter publication supabase_realtime add table public.games;
 | 서버 | `submit_answer`가 `now() >= games.ends_at` 또는 `status <> 'started'`면 **`game_ended` 예외**. 최종 판정은 항상 여기 |
 | 클라이언트(제출 시) | 예외를 받으면 확인 모달을 닫고 **사건 화면을 유지**한 채 안내 배너 표시 + `[판단 제출]` 비활성화. 선택 상태는 남긴다 |
 | 클라이언트(대기 중) | `games.status='ended'`가 Realtime/폴링으로 도착하면 즉시 같은 배너를 띄우고 제출 버튼을 잠근다(제출 시도 없이도 반영) |
-| 강제 이동 | **하지 않는다.** 진행 중 팀의 화면을 끊지 않고, 이동은 운영진 안내에 따른다 |
-| 종반부 | 임명·레이드·금배지는 시간 제한과 무관하게 계속 진행 가능(제출이 없는 구간이므로) |
+| 강제 이동 | **관리자 End(status='ended') 시 이동한다** — 운영 요청 2026-08-07로 정책 변경(아래 §9.1a). 안내 팝업 후 마지막 화면(종료 안내 SCR-023)으로 옮긴다. (시간 만료로 인한 종료도 서버가 status를 'ended'로 바꾸면 동일하게 동작) |
+| 종반부 | 임명·레이드·금배지는 시간 제한과 무관하게 진행. 단 관리자 End 후에는 마지막 화면으로 이동하며, **미완주 팀은 금배지 없이 종료 안내**를 본다 |
 
 필요 문구 2개를 `constants/copy.js`에 ko/en으로 추가한다: `case.endedNotice`(예: "게임이 종료되어 더 이상 판단을 제출할 수 없습니다."), `case.endedHint`(운영진 안내 대기).
+
+### 9.1a 관리자 게임 종료 시 참가자 이동 (2026-08-07 정책 변경)
+
+원안(§9.1)은 "강제 이동하지 않는다"였으나, 운영 요청으로 **관리자가 게임을 종료하면 진행 중 참가자를 마지막 화면으로 이동**시키도록 바꿨다. 구현(클라이언트 전용, 스키마 변경 없음):
+
+- **`flow.js`**: `subscribe`(game.js)로 `status='ended'`를 감지 → 진행 중(대기실·사건·임명·레이드) 화면이면 안내 팝업(`gameEnded.*`) → `[마지막 화면으로]` 클릭 시 `navigate(FLOW.ENDING, { skipGuard: true })`.
+- **`constants/flow.js` `resolveStep`**: 새 fact `gameEnded`(=`isEnded()`) 추가. 종료 후에는 서약을 마친 참가자를 `FLOW.ENDING`으로 고정 → 새로고침해도 사건/레이드로 되돌아가지 않는다.
+- **`ending.js`**: `forcedEnd = isEnded() && !finale.badgeAt && !allStagesCleared(team)` 이면 금배지 수여식을 건너뛰고 종료 안내를 바로 띄운다. 이때 `record_milestone`(서버에서 stages_cleared 요구)은 호출하지 않는다(미완주 팀 저장 없음).
+- 문구: `constants/copy.js`의 `gameEnded.title/msg/confirm` (ko/en).
 
 ---
 

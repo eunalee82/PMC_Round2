@@ -66,6 +66,11 @@ const KO = {
   'oath.fieldLabel': '서명',
   'oath.agree': '위 서약 내용에 동의하며, 수사관으로서 성실히 임무를 수행하겠습니다.',
   'oath.submit': '서약 완료',
+  'oath.back': '팀 선택으로 돌아가기',
+  // 관리자 게임 종료 시 참가자 안내 팝업 → 마지막 화면(종료 안내)으로 이동
+  'gameEnded.title': '게임이 종료되었습니다',
+  'gameEnded.msg': '감독관이 게임을 종료했습니다. 마지막 화면으로 이동합니다.',
+  'gameEnded.confirm': '마지막 화면으로',
 
   // SCR-005 Waiting Room
   'waiting.eyebrow': '출동 대기실 · WAITING ROOM',
@@ -95,6 +100,10 @@ const KO = {
   'case.next': '다음 사건 조사',
   'case.nextLast': 'Stage 결과 보기',
   'case.noAnalysis': '분석 보고서가 아직 준비되지 않았습니다.',
+  // 사건 본문을 서버에서 받아오는 동안/실패 시 (보안: 본문은 번들에 없다)
+  'case.loading': '사건 파일을 여는 중…',
+  'case.loadFail': '사건 파일을 불러오지 못했습니다. 잠시 후 다시 시도하십시오.',
+  'case.retry': '다시 시도',
   // 제출 실패 안내 (서버 판정 — docs/supabase-minimum-design.md §9.1)
   'submitFail.already_submitted': '이미 제출된 사건입니다',
   'submitFail.game_ended': '게임이 종료되어 제출할 수 없습니다',
@@ -334,6 +343,10 @@ const EN = {
   'oath.fieldLabel': 'Signature',
   'oath.agree': 'I agree to the oath above and will faithfully carry out my duty as an agent.',
   'oath.submit': 'Complete Oath',
+  'oath.back': 'Back to Team Selection',
+  'gameEnded.title': 'The Game Has Ended',
+  'gameEnded.msg': 'The supervisor has ended the game. Moving to the final screen.',
+  'gameEnded.confirm': 'Go to Final Screen',
 
   // SCR-005 Waiting Room
   'waiting.eyebrow': 'WAITING ROOM',
@@ -361,6 +374,9 @@ const EN = {
   'case.next': 'Investigate Next Case',
   'case.nextLast': 'View Stage Result',
   'case.noAnalysis': 'The analysis report is not ready yet.',
+  'case.loading': 'Opening the case file…',
+  'case.loadFail': 'Could not load the case file. Please try again in a moment.',
+  'case.retry': 'Try again',
   'submitFail.already_submitted': 'This case was already submitted',
   'submitFail.game_ended': 'The game has ended — submissions are closed',
   'submitFail.game_not_started': 'The game has not started yet',

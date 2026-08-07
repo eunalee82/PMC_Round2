@@ -17,7 +17,8 @@ mkdirSync(outDir, { recursive: true })
 globalThis.localStorage = { getItem: () => null, setItem: () => {} }
 
 const { BASE_TEAMS } = await import('../src/js/mocks/teams.js')
-const { CASES } = await import('../src/js/data/cases.js')
+// 본문은 브라우저 번들(data/cases.js)에서 빠졌다 → 진실의 원천인 DEV 본문 모듈에서 사건 목록을 읽는다.
+const { CASES } = await import('../src/js/dev/cases-content.js')
 const { SOLUTIONS } = await import('../src/js/dev/solutions.js') // 정답은 DEV 전용 모듈
 
 const q = (s) => `'${String(s).replace(/'/g, "''")}'` // SQL 문자열 이스케이프

@@ -416,6 +416,8 @@ Stage 3 아이템(배째 마스터)
 
 ### 10.1 ⚠️ 서버 마이그레이션 — 배포보다 먼저, 이 순서로
 
+> **✅ 적용·검증 완료 (2026-08-07 확인).** 프로젝트 `teyngjaladwqolxwykqk` 에서 `teams=33 · case_answers=15 · duration=80` · `submit_answer(p_choice_indexes)` 존재 · `admin_team_status` 뷰 존재를 확인했다(정답 시드 case-002→1 · case-005→{1,2,4} 포함). **재적용 불필요.** 아래 절차는 DB 를 새로 만들거나 초기화한 뒤 다시 세팅할 때를 위한 참고용이다. 상태는 언제든 `node scripts/check-migrations.mjs`(0009·0010·0011, 읽기전용) + SQL Editor 의 `select count(*) from public.case_answers;`(0003=15) 로 재확인한다.
+
 Supabase SQL Editor 에서:
 
 1. **`0009_multi_answer.sql`** — 복수 정답 컬럼·`same_index_set()`·`submit_answer` 교체
@@ -473,5 +475,38 @@ Claude 의 브라우저 확장이 연결되지 않아 대부분 사용자가 눈
 - **정답표**는 `src/js/dev/solutions.js` 가 정본이다. Q번호(진행 순번) ↔ 정답 대조는 아래 명령으로 언제든 다시 뽑는다.
 
 ```bash
-node -e "globalThis.localStorage={getItem:()=>null,setItem:()=>{}};const{pathToFileURL}=require('node:url');Promise.all([import(pathToFileURL('src/js/data/cases.js').href),import(pathToFileURL('src/js/dev/solutions.js').href)]).then(([{CASES},{SOLUTIONS}])=>{let q=0;for(const c of CASES){q++;const s=SOLUTIONS[c.id];const a=Array.isArray(s.answerIndexes)?s.answerIndexes.map(i=>i+1).join('·')+'번(복수)':(s.answerIndex+1)+'번';console.log('Q'+q+'. '+a+'  |  '+c.fileNo+' '+c.title)}})"
+node -e "globalThis.localStorage={getItem:()=>null,setItem:()=>{}};const{pathToFileURL}=require('node:url');Promise.all([import(pathToFileURL('src/js/dev/cases-content.js').href),import(pathToFileURL('src/js/dev/solutions.js').href)]).then(([{CASES},{SOLUTIONS}])=>{let q=0;for(const c of CASES){q++;const s=SOLUTIONS[c.id];const a=Array.isArray(s.answerIndexes)?s.answerIndexes.map(i=>i+1).join('·')+'번(복수)':(s.answerIndex+1)+'번';console.log('Q'+q+'. '+a+'  |  '+c.fileNo+' '+c.title)}})"
 ```
+
+---
+
+## 11. 2026-08-07 세션 기록 — 문제 본문 서버 이관(보안) + 서약 뒤로가기 · 종료 이동 + 검수 게이트
+
+### 11.1 마이그레이션 상태 확인 (0009·0010·0011·0003)
+새 PC에서 이어받아 `git pull` → `npm install` → `npm run validate`(오류 0). 읽기전용 프로브(`scripts/check-migrations.mjs` 방식, anon)로 **0009·0010·0011 적용 확인**, SQL로 `case_answers=15 · teams=33 · duration=80 · case-002=1 · case-005={1,2,4}` 확인 → **전부 적용 완료**. §10.1의 "미적용 to-do"는 stale였음(배너로 정정).
+
+### 11.2 ⭐ 문제 본문을 서버로 이관했다 (번들 유출 차단)
+정답·해설은 이미 `case_answers`로 빠져 있었지만 **사건 본문·선택지는 `src/js/data/cases.js`에 그대로 번들**되어 추출 가능했다. 이번에 본문도 서버로 옮겼다.
+
+- **`src/js/data/cases.js`** → 얇은 로더로 축소: `CASES`=매니페스트 재노출 + `loadCases(teamId, token)` + `localizeCase()`. 본문·정답 없음.
+- **`src/js/data/case-manifest.js`**(신규·자동생성): 비민감 구조 메타(`id·stage·caseNo·fileNo·choiceCount·multi·selectCount`)만. `stage-progress`·`progress-mock`이 `CASES`로 그대로 사용 → **그 파일들 무변경**.
+- **`src/js/dev/cases-content.js`**(신규): 본문 원본(진실의 원천). **DEV 전용 → 프로덕션 번들에서 제거**(`import.meta.env.DEV` 동적 import). 비상 mock·검증·시드 생성이 여기서 읽는다.
+- **서버**: `supabase/migrations/0012_cases_content.sql` — `public.cases` 테이블(RLS 전면거부, `case_answers`와 동일) + `get_cases(p_team_id,p_token,p_locale)` RPC(SECURITY DEFINER). `0013_seed_cases.sql`(생성: `scripts/export-cases.mjs`, **커밋 금지·gitignore·적용 후 삭제**).
+- **운영 모드**(사용자 결정): **LIVE = 게임 started + 팀 토큰이면 서버가 본문 일괄 제공**(가장 가벼운 방식). **PREVIEW = 관리자(`is_admin()`)면 상태 무관 본문 반환**(단 정답·해설은 미포함, 전용 화면 없음). **TEST = 미구현**(env 플래그로 추후 추가 가능).
+- **`case.js`**: 진입 시 `loadCases()` 한 번(로딩/재시도 표시) 후 렌더 — 렌더 로직은 그대로. `scripts/export-cases.mjs`·`validate.mjs`(매니페스트 정합 검사 추가)·`export-seed.mjs`는 본문을 `dev/cases-content.js`에서 읽도록 변경.
+- **검증**: `validate` 오류 0 · `build` 통과 · **프로덕션 번들에 본문·선택지·정답 문자열 0건**(양산 D-30/사라진 두 달/Scope Creep/녹취 A/answerIndex …) · DEV 본문 청크 미유출 · `get_cases` 호출부 존재. 서버 침투 점검: anon으로 `select * from cases` 차단(401) · 토큰 없이 `get_cases` → `not_owner`.
+
+### 11.3 서약 뒤로가기 · 관리자 종료 시 이동 (운영 요청)
+- **서약(SCR-004)에 [팀 선택으로 돌아가기]** 추가(`oath.js`) — 팀 잘못 고르면 서명 전 복귀. 팀 이름을 크게 강조(`screens.css` `.oath__team` = `--text-2xl`·black + 팀색 도트 글로우)해 오선택 인지.
+- **관리자 [게임 종료] → 참가자 안내 팝업 → 마지막 화면(SCR-023)으로 이동**: `flow.js`가 `status='ended'` 구독 → 팝업(`gameEnded.*`) → `navigate(ENDING, skipGuard)`. `constants/flow.js resolveStep`에 `gameEnded` fact 추가(종료 후 새로고침해도 마지막 화면 고정). `ending.js`는 `forcedEnd`(미완주+종료)면 금배지 건너뛰고 종료 안내 + `record_milestone` 미호출. **설계 §9.1 "강제이동 안 함"을 이 요청으로 덮어씀**(문서 §9.1a에 반영).
+
+### 11.4 검수 게이트 + Preview 배포
+- **`VITE_REVIEW_GATE` 빌드 플래그**(`main.js`): 켜지면 참가자 입장 앞에 비밀번호(`2026`) 게이트. 플래그 없으면 런타임에 안 뜸(실 행사 빌드 무영향). `?admin`은 게이트 밖.
+- **Preview 배포**로 3명 사전 검수: Vercel `pmc-round2` 링크 → Preview env `VITE_REVIEW_GATE=1` 추가 → `vercel deploy`(Preview, 실 URL 안 건드림). URL은 Vercel 배포 보호(로그인 벽)가 있어 **대시보드에서 공유 링크 생성 또는 Preview 보호 해제** 필요.
+
+### 11.5 남은 일 / 주의
+- **리뷰 후 정리(사용자 진행 예정)**: `?admin` → [대기 상태로 되돌리기 → 전부 초기화](점수 리셋) · `npx vercel env rm VITE_REVIEW_GATE preview`(로컬 `.env.local`의 같은 줄도 삭제). 게이트 코드는 남겨도 무해(플래그 없으면 안 뜸).
+- **실 행사 배포**: `VITE_REVIEW_GATE` 없이 Production 배포. 배포 전 `0013_seed_cases.sql`이 서버에 적용돼 있어야 LIVE 본문이 나온다(이번 세션에 적용·확인함).
+- **브라우저 LIVE 실측 미완**: 서버 모드에서 팀 토큰+게임 started로 본문이 실제로 렌더되는지, 사건 #005 복수 선택 등은 배포본에서 확인 필요.
+- **PREVIEW/TEST 화면 미구현**: 관리자용 문제 미리보기(정답·해설 포함)와 TEST 모드는 요청 시 추가.
+- **`.env.local` 필요**: 서버 모드 실행엔 `VITE_SUPABASE_URL`·`VITE_SUPABASE_ANON_KEY`(+검수 시 `VITE_REVIEW_GATE=1`). gitignore라 PC마다 만들어야 한다.

@@ -16,7 +16,9 @@ const pub = join(root, 'public')
 // localStorage가 없는 Node에서 lib/i18n.js가 안전하게 동작하도록 최소 스텁을 둔다.
 globalThis.localStorage = { getItem: () => null, setItem: () => {} }
 
-const { CASES } = await import('../src/js/data/cases.js')
+// 본문은 이제 브라우저 번들(data/cases.js)에 없다 → 진실의 원천인 DEV 본문 모듈에서 검증한다.
+const { CASES } = await import('../src/js/dev/cases-content.js')
+const { CASE_MANIFEST } = await import('../src/js/data/case-manifest.js') // 번들에 나가는 구조 메타
 const { SOLUTIONS } = await import('../src/js/dev/solutions.js') // 정답은 DEV 전용 모듈
 const { COPY } = await import('../src/js/constants/copy.js')
 const { STAGE_TOTALS, STAGE_POINTS, SCORE_MAX } = await import('../src/js/lib/progress.js')
@@ -147,6 +149,24 @@ if (builtMax !== SCORE_MAX) {
 // SOLUTIONS에만 남은 고아 정답(사건 교체 후 잔재) 탐지
 for (const id of Object.keys(SOLUTIONS)) {
   if (!ids.has(id)) warn(`SOLUTIONS['${id}']: 대응하는 사건이 없다 (잔재)`)
+}
+
+// ── 3d) 매니페스트 정합 — 번들에 나가는 case-manifest.js 가 본문과 어긋나면 화면이 깨진다 ──
+// 본문을 고치고 export-cases.mjs 재생성을 잊으면(선택지 개수·multi 등) 여기서 잡는다.
+{
+  const mById = new Map(CASE_MANIFEST.map((m) => [m.id, m]))
+  for (const c of CASES) {
+    const m = mById.get(c.id)
+    if (!m) { fail(`case-manifest.js 에 '${c.id}' 가 없다 — export-cases.mjs 를 재실행할 것`); continue }
+    if (m.stage !== c.stage) fail(`매니페스트 '${c.id}': stage(${m.stage}) ≠ 본문(${c.stage})`)
+    if (m.caseNo !== c.caseNo) fail(`매니페스트 '${c.id}': caseNo(${m.caseNo}) ≠ 본문(${c.caseNo})`)
+    if (m.choiceCount !== c.choices.length) fail(`매니페스트 '${c.id}': choiceCount(${m.choiceCount}) ≠ 보기 수(${c.choices.length})`)
+    if (!!m.multi !== !!c.multi) fail(`매니페스트 '${c.id}': multi 플래그가 본문과 다르다`)
+    if (m.multi && m.selectCount !== c.selectCount) fail(`매니페스트 '${c.id}': selectCount(${m.selectCount}) ≠ 본문(${c.selectCount})`)
+  }
+  for (const m of CASE_MANIFEST) {
+    if (!ids.has(m.id)) fail(`case-manifest.js 의 '${m.id}' 에 대응하는 본문이 없다 (잔재) — 재생성할 것`)
+  }
 }
 
 // ── 3c) 사건 단서 에셋 — 참조/실물 양방향 대조 ────────────────────

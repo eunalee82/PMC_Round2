@@ -33,6 +33,16 @@ export function createOathScreen (ctx) {
   })
   bindCopy(submitBtn.el.querySelector('.btn__label'), 'oath.submit')
 
+  // 팀을 잘못 골랐을 때 서약 전에 되돌아갈 수 있게 한다(SCR-004 → SCR-003). 점유·등록은 유지된다.
+  const backBtn = createButton({
+    label: t('oath.back'),
+    variant: 'ghost',
+    size: 'md',
+    block: true,
+    onClick: () => ctx.goTo(FLOW.TEAM)
+  })
+  bindCopy(backBtn.el.querySelector('.btn__label'), 'oath.back')
+
   function refresh () {
     submitBtn.update({ disabled: !(nameInput.value.trim() && checkbox.checked) })
   }
@@ -44,7 +54,7 @@ export function createOathScreen (ctx) {
       el('div', { class: 'oath__badge' }, [el('img', { src: ASSETS.logos.badgeGold, alt: 'PM보호국 금배지', class: 'oath__badge-img' })]),
       copyEl('span', { class: 'form-screen__step mono' }, 'oath.step'),
       copyEl('h1', { class: 'form-screen__title' }, 'oath.title'),
-      team ? el('span', { class: 'oath__team' }, [el('span', { class: 'oath__team-dot', style: { background: team.color } }), el('span', { text: team.name })]) : null,
+      team ? el('span', { class: 'oath__team' }, [el('span', { class: 'oath__team-dot', style: { background: team.color, color: team.color } }), el('span', { class: 'oath__team-name', text: team.name })]) : null,
       // 등록한 수사관 3명을 다시 보여준다 — 팀을 잘못 골랐다면 서약 전에 알아차릴 마지막 지점.
       agents.length ? el('div', { class: 'oath__agents' }, [
         copyEl('span', { class: 'oath__agents-label mono caps' }, 'oath.agents'),
@@ -62,13 +72,13 @@ export function createOathScreen (ctx) {
         checkbox,
         copyEl('span', {}, 'oath.agree')
       ]),
-      el('div', { class: 'form-screen__actions' }, [submitBtn.el])
+      el('div', { class: 'form-screen__actions' }, [submitBtn.el, backBtn.el])
     ])
   ])
 
   return {
     el: node,
     mounted () { ctx.audio.playBgm(ASSETS.bgm.opening) },
-    destroy () { submitBtn.destroy() }
+    destroy () { submitBtn.destroy(); backBtn.destroy() }
   }
 }

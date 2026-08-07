@@ -10,8 +10,9 @@ import { t } from '../../lib/copy.js'
 import { ASSETS } from '../../constants/assets.js'
 import { FLOW } from '../../constants/flow.js'
 import { STAGE_META, STAGE_ITEM_ICONS } from '../../constants/stages.js'
-import { localizeCase } from '../../data/cases.js'
+import { localizeCase, loadCases } from '../../data/cases.js'
 import { submitCase } from '../../lib/grade.js'
+import { getClaimToken } from '../../lib/entries.js'
 import { findTeam } from '../../lib/teams.js'
 import { remainingSeconds, isEnded, subscribe as subscribeGame, getConnection, subscribeConnection } from '../../lib/game.js'
 import { getProgress, getRanking, STAGE_TOTALS, SCORE_MAX, pointsFor, subscribeProgress } from '../../lib/progress.js'
@@ -370,18 +371,39 @@ export function createCaseScreen (ctx) {
   // 판정 순서: (1) 미완료 스테이지가 있으면 그 스테이지의 브리핑/첫 미제출 사건,
   //           (2) 세 스테이지를 모두 마쳤으면 Stage 3 결과 화면 — 결과→보상→감독관 임명으로 이어진다.
   //           (마지막 사건 제출 직후 새로고침해도 아이템 획득 연출을 건너뛰지 않는다.)
-  const stage = firstIncompleteStage(teamId)
-  const cases = stageCasesFor(stage)
-  const done = submittedCount(teamId, stage)
-  if (isStageComplete(teamId, stage)) {
-    showStageResult(stage) // = Stage 3 완료 상태(firstIncompleteStage가 3을 반환)
-  } else if (cases.length === 0 || done === 0) {
-    showBriefing(stage) // 사건 없는 스테이지 또는 스테이지 시작 전 → 브리핑
-  } else {
-    const p = getProgress(teamId)
-    const idx = cases.findIndex((c) => !p.submitted.includes(c.id))
-    showCase(stage, idx < 0 ? 0 : idx) // 진행 중 → 첫 미제출 사건부터
+  function renderRecovered () {
+    const stage = firstIncompleteStage(teamId)
+    const cases = stageCasesFor(stage)
+    const done = submittedCount(teamId, stage)
+    if (isStageComplete(teamId, stage)) {
+      showStageResult(stage) // = Stage 3 완료 상태(firstIncompleteStage가 3을 반환)
+    } else if (cases.length === 0 || done === 0) {
+      showBriefing(stage) // 사건 없는 스테이지 또는 스테이지 시작 전 → 브리핑
+    } else {
+      const p = getProgress(teamId)
+      const idx = cases.findIndex((c) => !p.submitted.includes(c.id))
+      showCase(stage, idx < 0 ? 0 : idx) // 진행 중 → 첫 미제출 사건부터
+    }
   }
+
+  // 사건 본문은 서버에서 받아온다(보안: 번들에 없음 — 서버가 started+토큰일 때만 내려준다).
+  // 받은 뒤에 현재 화면을 판정·렌더한다. 라우터 가드가 미시작/미인증이면 여기 오기 전에 되돌린다.
+  async function bootstrap () {
+    mountView(el('div', { class: 'case-loading' }, [el('p', { class: 'case-loading__text', text: t('case.loading') })]))
+    try {
+      await loadCases(teamId, getClaimToken(teamId))
+    } catch (e) {
+      console.warn('[case] 본문 로드 실패', e)
+      const retry = trackView(createButton({ label: t('case.retry'), variant: 'primary', icon: 'refresh', onClick: () => bootstrap() }))
+      mountView(el('div', { class: 'case-loading' }, [
+        el('p', { class: 'case-loading__text', text: t('case.loadFail') }),
+        retry.el
+      ]))
+      return
+    }
+    renderRecovered()
+  }
+  bootstrap()
 
   return {
     el: shell.el,

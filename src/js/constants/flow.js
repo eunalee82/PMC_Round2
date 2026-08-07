@@ -49,9 +49,16 @@ export function isRegistered (session) {
 //   stagesCleared  — Stage 1~3 모든 사건을 제출했는가 (종반부 진입 조건, game-flow.md §11.1)
 //   finale         — { appointedAt, raidEndedAt } 종반부 저장 지점
 export function resolveStep (step, session, facts = {}) {
-  const { gameStarted = false, stagesCleared = false, finale = {} } = facts
+  const { gameStarted = false, gameEnded = false, stagesCleared = false, finale = {} } = facts
   const registered = isRegistered(session)
   const isGameplay = step === FLOW.CASE || FINALE_ORDER.includes(step)
+
+  // 게임 종료 후에는 서약을 마친 참가자를 마지막 화면(종료 안내)으로 고정한다 — 새로고침해도
+  // 사건/레이드로 돌아가지 않는다(운영 요청 2026-08-07). ENDING 화면이 완주 여부에 따라
+  // 금배지 수여 또는 종료 안내를 고른다. 입장·서약 전(pledgedAt 없음)이면 평소 흐름을 따른다.
+  if (gameEnded && registered && session.pledgedAt && (isGameplay || step === FLOW.WAITING)) {
+    return FLOW.ENDING
+  }
 
   if (isGameplay) {
     if (!registered) return FLOW.TEAM

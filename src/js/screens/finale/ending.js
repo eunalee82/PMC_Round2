@@ -7,6 +7,8 @@ import { t } from '../../lib/copy.js'
 import { ASSETS } from '../../constants/assets.js'
 import { findTeam } from '../../lib/teams.js'
 import { getProgress, recordFinale } from '../../lib/progress.js'
+import { isEnded } from '../../lib/game.js'
+import { allStagesCleared } from '../../lib/stage-progress.js'
 import { createButton } from '../../../components/primitives/button.js'
 
 export function createEndingScreen (ctx) {
@@ -58,8 +60,10 @@ export function createEndingScreen (ctx) {
   }
 
   // ── SCR-023 종료 안내 — 순위는 표시하지 않는다(감독관 발표 대상). 총점은 진행 중 계속 보였던 값이라 유지. ──
-  function showGameEnd () {
-    recordFinale(teamId, { endedAt: Date.now() }) // 저장 시점: 게임 종료 (§18)
+  // persist=false: 관리자 강제 종료로 미완주 팀이 끌려온 경우 — 종반부 저장(record_milestone)은
+  // 서버에서 stages_cleared 를 요구하므로 호출하지 않는다(정상 완주 팀만 endedAt 을 남긴다).
+  function showGameEnd ({ persist = true } = {}) {
+    if (persist) recordFinale(teamId, { endedAt: Date.now() }) // 저장 시점: 게임 종료 (§18)
     const p = getProgress(teamId)
     const solved = p.solved.length
     const stat = (k, v) => el('div', { class: 'gameend__stat' }, [
@@ -94,7 +98,12 @@ export function createEndingScreen (ctx) {
   }
 
   // 재진입 판정 — 이미 마무리한 팀은 종료 안내로 복구한다 (CLAUDE.md §2).
-  if (getProgress(teamId).finale.endedAt) showGameEnd()
+  // 관리자 강제 종료로 끌려온 미완주 팀(Stage 미완 · 금배지 전)은 금배지 수여를 건너뛰고
+  // 바로 종료 안내를 띄운다 — 놀지 않은 팀에게 금배지 연출을 주지 않기 위해서다(운영 요청 2026-08-07).
+  const finale = getProgress(teamId).finale
+  const forcedEnd = isEnded() && !finale.badgeAt && !allStagesCleared(teamId)
+  if (finale.endedAt) showGameEnd()
+  else if (forcedEnd) showGameEnd({ persist: false })
   else showBadge()
 
   return {

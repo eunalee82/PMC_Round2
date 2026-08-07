@@ -164,8 +164,9 @@
 /* SCR-004 Oath */
 .screen--oath .oath { align-items: center; text-align: center; max-width: 620px; }
 .oath__badge-img { width: 88px; height: 88px; object-fit: contain; filter: drop-shadow(var(--glow-gold)); }
-.oath__team { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: var(--r-full); background: var(--bg-2); border: 1px solid var(--border); font-size: var(--text-sm); font-weight: var(--fw-semibold); }
-.oath__team-dot { width: 10px; height: 10px; border-radius: 50%; }
+/* 팀 이름을 크게 강조한다 — 잘못 고른 팀을 서명 전에 바로 알아채도록(운영 요청 2026-08-07). */
+.oath__team { display: inline-flex; align-items: center; gap: var(--s-3); padding: var(--s-3) var(--s-5); border-radius: var(--r-full); background: var(--bg-2); border: 1px solid var(--border); font-size: var(--text-2xl); font-weight: var(--fw-black); line-height: 1.1; }
+.oath__team-dot { width: 16px; height: 16px; border-radius: 50%; flex: none; box-shadow: 0 0 12px currentColor; }
 .oath__agents { display: flex; flex-direction: column; align-items: center; gap: var(--s-2); width: 100%; }
 .oath__agents-label { font-size: var(--text-xs); color: var(--text-3); letter-spacing: var(--tracking-caps); }
 .oath__agents .team-roster__chips { justify-content: center; flex: none; }
