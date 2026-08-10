@@ -56,6 +56,43 @@
 .lang-select__opt:hover { color: var(--text-1); }
 .lang-select__opt.is-active { background: var(--grad-primary); color: #fff; box-shadow: var(--glow-accent); }
 
+/* 음향 점검 — 입장 전 스피커 확인(SCR-001). 레벨 바는 "앱은 재생 중"이라는 시각 증거다. */
+.sound-test { display: flex; flex-direction: column; align-items: center; gap: var(--s-2); margin-top: var(--s-2); max-width: 46rem; }
+.sound-test__label { font-size: var(--text-xs); color: var(--text-3); letter-spacing: var(--tracking-caps); }
+.sound-test__row {
+  display: inline-flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; justify-content: center;
+  padding: var(--s-2) var(--s-3); border: 1px solid var(--border); border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--bg-2) 70%, transparent); backdrop-filter: blur(6px);
+}
+.sound-test__btn {
+  display: inline-flex; align-items: center; gap: var(--s-2); padding: 8px 16px;
+  border: 1px solid var(--border-strong); border-radius: var(--r-full); background: transparent;
+  color: var(--text-2); font-size: var(--text-sm); font-weight: var(--fw-semibold); cursor: pointer;
+  transition: color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+}
+.sound-test__btn:hover { color: var(--text-1); border-color: var(--accent); }
+.sound-test__btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.sound-test__btn.is-playing { color: var(--text-1); border-color: var(--accent); background: var(--accent-soft); }
+.sound-test__icon { display: inline-flex; }
+
+.sound-test__bars { display: inline-flex; align-items: flex-end; gap: 3px; height: 18px; }
+.sound-test__bar { width: 3px; height: 4px; border-radius: var(--r-sm); background: var(--border-strong); transition: background var(--dur-1) var(--ease); }
+.sound-test__bars.is-playing .sound-test__bar {
+  background: var(--accent);
+  animation: sound-level 0.9s var(--ease) infinite;
+  animation-delay: calc(var(--bar-i) * 0.12s);
+}
+
+.sound-test__vol { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--text-3); }
+.sound-test__slider { width: 96px; accent-color: var(--accent); cursor: pointer; }
+.sound-test__slider:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.sound-test__status { font-size: var(--text-xs); color: var(--text-3); line-height: var(--leading); text-align: center; }
+
+/* 연출이 꺼져도 "재생 중"은 알 수 있어야 한다 — 막대를 고정 높이로 켜 둔다 (CLAUDE.md §13). */
+@media (prefers-reduced-motion: reduce) {
+  .sound-test__bars.is-playing .sound-test__bar { animation: none; height: 12px; }
+}
+
 .entry__cta { margin-top: var(--s-3); }
 .entry__foot { font-size: var(--text-xs); color: var(--text-3); letter-spacing: var(--tracking-caps); }
 

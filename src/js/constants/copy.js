@@ -299,7 +299,14 @@ const KO = {
   'audio.volume': '볼륨',
   'entry.sound': '음향',
   'entry.muted': '음소거',
-  'entry.fullscreen': '전체 화면'
+  'entry.fullscreen': '전체 화면',
+  // 음향 점검(SCR-001) — 사건 단서에 녹취가 있어, 입장 전에 소리를 확인할 유일한 지점이다.
+  'entry.soundTest': '음향 점검',
+  'entry.soundTest.play': '테스트 음악 재생',
+  'entry.soundTest.stop': '재생 중지',
+  'entry.soundTest.hint': '사건 단서에 녹취 음성이 있습니다. 입장 전에 소리가 들리는지 확인하십시오.',
+  'entry.soundTest.playing': '재생 중 — 소리가 들리십니까? 막대는 움직이는데 소리가 없다면 기기 볼륨과 브라우저 탭 음소거를 확인하십시오.',
+  'entry.soundTest.fail': '음향을 재생할 수 없습니다. 브라우저 설정에서 이 사이트의 소리 권한을 확인하십시오.'
 }
 
 // 영문(en) — ko와 같은 키. 비어 있는 키는 lib/copy.js가 자동으로 ko로 폴백한다.
@@ -582,7 +589,13 @@ const EN = {
   'audio.volume': 'Volume',
   'entry.sound': 'Sound',
   'entry.muted': 'Muted',
-  'entry.fullscreen': 'Full Screen'
+  'entry.fullscreen': 'Full Screen',
+  'entry.soundTest': 'Sound Check',
+  'entry.soundTest.play': 'Play test audio',
+  'entry.soundTest.stop': 'Stop',
+  'entry.soundTest.hint': 'Some case evidence is audio. Confirm you can hear sound before entering.',
+  'entry.soundTest.playing': 'Playing — can you hear it? If the bars move but there is no sound, check your device volume and whether the browser tab is muted.',
+  'entry.soundTest.fail': 'Audio could not be played. Check this site\'s sound permission in your browser settings.'
 }
 
 export const COPY = { ko: KO, en: EN }

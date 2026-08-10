@@ -5,6 +5,8 @@
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes glow-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
 @keyframes shimmer { 100% { background-position: 200% 0; } }
+/* 음향 점검 레벨 바 — height 만 움직인다(3px 폭이라 리플로우 비용이 사실상 없다). */
+@keyframes sound-level { 0%, 100% { height: 4px; } 50% { height: 16px; } }
 
 .anim-rise { animation: rise var(--dur-3) var(--ease-out) both; }
 .anim-fade { animation: fade-in var(--dur-2) var(--ease) both; }

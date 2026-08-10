@@ -7,6 +7,7 @@ import { FLOW } from '../../constants/flow.js'
 import { t, copyEl, bindCopy } from '../../lib/copy.js'
 import { getLocale, setLocale } from '../../lib/i18n.js'
 import { createButton } from '../../../components/primitives/button.js'
+import { createSoundTest } from '../../../components/shell/sound-test.js'
 
 function toggleFullscreen () {
   if (!document.fullscreenElement) {
@@ -35,13 +36,24 @@ export function createEntryScreen (ctx) {
     icon(muted ? 'volumeOff' : 'volume', { size: 18 }),
     el('span', { text: muted ? t('entry.muted') : t('entry.sound') })
   ])
-  audioBtn.addEventListener('click', () => {
-    muted = !muted
-    ctx.audio.unlock()
+  function paintAudioBtn () {
+    audioBtn.replaceChildren(icon(muted ? 'volumeOff' : 'volume', { size: 18 }), el('span', { text: muted ? t('entry.muted') : t('entry.sound') }))
+  }
+  function setSessionMuted (value) {
+    if (muted === value) return
+    muted = value
     ctx.audio.setMuted(muted)
     ctx.update({ muted })
-    audioBtn.replaceChildren(icon(muted ? 'volumeOff' : 'volume', { size: 18 }), el('span', { text: muted ? t('entry.muted') : t('entry.sound') }))
+    paintAudioBtn()
+  }
+  audioBtn.addEventListener('click', () => {
+    ctx.audio.unlock()
+    setSessionMuted(!muted)
   })
+
+  // 음향 점검 — 사건 단서에 녹취가 있어, 소리가 나오는지 입장 전에 확인할 수 있어야 한다.
+  // 테스트를 누르면 음소거 상태를 자동으로 풀고 칩 표시도 함께 되돌린다(참가자가 이유 모를 무음을 겪지 않게).
+  const soundTest = createSoundTest({ audio: ctx.audio, onUnmute: () => setSessionMuted(false) })
 
   const fsBtn = el('button', { class: 'ghost-chip', type: 'button', 'aria-label': '전체 화면 전환' }, [
     icon('maximize', { size: 18 }),
@@ -81,10 +93,11 @@ export function createEntryScreen (ctx) {
         copyEl('span', {}, 'entry.alert')
       ]),
       langSelect,
+      soundTest.el,
       el('div', { class: 'entry__cta' }, [enterBtn.el])
     ]),
     copyEl('span', { class: 'entry__foot mono' }, 'entry.foot')
   ])
 
-  return { el: node, destroy () { enterBtn.destroy() } }
+  return { el: node, destroy () { soundTest.destroy(); enterBtn.destroy() } }
 }
