@@ -1,6 +1,6 @@
 // 시드 SQL 생성기 — `node scripts/export-seed.mjs` (추가 패키지 없음)
 //   · supabase/migrations/0002_seed_teams.sql   ← src/js/mocks/teams.js (커밋 O)
-//   · supabase/migrations/0003_seed_answers.sql ← cases.js 의 SOLUTIONS (커밋 X · .gitignore)
+//   · supabase/migrations/0003_seed_answers.sql ← src/js/dev/solutions.js 의 SOLUTIONS (커밋 X · .gitignore)
 //
 // 정답 시드는 저장소에 남기지 않는다: 생성 → 대시보드 SQL Editor 적용 → 파일 삭제.
 // see docs/supabase-minimum-design.md §11
@@ -13,11 +13,12 @@ const root = resolve(here, '..')
 const outDir = join(root, 'supabase', 'migrations')
 mkdirSync(outDir, { recursive: true })
 
-// data/cases.js → lib/i18n.js 가 localStorage 를 만지므로 Node 용 스텁을 둔다
+// dev/cases-content.js → lib/i18n.js 가 localStorage 를 만지므로 Node 용 스텁을 둔다
 globalThis.localStorage = { getItem: () => null, setItem: () => {} }
 
 const { BASE_TEAMS } = await import('../src/js/mocks/teams.js')
-// 본문은 브라우저 번들(data/cases.js)에서 빠졌다 → 진실의 원천인 DEV 본문 모듈에서 사건 목록을 읽는다.
+// 본문은 0012 에서 서버(public.cases)로 이관돼 브라우저 번들에 없다 → 진실의 원천인 DEV 본문 모듈에서 사건 목록을 읽는다.
+// (data/cases.js 는 매니페스트 재노출 + get_cases 로더만 남은 얇은 파일이라 사건 목록의 출처가 아니다)
 const { CASES } = await import('../src/js/dev/cases-content.js')
 const { SOLUTIONS } = await import('../src/js/dev/solutions.js') // 정답은 DEV 전용 모듈
 
@@ -68,7 +69,8 @@ const multiCount = CASES.filter((c) => Array.isArray(SOLUTIONS[c.id].answerIndex
 
 const answersSql = `-- 0003_seed_answers.sql — 정답·해설 시드 (생성: scripts/export-seed.mjs)
 -- ⚠️ 커밋 금지. 적용 후 이 파일을 삭제한다 (.gitignore 에 등록되어 있다).
--- 사건 본문은 src/js/data/cases.js 에 남아 있고, 여기에는 정답 인덱스와 해설만 있다.
+-- 사건 본문은 0012 에서 서버(public.cases)로 옮겨졌다 → 본문 시드는 0013_seed_cases.sql 이 담당하고,
+-- 이 파일에는 정답 인덱스와 해설만 있다. 원본은 src/js/dev/solutions.js (DEV 전용 · 번들 제외).
 
 -- ⚠️ answer_indexes 컬럼은 0009_multi_answer.sql 이 만든다 — 0009 를 먼저 적용해야 이 시드가 돈다.
 -- 순서를 놓치면 'column "answer_indexes" does not exist'(42703) 라는 알아보기 힘든 오류가 나므로,
@@ -92,7 +94,7 @@ on conflict (case_id) do update
       analysis_ko    = excluded.analysis_ko,
       analysis_en    = excluded.analysis_en;
 
--- 사건 목록에 없는 옛 정답 행 정리 — cases.js 가 정본이다.
+-- 사건 목록에 없는 옛 정답 행 정리 — src/js/dev/cases-content.js 의 사건 목록이 정본이다.
 -- upsert 는 사라진 사건을 지우지 않으므로, 사건 id 를 바꾸거나 사건을 교체하면 유령 행이 남는다
 -- (2026-08-05 실측: case_answers 15행이어야 하는데 18행이었다). 배열 비교라 safeupdate 제약도 통과한다.
 delete from public.case_answers
