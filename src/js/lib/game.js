@@ -13,6 +13,8 @@ export function getStatus () { return impl.getStatus() }
 export function getStartedAt () { return impl.getStartedAt() }
 export function isStarted () { return impl.isStarted() }
 export function isEnded () { return impl.isEnded ? impl.isEnded() : false }
+// 제한 시간 경과(타임오버). status='ended' 와 원인은 다르지만 참가자 화면에서는 같게 다룬다.
+export function isTimeUp () { return impl.isTimeUp ? impl.isTimeUp() : false }
 export function remainingSeconds () { return impl.remainingSeconds() }
 export function subscribe (fn) { return impl.subscribe(fn) }
 

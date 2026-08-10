@@ -135,14 +135,15 @@ EvidenceViewer가 네이티브 컨트롤로 재생하고 헤더 소리 설정(�
 | /audio/sfx/question2/question2-4.mp3 | Stage 1 · 2번째 사건 #002 녹취 D | 있음 · 사용 중 |
 | /audio/sfx/question3/question3.mp3 | Stage 1 · 3번째 사건 #003 감독관 브리핑 · 국문 (2026-08-06 도착) | 있음 · 사용 중 |
 | /audio/sfx/question3/question3_en.mp3 | 같은 브리핑 **영문판** | 있음 · 사용 중 |
-| /audio/sfx/question4/question4.mp3 | Stage 2 · 사건 #004 관계자 인터뷰 · 국문. **인터뷰 1~4가 한 파일**(사건 #011과 같은 형태) | 있음 · 사용 중 |
+| /audio/sfx/question4/question4.mp3 | Stage 2 · 사건 #004 관계자 인터뷰 · 국문. **인터뷰 1~4가 한 파일** — 사건 #011은 2026-08-10에 화자별로 나눴으므로 이제 이 사건만 병합 형태다 | 있음 · 사용 중 |
 | /audio/sfx/question4/question4_en.mp3 | 같은 인터뷰 **영문판** | 있음 · 사용 중 |
 | /audio/sfx/question7/question7-1~4.mp3 | Stage 2 · 사건 #007 PM 후보 A~D 답변 · 국문 | 있음 · 사용 중 |
 | /audio/sfx/question7/question7-1~4_en.mp3 | 같은 답변 **영문판** | 있음 · 사용 중 |
 | /audio/sfx/question9/question9-1~4.mp3 | Stage 2 · 사건 #009 인터뷰 A~D(개발조직장·사업부 임원·HR·Chief Architect) · 국문 | 있음 · 사용 중 |
 | /audio/sfx/question9/question9-1~4_en.mp3 | 같은 인터뷰 **영문판** | 있음 · 사용 중 |
-| /audio/sfx/question11/question11.mp3 | Stage 3 · 11번째 사건 #011 참가자 증언 녹취 (증언 4명 1파일) · 국문 | 있음 · 사용 중 |
-| /audio/sfx/question11/question11_en.mp3 | 같은 증언 **영문판** (2026-08-06 도착). 4개 WAV(각 25~28초 · 합 9.2MB)로 와서 **증언 사이 0.8초 공백을 넣어 1파일로 병합 + 64kbps 모노 MP3**(834KB · 106.7초). 원본 WAV 는 `img/audio-src/` 보관 | 있음 · 사용 중 |
+| /audio/sfx/question11/question11-1~4.mp3 | Stage 3 · 사건 #011 참가자 증언 1~4(개발자·일정 담당자·상품기획 담당자·품질 담당자) · 국문. **2026-08-10 화자별 분할**(각 28~32초 · 합 121.2초 ≈ 병합본 120.8초) | 있음 · 사용 중 |
+| /audio/sfx/question11/question11-1~4_en.mp3 | 같은 증언 **영문판** 화자별 분할(각 25~29초 · 합 106.7초 ≈ 병합본 106.8초) | 있음 · 사용 중 |
+| ~~/audio/sfx/question11/question11.mp3~~<br>~~/audio/sfx/question11/question11_en.mp3~~ | 증언 4명을 이어 붙인 **병합본**. 특정 증언만 다시 들을 수 없어 제한 시간을 크게 먹어서 화자별 분할로 대체(2026-08-10). `img/audio-src/` 로 옮겼다 | 서빙 제외 · 보관 |
 | /audio/sfx/question14/question14-1~4_en.mp3 | Stage 3 · 사건 #014 후보 PM 인터뷰 **영문판** (2026-08-06 도착). 원본이 WAV(0.7~1.2MB)로 와서 **64kbps 모노 MP3 로 변환**했다(60~103KB). 원본 WAV 는 `img/audio-src/` 보관 | 있음 · 사용 중 |
 | /audio/sfx/question14/question14-1.mp3 | Stage 3 · 14번째 사건 #014 이 PM 인터뷰 녹취 | 있음 · 사용 중 |
 | /audio/sfx/question14/question14-2.mp3 | Stage 3 · 14번째 사건 #014 최 PM 인터뷰 녹취 | 있음 · 사용 중 |
@@ -150,7 +151,8 @@ EvidenceViewer가 네이티브 컨트롤로 재생하고 헤더 소리 설정(�
 | /audio/sfx/question14/question14-4.mp3 | Stage 3 · 14번째 사건 #014 박 PM 인터뷰 녹취 | 있음 · 사용 중 |
 
 > 경로 상수는 `ASSETS.questionAudio`(`src/js/constants/assets.js`). 사건 미제작 파일은 아직 상수에 등록하지 않았다.
-> 재생 길이 확인: `question11.mp3` 2:01 · `question14-1~4.mp3` 각 10~14초 (브라우저 `loadedmetadata` 기준).
+> 재생 길이 확인: `question11-1~4.mp3` 각 28~32초(합 2:01) · `question14-1~4.mp3` 각 10~14초.
+> 분할 파일은 **합계가 병합본 길이와 일치하는지**로 누락을 확인한다(MP3 프레임 헤더 기준).
 >
 > ⚠️ **사건 파일 번호 중복**: Stage 3의 14번째 사건이 Stage 1의 2번째 사건과 같은 `사건 파일 #014`를 쓴다.
 > 데이터 id는 `case-014`(Stage 1) / `case-s3-014`(Stage 3)로 분리했지만 **화면에는 둘 다 "사건 파일 #014"로 표시**된다.

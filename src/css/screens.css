@@ -61,6 +61,17 @@
 
 /* ─────────────── SCR-002 Opening Video ─────────────── */
 .screen--opening { position: relative; background: #000; }
+/* 상단 진행 가이드 — 하단 컨트롤은 영상 위에 겹쳐 있어 Edge 에서 플레이어 UI에 묻힌다는 보고가 있었다
+   (2026-08-10). 그래서 다음 행동 안내는 흐름 안(영상 위쪽)에 두어 절대 가려지지 않게 한다. */
+.opening__topbar {
+  display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap;
+  padding: var(--s-3) var(--s-5);
+  background: var(--bg-2); border-bottom: 1px solid var(--border);
+}
+.opening__guide {
+  margin: 0; display: inline-flex; align-items: center; gap: var(--s-2);
+  color: var(--warning); font-size: var(--text-sm); line-height: 1.4;
+}
 .opening__stage { flex: 1; display: grid; place-items: center; padding: var(--s-4); }
 .opening__yt { width: min(100%, 1280px); aspect-ratio: 16 / 9; max-height: 100%; border-radius: var(--r-md); overflow: hidden; box-shadow: var(--shadow-3); }
 .opening__video { width: 100%; height: 100%; border: 0; display: block; background: #000; object-fit: contain; }
@@ -96,7 +107,9 @@
 }
 /* 팀 선택 — 시작 버튼을 제목 옆(헤더 우측)으로 */
 .form-screen__head--row { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: var(--s-4); }
-.form-screen__head--row .form-screen__headings { display: flex; flex-direction: column; gap: var(--s-2); min-width: 0; }
+.form-screen__head--row .form-screen__headings { display: flex; flex-direction: column; gap: var(--s-2); min-width: 0; align-items: flex-start; }
+/* 제목 위 [첫 화면으로 돌아가기] — 세로 스택 안에서 폭이 늘어나지 않게 붙잡는다 */
+.form-screen__headings > .btn { flex: none; align-self: flex-start; }
 .form-screen__head--row > .btn { flex: none; margin-top: 2px; }
 @media (max-width: 560px) {
   .form-screen__head--row { flex-direction: column; }
@@ -137,6 +150,10 @@
 .team-roster__chips { display: flex; flex-wrap: wrap; gap: var(--s-2); flex: 1; min-width: 0; }
 .team-roster__edit { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: var(--r-md); border: 1px solid var(--border); background: transparent; color: var(--text-3); font-size: var(--text-xs); }
 .team-roster__edit:hover { color: var(--text-1); border-color: var(--border-strong); }
+.team-roster__actions { display: flex; flex-wrap: wrap; gap: var(--s-2); flex: none; }
+/* 팀 선택 취소 — 되돌릴 수 없는 조작이라 [수정]과 색으로 구분한다(눌러야 확인 모달이 뜬다) */
+.team-roster__edit--danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 34%, transparent); }
+.team-roster__edit--danger:hover { color: var(--danger); border-color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
 .email-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 4px 10px; border-radius: var(--r-full); background: var(--bg-2); border: 1px solid var(--border); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-2); }
 .email-chip svg { color: var(--success); flex: none; }
 .email-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

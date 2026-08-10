@@ -170,6 +170,14 @@ export function remainingSeconds () {
   return Math.max(0, Math.round((state.endsAt - serverNow()) / 1000))
 }
 
+// 타임오버 — status 는 아직 'started' 지만 제한 시간이 지난 상태.
+// 서버는 이 시점부터 제출을 거부한다(0001_init.sql submit_answer: now() >= ends_at → 'game_ended'),
+// 반면 games.status 는 관리자가 [게임 종료]를 누를 때까지 바뀌지 않는다. 그 사이 참가자가 사건 화면에
+// 남아 있으면 안 되므로(운영 요청 2026-08-10) 화면 쪽에서 이 판정을 종료와 동일하게 다룬다.
+export function isTimeUp () {
+  return state.status === 'started' && !!state.endsAt && remainingSeconds() <= 0
+}
+
 // ── 관리자 액션 (서버에서 is_admin() 검증 · 실패 시 'forbidden') ──
 export async function startGame (durationMinutes = null) {
   const data = await rpc('admin_start_game', { p_duration_minutes: durationMinutes })

@@ -5,7 +5,8 @@ import { FLOW, resolveStep } from './constants/flow.js'
 import { createAudioManager } from './lib/audio.js'
 import { clearCopyBindings, t } from './lib/copy.js'
 import { getDeviceId, ownsTeam, releaseTeam, subscribe as subscribeEntries } from './lib/entries.js'
-import { isStarted, isEnded, subscribe as subscribeGame } from './lib/game.js'
+import { isStarted, isEnded, isTimeUp, subscribe as subscribeGame } from './lib/game.js'
+import { clearParticipantState } from './lib/local-state.js'
 import { getFinale, hydrateProgress, isHydrated, refreshRanking } from './lib/progress.js'
 import { allStagesCleared } from './lib/stage-progress.js'
 import { el } from './utils/dom.js'
@@ -140,29 +141,49 @@ export function createFlow ({ root }) {
     if (!assertClaim()) navigate(FLOW.TEAM, { skipGuard: true })
   })
 
-  // 관리자가 게임을 종료하면(status='ended') 진행 중인 참가자에게 안내 팝업을 띄우고
-  // 마지막 화면(종료 안내)으로 이동시킨다(운영 요청 2026-08-07). 종료 후 새로고침 복구는
-  // resolveStep의 gameEnded 판정이 맡는다(guardFacts). 입장 전 화면·이미 종료 안내면 팝업을 띄우지 않는다.
+  // 게임이 끝나면(관리자 종료 또는 제한 시간 경과) 진행 중인 참가자에게 안내 팝업 하나를 띄우고
+  // 마지막 화면(종료 안내)으로 이동시킨다(운영 요청 2026-08-07 · 타임오버 2026-08-10).
+  // 종료 후 새로고침 복구는 resolveStep의 gameEnded 판정이 맡는다(guardFacts).
+  // 입장 전 화면·이미 종료 안내면 팝업을 띄우지 않는다.
   let endedModal = null
   const PLAYING = [FLOW.WAITING, FLOW.CASE, FLOW.APPOINT, FLOW.RAID]
-  subscribeGame((status) => {
-    if (status !== 'ended' || endedModal || !PLAYING.includes(session.step)) return
+  function showEndNotice (keyPrefix) {
+    if (endedModal || !PLAYING.includes(session.step)) return
     endedModal = createModal({
-      title: t('gameEnded.title'),
+      title: t(`${keyPrefix}.title`),
       size: 'sm',
-      content: [el('p', { class: 'auth-hint', text: t('gameEnded.msg') })],
-      actions: [{ label: t('gameEnded.confirm'), variant: 'primary', onClick: () => navigate(FLOW.ENDING, { skipGuard: true }) }],
-      onClose: () => { endedModal = null }
+      content: [el('p', { class: 'auth-hint', text: t(`${keyPrefix}.msg`) })],
+      actions: [{ label: t(`${keyPrefix}.confirm`), variant: 'primary' }],
+      // 확인·ESC·배경 클릭 중 무엇으로 닫혀도 마지막 화면으로 보낸다 — 닫고 사건 화면에 남으면
+      // 제출은 서버가 거부하는데 화면만 살아 있어 참가자가 이유를 알 수 없다.
+      onClose: () => { endedModal = null; navigate(FLOW.ENDING, { skipGuard: true }) }
     })
     endedModal.open()
+  }
+
+  subscribeGame((status) => {
+    if (status === 'ended') { showEndNotice('gameEnded'); return }
+    // 관리자가 대기 상태로 되돌리면(초기화) 이 기기의 로컬 흔적도 함께 지운다 — 같은 PC로 들어오는
+    // 다음 팀이 이전 팀의 세션·언어로 시작하지 않게 한다(운영 요청 2026-08-10).
+    // 모듈 캐시(로케일·진행·팀 목록)까지 확실히 비우려면 다시 불러오는 편이 안전하다.
+    if (status === 'scheduled' && (session.teamId || session.step !== FLOW.ENTRY)) {
+      const removed = clearParticipantState()
+      console.info('[flow] 관리자 초기화 — 로컬 상태를 지우고 첫 화면으로 되돌린다', removed)
+      location.reload()
+    }
   })
+
+  // 타임오버는 status 변화로 오지 않는다 — 서버는 ends_at 이 지나도 관리자가 [게임 종료]를 누를 때까지
+  // status='started' 를 유지한다(제출만 거부). 그래서 초당 한 번 직접 확인한다.
+  setInterval(() => { if (isTimeUp()) showEndNotice('timeUp') }, 1000)
 
   // 라우터 가드에 넘길 서버(현재는 MOCK) 상태 — constants/flow.js가 상태 모듈을 import하지 않도록
   // 여기서 읽어 넘긴다. 진행 판정은 lib/stage-progress.js·lib/progress.js가 단일 출처다.
   function guardFacts () {
     return {
       gameStarted: isStarted(),
-      gameEnded: isEnded(),
+      // 타임오버도 종료로 본다 — 새로고침해도 사건 화면으로 돌아가지 않아야 한다.
+      gameEnded: isEnded() || isTimeUp(),
       stagesCleared: allStagesCleared(session.teamId),
       finale: getFinale(session.teamId)
     }

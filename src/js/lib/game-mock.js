@@ -51,6 +51,11 @@ export function remainingSeconds () {
   return Math.max(0, Math.round((startedAt + DURATION_MS - Date.now()) / 1000))
 }
 
+// 타임오버 — status 는 아직 'started' 지만 제한 시간이 지난 상태(서버 구현과 같은 계약).
+export function isTimeUp () {
+  return getStatus() === STARTED && !!getStartedAt() && remainingSeconds() <= 0
+}
+
 // 미션 타이머 기준 시각 보장 — 문제 입장 시점에 아직 시작 안 됐으면 지금부터 흐르게 한다.
 // (관리자 Start로 이미 startedAt이 있으면 그 값을 유지 = 게임 시작 = 문제 입장 시점)
 export function ensureStarted () {

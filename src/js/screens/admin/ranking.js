@@ -12,6 +12,7 @@ import { getRanking, STAGE_POINTS } from '../../lib/progress.js'
 import { builtTotal, STAGES } from '../../lib/stage-progress.js'
 import { supabase, isServerMode } from '../../lib/supabase.js'
 import { createButton } from '../../../components/primitives/button.js'
+import { createAdminBackBar } from '../../../components/admin/back-bar.js'
 
 const MEDALS = { 1: 'is-gold', 2: 'is-silver', 3: 'is-bronze' }
 
@@ -82,12 +83,15 @@ export function createRankingView (props = {}) {
   ])
 
   const closeBtn = createButton({
-    label: '관리자 콘솔로', variant: 'secondary', size: 'md', icon: 'refresh',
+    label: '관리자 콘솔로', variant: 'secondary', size: 'md', icon: 'arrowLeft',
     onClick: () => { if (onClose) onClose() }
   })
+  // 표가 길어 하단 버튼만으로는 콘솔로 돌아가기 어렵다 — 상단에 스크롤을 따라오는 버튼을 둔다.
+  const backBar = createAdminBackBar({ onBack: () => { if (onClose) onClose() } })
 
   const node = el('div', { class: 'screen screen--finale screen--ranking' }, [
     el('div', { class: 'finale__inner finale__inner--wide' }, [
+      backBar.el,
       el('div', { class: 'ranking anim-fade' }, [
         el('span', { class: 'finale__eyebrow mono caps', text: t('rank.eyebrow') }),
         el('h1', { class: 'finale__title', text: t('rank.title') }),
@@ -117,6 +121,6 @@ export function createRankingView (props = {}) {
 
   return {
     el: node,
-    destroy () { closeBtn.destroy(); node.remove() }
+    destroy () { closeBtn.destroy(); backBar.destroy(); node.remove() }
   }
 }

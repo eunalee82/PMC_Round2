@@ -278,16 +278,21 @@
 @keyframes badgeIn { 0% { opacity: 0; transform: scale(0.7) rotate(-14deg); } 60% { opacity: 1; } 100% { opacity: 1; transform: none; } }
 @keyframes badgeSweep { 0% { transform: translateX(-60%); } 55%, 100% { transform: translateX(60%); } }
 
-/* ── 국장 최종 메시지 블록 (종료 안내 SCR-023에서 사용) ── */
-.ending__boss {
-  display: flex; align-items: center; gap: var(--s-4); text-align: left; width: 100%;
-  padding: var(--s-5); border-radius: var(--r-lg);
-  background: var(--glass-card); border: 1px solid color-mix(in srgb, var(--gold) 24%, transparent);
+/* 국장 최종 메시지 블록(.ending__boss)은 2026-08-10 운영 결정으로 종료 안내에서 제거됐다.
+   임명 화면(SCR-015)의 국장 블록은 .appoint__boss 로 따로 살아 있다. */
+
+/* ── 관리자 오버레이 상단 되돌아가기 바 (팀 현황 · 최종 랭킹) ──
+   표가 33행이라 하단 버튼만 있으면 끝까지 스크롤해야 콘솔로 돌아갈 수 있었다(운영 요청 2026-08-10).
+   스크롤 컨테이너는 .screen--finale(overflow-y:auto) 이므로 sticky 로 두면 표를 따라 붙어 온다.
+   아래로 흐르는 그라디언트 배경 = 표 행이 버튼 밑으로 지나갈 때 글자가 겹쳐 보이지 않게.
+   sticky 오프셋은 **스크롤 컨테이너의 padding-top 과 같은 음수**로 둔다 — sticky 는 padding box 기준이라
+   top:0 이면 화면 위쪽에 padding 만큼(2.5rem) 빈틈이 생기고 표 행이 그 틈으로 지나간다. */
+.admin-backbar {
+  position: sticky; top: calc(-1 * var(--s-10)); z-index: var(--z-header);
+  align-self: stretch; display: flex; justify-content: flex-start;
+  padding: var(--s-3) 0;
+  background: linear-gradient(180deg, var(--bg-0) 58%, transparent);
 }
-.ending__boss-img { width: 96px; height: 96px; flex: none; object-fit: cover; object-position: top center; border-radius: var(--r-md); border: 1px solid var(--border-strong); }
-.ending__boss-msg { display: flex; flex-direction: column; gap: var(--s-2); min-width: 0; }
-.ending__boss-label { color: var(--gold); font-size: var(--text-xs); letter-spacing: var(--tracking-caps); }
-.ending__boss-text { margin: 0; color: var(--text-1); line-height: var(--leading); white-space: pre-line; }
 
 /* ── SCR-022 최종 랭킹 (관리자 콘솔 발표 화면 — screens/admin/ranking.js) ── */
 .ranking { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--s-4); }
@@ -334,7 +339,8 @@
 .gameend__tag { color: var(--text-3); font-size: var(--text-xs); letter-spacing: 0.26em; }
 .gameend__title { margin: 0; font-size: var(--text-2xl); font-weight: var(--fw-black); }
 .gameend__team { color: var(--gold); font-weight: var(--fw-bold); }
-.gameend__msg { margin: 0; color: var(--text-2); line-height: var(--leading); white-space: pre-line; max-width: 460px; }
+/* 국장 메시지를 뺀 뒤 이 문단이 마지막 화면의 본문이다 — 3문단이 들어가므로 폭을 넓힌다(2026-08-10) */
+.gameend__msg { margin: 0; color: var(--text-2); line-height: var(--leading); white-space: pre-line; max-width: 620px; }
 .gameend__stats { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-3); margin: var(--s-3) 0; }
 .gameend__stat {
   display: flex; flex-direction: column; gap: 4px; min-width: 118px;
@@ -343,14 +349,16 @@
 }
 .gameend__stat-val { font-size: var(--text-xl); font-weight: var(--fw-black); color: var(--text-1); }
 .gameend__stat-key { color: var(--text-3); font-size: var(--text-xs); letter-spacing: var(--tracking-caps); }
+.gameend__actions { display: flex; justify-content: center; margin-top: var(--s-2); }
 
 /* ── 반응형 ── */
 @media (max-width: 900px) {
-  .appoint__boss, .ending__boss { flex-direction: column; align-items: center; text-align: center; }
+  .appoint__boss { flex-direction: column; align-items: center; text-align: center; }
   .appoint__items, .ready__items { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
   .screen--finale { padding: var(--s-6) var(--s-4) var(--s-12); }
+  .admin-backbar { top: calc(-1 * var(--s-6)); } /* 위 padding-top 변경에 맞춘다 */
   .finale__title { font-size: var(--text-2xl); }
   .appoint__stage { grid-template-columns: 64px 1fr auto 20px; }
   .raid__stats { flex-wrap: wrap; justify-content: flex-end; }

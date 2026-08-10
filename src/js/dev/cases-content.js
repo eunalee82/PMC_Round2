@@ -14,9 +14,10 @@ export const CASES = [
     id: 'case-001',
     stage: 1, // Stage 1 · Mindset
     caseNo: 1, // Stage 내 사건 순번
-    // 사건 파일 번호는 단서 이미지에 인쇄된 값(CASE FILE #007)에 맞춘다 — 화면과 이미지가 어긋나면
+    // 사건 파일 번호는 단서 이미지에 인쇄된 값(CASE FILE #001)에 맞춘다 — 화면과 이미지가 어긋나면
     // 참가자가 다른 사건으로 오인한다(운영 결정 2026-08-05). caseNo(진행 순번)와는 별개 값이다.
-    fileNo: '#007',
+    // 2026-08-10 이미지 교체로 인쇄값이 #007 → #001 로 바뀌어 함께 내렸다(case-007 과의 번호 중복도 해소).
+    fileNo: '#001',
     title: '양산 D-30, 누가 미래를 놓쳤는가?',
     brief: [
       'PM보호국은 양산 30일 전 진행된 프로젝트 회의실을 조사했다.',
@@ -34,17 +35,17 @@ export const CASES = [
       ]
     },
     // 보기(단서) — 순서 = 화면 번호 1~4 = 이미지의 CLUE 1~4.
-    // 단서 이미지는 영문판 하나로 운영하므로(운영 결정 2026-08-05), 국문 화면에서는 desc의 한글 단서명이
-    // 이미지의 영문 소제목(Project Schedule Forecast Dashboard 등)을 대신 짚어주는 역할을 한다.
+    // desc(단서명)를 두지 않는다 — 이미지 명패에 단서명이 인쇄되어 있어 화면에 다시 적으면 중복이고,
+    // 참가자가 이미지를 읽지 않고 라벨만 보고 답을 고르게 된다. see CLAUDE.md §16.2 (확정 2026-08-10)
     choices: [
-      { label: '단서 1', desc: '프로젝트 일정 예측 대시보드' },
-      { label: '단서 2', desc: '변경 영향 분석서' },
-      { label: '단서 3', desc: '회의 안건' },
-      { label: '단서 4', desc: '프로젝트 운영 현황' }
+      { label: '단서 1' },
+      { label: '단서 2' },
+      { label: '단서 3' },
+      { label: '단서 4' }
     ],
     en: {
       // 제목은 **단서 이미지에 인쇄된 영문**을 그대로 쓴다 — 이미지에 'PRODUCTION D-30, WHO MISSED THE
-      // FUTURE?' 가 박혀 있어 화면 제목이 다르면 참가자가 다른 사건으로 오인한다(fileNo #007과 같은 이유).
+      // FUTURE?' 가 박혀 있어 화면 제목이 다르면 참가자가 다른 사건으로 오인한다(fileNo #001과 같은 이유).
       // 그래서 국문 '양산'의 직역인 'Mass Production' 이 아니라 이미지의 'Production' 을 따른다.
       title: 'Production D-30: Who Missed the Future?',
       // 문단은 국문과 1:1로 맞춘다 — 이전 en 판은 6문단을 4문단으로 압축해 '그런데…' 연출 호흡이 사라졌다.
@@ -62,10 +63,10 @@ export const CASES = [
         images: [{ src: ASSETS.questions.q1, alt: 'Four clues left at the scene (CLUE 1-4)' }]
       },
       choices: [
-        { label: 'Clue 1', desc: 'Project Schedule Forecast Dashboard' },
-        { label: 'Clue 2', desc: 'Change Impact Analysis' },
-        { label: 'Clue 3', desc: 'Meeting Agenda' },
-        { label: 'Clue 4', desc: 'Project Operations Status' }
+        { label: 'Clue 1' },
+        { label: 'Clue 2' },
+        { label: 'Clue 3' },
+        { label: 'Clue 4' }
       ]
     }
   },
@@ -340,7 +341,7 @@ export const CASES = [
       '"전체 진행률은 이미 85%입니다. 일정 버퍼도 아직 5일 남아 있습니다. 현재 일정 상태는 GREEN이며 특별한 문제는 없습니다."',
       '그러나 PMS는 경고를 철회하지 않았다. PM보호국은 PMS가 경고를 발생시킨 이유를 조사하기 위해 Week 4 시점의 Schedule Health Board를 확보하였다.'
     ].join('\n'),
-    prompt: '다음 중 PMBOK® Guide 8판의 Schedule Performance Domain 관점에서 가장 부적절한 해석은 무엇인가?',
+    prompt: 'PM 보호국은 PMS가 생성한 경고의 타당성을 검토하고 있다.\n 다음 중 PMBOK® Guide 8판의 Schedule Performance Domain 관점에서 가장 부적절한 해석은 무엇인가?',
     evidence: {
       caption: 'EVIDENCE · Week 4 Schedule Health Board',
       images: [
@@ -621,15 +622,21 @@ export const CASES = [
       '경영진은 차세대 스마트 디바이스 개발 프로젝트를 전략 프로젝트로 지정하며 다음과 같이 지시했다.',
       '"AI를 적극 활용하여 프로젝트의 생산성과 품질을 높이고, 고객에게 더 큰 가치를 제공하라."',
       '이에 따라 홍길동 PM은 프로젝트 초기부터 AI를 활용한 프로젝트 혁신을 추진하였다. 회의록 작성, 일정 계획, 요구사항 분석, 리스크 검토 등 프로젝트 전반에 AI 활용이 빠르게 확산되었다.',
+      '위 프로젝트 참가자들의 증언은 모두 AI를 활용하여 프로젝트의 생산성과 품질을 높이려는 목적을 담고 있다.',
       '그러나 프로젝트가 진행되던 중 일부 팀원들은 한 가지 의문을 갖게 되었다.',
       '"PM께서 AI는 적극 활용하자고 하시는데… 정말 PMBOK 8판에서 말하는 AI 활용 원칙을 제대로 이해하고 계신 걸까?"',
       'PM보호국은 프로젝트 관계자들을 조사해 다음 증언을 확보하였다. 네 증언은 모두 AI를 활용해 프로젝트의 생산성과 품질을 높이려는 목적을 담고 있다. 그러나 한 명의 증언에는 PMBOK® Guide 8판 Appendix X3.1.1(Strategies for AI Adoption)의 AI 채택 전략을 잘못 이해한 PM의 발언이 포함되어 있다.'
     ].join('\n'),
     prompt: '다음 증언 중, PM의 AI 채택 전략상 가장 중요한 고려사항이 누락되었음을 보여주는 증언은 누구의 것인가?',
     evidence: {
-      caption: 'EVIDENCE · 프로젝트 참가자 증언 녹취',
+      caption: 'EVIDENCE · 참가자 증언 녹취 4',
+      // 증언별 분할(2026-08-10) — 한 파일이던 녹취를 화자별로 나눴다. 특정 증언만 다시 듣지 못하면
+      // 2분짜리 음성을 처음부터 다시 들어야 해서 제한 시간을 크게 먹었다.
       audios: [
-        { src: ASSETS.questionAudio.q11, label: '참가자 증언 녹취' }
+        { src: ASSETS.questionAudio.q11_1, label: '증언 1 · 개발자' },
+        { src: ASSETS.questionAudio.q11_2, label: '증언 2 · 일정 담당자' },
+        { src: ASSETS.questionAudio.q11_3, label: '증언 3 · 상품기획 담당자' },
+        { src: ASSETS.questionAudio.q11_4, label: '증언 4 · 품질 담당자' }
       ]
     },
     // 보기 = 증언자 4명 (순서 = 화면 번호 1~4, 녹취 등장 순서와 일치)
@@ -653,10 +660,13 @@ export const CASES = [
       // 국문 '가장 중요한 고려사항'에 없는 강조(single)를 넣지 않는다.
       prompt: 'Among the testimonies, whose account shows that the most important consideration in the PM\'s AI adoption strategy is missing?',
       evidence: {
-        caption: 'EVIDENCE · recorded testimony of project participants',
-        // 영문 증언 도착(2026-08-06) → 국문 음성 대신 _en 을 쓴다.
+        caption: 'EVIDENCE · 4 participant testimony recordings',
+        // 영문 증언 도착(2026-08-06) → 국문 음성 대신 _en 을 쓴다. 화자별 분할은 2026-08-10.
         audios: [
-          { src: ASSETS.questionAudio.q11_en, label: 'Participant testimony recording' }
+          { src: ASSETS.questionAudio.q11_1_en, label: 'Testimony 1 · Developer' },
+          { src: ASSETS.questionAudio.q11_2_en, label: 'Testimony 2 · Schedule lead' },
+          { src: ASSETS.questionAudio.q11_3_en, label: 'Testimony 3 · Product planner' },
+          { src: ASSETS.questionAudio.q11_4_en, label: 'Testimony 4 · Quality lead' }
         ]
       },
       choices: [
@@ -713,15 +723,15 @@ export const CASES = [
       prompt: 'Among the secured clues, find the decision that failed to adequately examine the "long-term impact and feasibility of adopting an AI-based capability" emphasized by PMBOK® Guide 8th Edition.',
       // 영문판 단서 이미지 도착(2026-08-06) → 국문 이미지 대신 _en 을 쓴다.
       evidence: {
-        caption: 'EVIDENCE · 4 secured clues',
+        caption: 'EVIDENCE · 4 secured evidences',
         images: [
-          { src: ASSETS.questions.q12_1_en, alt: 'Clue A', label: 'Clue A' },
-          { src: ASSETS.questions.q12_2_en, alt: 'Clue B', label: 'Clue B' },
-          { src: ASSETS.questions.q12_3_en, alt: 'Clue C', label: 'Clue C' },
-          { src: ASSETS.questions.q12_4_en, alt: 'Clue D', label: 'Clue D' }
+          { src: ASSETS.questions.q12_1_en, alt: 'Evidence A', label: 'Evidence A' },
+          { src: ASSETS.questions.q12_2_en, alt: 'Evidence B', label: 'Evidence B' },
+          { src: ASSETS.questions.q12_3_en, alt: 'Evidence C', label: 'Evidence C' },
+          { src: ASSETS.questions.q12_4_en, alt: 'Evidence D', label: 'Evidence D' }
         ]
       },
-      choices: ['Clue A', 'Clue B', 'Clue C', 'Clue D']
+      choices: ['Evidence A', 'Evidence B', 'Evidence C', 'Evidence D']
     }
   },
   {

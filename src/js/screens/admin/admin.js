@@ -165,7 +165,9 @@ export function mountAdmin (root) {
     const resetBtn = createButton({ label: '대기 상태로 되돌리기 (리허설)', variant: 'ghost', size: 'md', icon: 'refresh', block: true })
     resetBtn.update({
       onClick: guard(resetBtn, async () => {
-        const wipe = window.confirm('진행 데이터(제출·점수·입장)도 함께 초기화하시겠습니까?\n\n[확인] 전부 초기화 · [취소] 게임 상태만 대기로 되돌리기')
+        // 참가자 기기의 로컬 흔적(세션·언어·진행 캐시)은 상태가 'scheduled' 로 바뀌는 것을 보고
+        // 각 기기가 스스로 지운다 — flow.js 의 subscribeGame 참조(운영 요청 2026-08-10).
+        const wipe = window.confirm('진행 데이터(제출·점수·입장)도 함께 초기화하시겠습니까?\n\n[확인] 전부 초기화 · [취소] 게임 상태만 대기로 되돌리기\n\n※ 어느 쪽이든 접속 중인 참가자 기기는 저장된 세션·언어 선택을 지우고 첫 화면으로 돌아갑니다.')
         await resetGame(wipe)
         if (!isServerMode()) resetAllProgress()
       })

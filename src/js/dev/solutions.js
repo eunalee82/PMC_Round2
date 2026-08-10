@@ -77,7 +77,7 @@ export const SOLUTIONS = {
     answerIndex: 2, // 정답: 3번
     analysis: [
       '정답은 ③입니다.',
-      '이 사건의 핵심 문제는 기술적 판단의 정확성보다, 거버넌스(Governance) 관점에서 적절한 의사결정 체계를 적용하지 못한 것입니다. 플랫폼 변경은 개발팀뿐 아니라 운영 조직, 유지보수 체계, 협력사까지 영향을 미치는 중요한 변경이었음에도 PM은 이를 프로젝트 내부 회의체에서만 결정하였습니다.',
+      '이 사건의 핵심 문제는 기술적 판단의 정확성보다 거버넌스(Governance) 관점에서 적절한 의사결정 체계를 적용하지 못한 것입니다. 플랫폼 변경은 개발팀뿐 아니라 운영 조직, 유지보수 체계, 협력사까지 영향을 미치는 중요한 변경이었음에도 PM은 이를 프로젝트 내부 회의체에서만 결정하였습니다. 주요 이해관계자를 포함한 검토와 승인 체계를 거쳤어야 했으나, 의사결정 범위를 잘못 설정한 것이 프로젝트 지연의 근본 원인이 되었습니다.',
       '사건 파일의 부제 「그 결정은 왜 회의실을 벗어나지 못했는가」가 암시하듯, PM은 타 조직에 큰 영향을 미치는 중대한 사안을 프로젝트 내부의 기술적 관점으로만 한정하여 결정하는 오류를 범했습니다. 출시 6주 전의 핵심 플랫폼 변경은 단순한 개발 이슈를 넘어 운영 프로세스·유지보수 체계·협력사 연계까지 파급력을 가지므로, 반드시 운영 조직을 포함한 주요 이해관계자와 사전에 검토해야 하는 사안입니다.',
       '그럼에도 PM은 기술 검토 결과에만 의존해 운영 측의 사전 검토 의견을 묵살하고 내부 회의체에서 단독으로 추진을 결정했습니다. 이는 중대한 변경에 대한 의사결정 거버넌스를 적용하지 못한 판단 실수입니다.',
       '[보기별 판단]\n① 오답입니다. 변경 이후의 모니터링도 중요하지만, 문제의 핵심은 변경을 결정하기 **전에** 적절한 의사결정 체계를 거치지 않은 것입니다.\n② 오답입니다. 영향 분석 부족도 일부 원인이지만, 더 본질적인 문제는 누가 의사결정에 참여해야 하는지에 대한 거버넌스 실패입니다.\n③ 정답입니다. 프로젝트 내부 의사결정과 주요 이해관계자 의사결정을 구분하지 못해, 거버넌스 체계를 우회한 채 변경을 승인하였습니다.\n④ 오답입니다. 작업량 산정의 보수성은 결과적으로 드러난 이슈이며, 근본 원인은 의사결정 구조와 이해관계자 참여 부족입니다.'
@@ -148,7 +148,7 @@ export const SOLUTIONS = {
       '다섯 개의 메모를 보면 모든 조직이 프로젝트가 성공적으로 완료되었다는 사실에는 동의하고 있습니다. 그러나 성공을 판단하는 기준이 서로 다릅니다.\n· PM은 계획 대비 성과(KPI)와 Baseline 유지를 성공으로 인식합니다.\n· 개발팀은 계획된 요구사항과 일정 달성을 성공으로 인식합니다.\n· 고객은 계약된 기능의 제공 여부를 중요하게 봅니다.\n· 운영조직은 실제 운영 환경에서의 활용과 안정화를 중요하게 봅니다.\n· 사업부는 투자, 시장 상황, 향후 사업 확대 가능성을 중요하게 봅니다.',
       '즉, 모든 이해관계자가 프로젝트의 성공을 인정하고 있음에도 각 조직이 프로젝트를 평가하는 기준과 기대하는 가치가 서로 달랐습니다. 그 결과 종료 이후 Portfolio Review에서 후속 투자·서비스 확장·기능 확대에 대한 공통된 판단을 내리지 못하게 되었습니다.',
       'PMBOK® Guide 8판의 Stakeholder Performance Domain 관점에서는 프로젝트 수행 중 이해관계자의 기대·관점·성공 기준을 지속적으로 파악하고 정렬(Alignment)하는 것이 중요합니다.',
-      '[보기별 판단]\n① 오답입니다. 사업 환경 변화나 Scope 재검토의 필요성을 직접적으로 보여주는 증거는 없습니다. 고객 역시 계약된 기능이 모두 제공되었다고 기록하고 있습니다.\n② 정답입니다. 메모 전반에서 프로젝트 성공에 대한 관점과 판단 기준이 조직마다 다르게 나타나며, 수행 과정에서 이 관점 차이를 관리하고 주요 의사결정에 반영할 필요가 있었음을 시사합니다.\n③ 오답입니다. 실제 사용량이나 사업효과 언급이 일부 있으나, 핵심 단서는 Portfolio Review 참석자들이 결과를 서로 다르게 해석했다는 점입니다. 이는 성과지표 부족보다 이해관계자 정렬 부족과 더 직접 연결됩니다.\n④ 오답입니다. 의사결정 기준 재검토의 필요성을 배제할 수는 없으나, 증거물에서 드러나는 핵심 문제는 조직 간 성공 기준과 기대의 차이이지 Governance 체계 자체의 문제는 아닙니다.'
+      '[보기별 판단]\n① 오답입니다. 사업 환경 변화나 Scope 재검토의 필요성을 직접적으로 보여주는 증거는 없습니다. 고객 역시 계약된 기능이 모두 제공되었다고 기록하고 있습니다.\n② 정답입니다. 메모 전반에서 프로젝트 성공에 대한 관점과 판단 기준이 조직마다 다르게 나타나며, 수행 과정에서 이 관점 차이를 관리하고 주요 의사결정에 반영할 필요가 있었음을 시사합니다.\n③ 오답입니다. 실제 사용량이나 사업효과 언급이 일부 있으나, 핵심 단서는 Portfolio Review 참석자들이 결과를 서로 다르게 해석했다는 점입니다. 이는 성과지표 부족보다 이해관계자 정렬 부족과 더 직접 연결됩니다.\n④ 오답입니다. 사업 전략과 의사결정 기준 재검토의 필요성을 배제할 수는 없으나, 증거물에서 드러나는 핵심 문제는 조직 간 성공 기준과 기대의 차이이지 Governance 체계 자체의 문제는 아닙니다.'
     ].join('\n\n'),
     en: {
       analysis: [
@@ -268,14 +268,12 @@ export const SOLUTIONS = {
     analysis: [
       '정답은 ② 다기준 의사결정 분석입니다.',
       '복구된 로그에는 전략 적합성 · 예상 사업 가치 · 실행 가능성 · 위험 수준 등 여러 기준을 함께 평가해 종합 점수를 산정하고 우선순위를 결정하는 과정이 나타납니다. 이는 PMBOK® Guide 8판의 다기준 의사결정 분석(Multi-Criteria Decision Analysis)에 해당합니다.',
-      '자원이 부족해 4개 프로젝트를 동시에 할 수 없고, 기대 효과·리스크·전략적 중요도가 제각각인 상황 — 즉 서로 다른 축을 하나의 우선순위로 모아야 하는 문제입니다.',
       '[보기별 해설]\n① 데이터 기반 의사결정 — 데이터 활용은 포함되지만, 여러 평가 기준을 종합해 우선순위를 결정하는 것이 이 사건의 핵심입니다.\n② 다기준 의사결정 분석(정답) — 가치·전략 적합성·위험·실행 가능성 등 다양한 기준을 함께 평가해 최적의 우선순위를 도출합니다.\n③ 리스크 식별 및 평가 — 위험 수준은 평가 요소 중 하나일 뿐이고, 문제의 목적은 프로젝트 우선순위 결정입니다.\n④ 조기 경고 신호 — 프로젝트 이상 징후를 조기에 탐지하는 활용 사례이며 우선순위 선정과는 관련이 없습니다.'
     ].join('\n\n'),
     en: {
       analysis: [
         'The answer is ② Multi-criteria decision analysis.',
         'The recovered logs show several criteria being evaluated together — strategic fit, expected business value, feasibility, risk level — to compute a composite score and set priorities. That is Multi-Criteria Decision Analysis in PMBOK® Guide 8th Edition.',
-        'Resources are short, the four projects cannot run at once, and each differs in expected benefit, risk and strategic weight — the problem is exactly one of folding different axes into a single priority order.',
         '[Option-by-option]\n① Data-driven decision making — Data is involved, but the core of this case is combining multiple evaluation criteria to set priorities.\n② Multi-criteria decision analysis (answer) — Evaluates value, strategic fit, risk and feasibility together to derive the optimal priority order.\n③ Risk identification and assessment — Risk level is only one of the criteria; the goal here is prioritizing projects.\n④ Early warning signals — A use case for early detection of project anomalies, unrelated to prioritization.'
       ].join('\n\n')
     }

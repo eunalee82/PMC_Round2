@@ -19,9 +19,15 @@ const KO = {
   'entry.alert': '긴급 사건 접수 — 감독관 자격 시험 15문항',
   'entry.enter': 'PM보호국 입장',
   'entry.foot': 'PMB-OS · CLASSIFIED',
+  // 첫 화면(SCR-001)이 언어 선택 지점이라, 팀을 점유하기 전까지는 되돌아올 길을 남겨 둔다
+  // (운영 요청 2026-08-10 — 언어를 잘못 고른 팀이 처음으로 못 돌아가던 문제).
+  'common.backToStart': '첫 화면으로 돌아가기',
 
   // SCR-002 Opening
   'opening.skip': '건너뛰기',
+  // Edge에서 영상이 재생되는 동안 아래쪽 진행 버튼을 못 찾는 팀이 있어 상단에 길을 적어 둔다
+  // (운영 요청 2026-08-10).
+  'opening.guide': '영상 시청이 끝나면 화면 아래쪽 [팀 선택으로] 버튼을 눌러 다음 단계로 이동하십시오.',
   'opening.briefingStamp': 'PMB 브리핑',
   'opening.briefing1': '현대의 프로젝트는 기술이 아니라 잘못된 판단으로 실패한다.',
   'opening.briefing2': '그 실패를 만드는 존재를 PM보호국은 "빌런"이라 부른다.',
@@ -46,6 +52,13 @@ const KO = {
   'team.register.warnSuspect': '이메일 형식을 확인하십시오. 이대로도 입장은 되지만 운영진 확인 대상으로 표시됩니다.',
   'team.registered': '등록된 수사관',
   'team.registeredEdit': '수정',
+  // 팀 오선택 되돌리기(운영 요청 2026-08-10) — 점유를 풀어 다른 팀을 고를 수 있게 한다.
+  'team.cancel': '팀 선택 취소',
+  'team.cancel.title': '팀 선택을 취소하시겠습니까?',
+  'team.cancel.msg': '이 팀의 입장이 해제되고 등록한 수사관 3명의 이메일도 지워집니다. 다른 팀을 다시 선택해 등록해야 합니다.',
+  'team.cancel.confirm': '선택 취소',
+  'team.cancel.keep': '그대로 두기',
+  'team.cancel.err': '입장 해제에 실패했습니다. 네트워크를 확인한 뒤 다시 시도하거나 운영진에게 알려 주십시오.',
 
   // SCR-003 · 이미 입장한 팀 (재입장)
   'team.claimed.title': '이미 입장한 팀입니다',
@@ -71,6 +84,11 @@ const KO = {
   'gameEnded.title': '게임이 종료되었습니다',
   'gameEnded.msg': '감독관이 게임을 종료했습니다. 마지막 화면으로 이동합니다.',
   'gameEnded.confirm': '마지막 화면으로',
+  // 제한 시간 종료(타임오버) — 관리자 종료와 같은 처리지만 원인이 달라 문구를 분리한다
+  // (운영 요청 2026-08-10).
+  'timeUp.title': '예선 2라운드가 종료되었습니다',
+  'timeUp.msg': '제한 시간이 모두 지났습니다. [확인]을 누르면 마지막 화면으로 이동합니다.',
+  'timeUp.confirm': '확인',
 
   // SCR-005 Waiting Room
   'waiting.eyebrow': '출동 대기실 · WAITING ROOM',
@@ -233,9 +251,8 @@ const KO = {
   // 참가자 흐름의 마지막 버튼 — 여기서 예선 2라운드를 마친다(최종 결과 발표는 감독관 몫).
   'badge.finish': '예선 2라운드 끝내기',
 
-  // 국장 최종 메시지 (docs/game-flow.md §14.2) — 종료 안내 화면에 표시
-  'ending.bossLabel': 'PM보호국 국장 최종 메시지',
-  'ending.bossMessage': '수고하셨습니다.\n\n여러분은 모든 사건을 해결하고\n프로젝트의 가치를 지켜냈습니다.\n\n오늘부터 여러분은\nPM보호국 정식 감독관입니다.',
+  // ※ 국장 최종 메시지(ending.bossLabel/bossMessage)는 2026-08-10 운영 결정으로 종료 안내 화면에서
+  //    제거했다 — 마지막 화면은 본선 안내와 감사 인사만 남긴다(연출보다 안내가 먼저 읽혀야 한다).
 
   // SCR-022 Final Ranking — 관리자 콘솔(?admin) 전용 발표 화면
   'rank.eyebrow': 'FINAL RANKING',
@@ -252,12 +269,15 @@ const KO = {
   'rank.empty': '아직 집계된 팀이 없습니다.',
 
   // SCR-023 종료 안내 — 순위는 감독관이 발표하므로 참가자 화면에는 표시하지 않는다.
+  // 본문은 2026-08-10 운영 확정 문구다(본선 진출은 예선 1라운드 점수와 합산 발표).
   'end.tag': 'ROUND 2 COMPLETE',
   'end.title': '예선 2라운드를 마쳤습니다',
-  'end.msg': '여러분은 프로젝트의 Value를 지켜냈습니다.\n\nPM보호국 정식 감독관 임명을 축하합니다.',
+  'end.msg': '예선 2라운드가 성공적으로 마무리되었습니다.\n\n본선 진출 결과는 예선 1라운드 점수와 함께 종합 평가하여 발표할 예정입니다.\n\n열정적으로 참여해 주신 모든 참가자 여러분께 진심으로 감사드립니다.',
   'end.rankLabel': '최종 계급',
   'end.scoreLabel': 'Investigation Score',
-  'end.wait': '최종 결과는 감독관의 발표를 기다려 주십시오.',
+  // 브라우저 종료 — 스크립트로 열지 않은 탭은 window.close()가 무시되므로 안내 문구를 함께 둔다.
+  'end.close': '브라우저 종료하기',
+  'end.closeHint': '창이 자동으로 닫히지 않으면 이 탭을 직접 닫아 주십시오. (Ctrl+W)',
 
   // 캡처 가드 (게임플레이 오버레이)
   'guard.gateTitle': '전체화면에서 사건을 조사합니다',
@@ -298,9 +318,11 @@ const EN = {
   'entry.alert': 'URGENT CASE INTAKE — Supervisor Qualification Exam · 15 cases',
   'entry.enter': 'Enter the Bureau',
   'entry.foot': 'PMB-OS · CLASSIFIED',
+  'common.backToStart': 'Back to First Screen',
 
   // SCR-002 Opening
   'opening.skip': 'Skip',
+  'opening.guide': 'When the video ends, press [To team selection] at the bottom of the screen to continue.',
   'opening.briefingStamp': 'PMB BRIEFING',
   'opening.briefing1': 'Modern projects fail not from technology, but from wrong judgment.',
   'opening.briefing2': 'The Bureau calls the force behind that failure the "Villain".',
@@ -324,6 +346,12 @@ const EN = {
   'team.register.warnSuspect': 'Please check the email format. You can still enter, but it will be flagged for staff review.',
   'team.registered': 'Registered Agents',
   'team.registeredEdit': 'Edit',
+  'team.cancel': 'Cancel team selection',
+  'team.cancel.title': 'Cancel your team selection?',
+  'team.cancel.msg': 'This team\'s entry will be released and the three registered agent emails will be cleared. You will need to select and register a team again.',
+  'team.cancel.confirm': 'Cancel Selection',
+  'team.cancel.keep': 'Keep It',
+  'team.cancel.err': 'Could not release the entry. Check your network and try again, or notify the staff.',
 
   'team.claimed.title': 'This team is already taken',
   'team.claimed.hint': 'If this is your team, enter one of the registered agent emails.',
@@ -347,6 +375,9 @@ const EN = {
   'gameEnded.title': 'The Game Has Ended',
   'gameEnded.msg': 'The supervisor has ended the game. Moving to the final screen.',
   'gameEnded.confirm': 'Go to Final Screen',
+  'timeUp.title': 'The Round 2 qualifier has ended',
+  'timeUp.msg': 'Time is up. Press [OK] to move to the final screen.',
+  'timeUp.confirm': 'OK',
 
   // SCR-005 Waiting Room
   'waiting.eyebrow': 'WAITING ROOM',
@@ -421,10 +452,12 @@ const EN = {
   'item.equip': 'Equip Item',
   'item.next': 'Proceed to Stage 2',
   'item.nextStage3': 'Proceed to Stage 3',
+  // 아이템 영문명은 로마자 표기(Gapjil/Baejjae)를 쓰지 않는다 — 영문 참가자에게 뜻이 전달되지 않아
+  // 의미를 옮긴 표현으로 교체했다(운영 결정 2026-08-10). 갑질 = 우월적 지위 남용 → overreach.
   'item.stage1.rarity': 'RARE ITEM',
-  'item.stage1.name': 'Gapjil Mirror Shield',
-  'item.stage1.desc': 'A shield that reflects unreasonable internal/external client demands through proper Change Control. It reflects the Villain\'s attacks in the Final Raid.',
-  'item.stage1.congrats': 'Congratulations. You have acquired the "Gapjil Mirror Shield", which lets you counter the unreasonable internal and external client demands that arise during a project.',
+  'item.stage1.name': 'Overreach Mirror Shield',
+  'item.stage1.desc': 'A shield that reflects overreaching internal/external client demands through proper Change Control. It reflects the Villain\'s attacks in the Final Raid.',
+  'item.stage1.congrats': 'Congratulations. You have acquired the "Overreach Mirror Shield", which lets you counter the overreaching internal and external client demands that arise during a project.',
   'item.stage1.effect': 'Reflects the Villain\'s attacks',
   'item.stage2.rarity': 'EPIC ITEM',
   'item.stage2.name': 'Unlimited Resource Approval',
@@ -433,9 +466,10 @@ const EN = {
   'item.stage2.effect': 'Ultimate move unlocked',
   // Stage 3's reward is a skill, not an item — docs/game-flow.md §10.3 / screen-list.md SCR-013.
   'item.stage3.rarity': 'LEGEND SKILL',
-  'item.stage3.name': 'Baejjae Master',
+  // 배째(배 째라) = 부당한 요구를 단호히 거절하고 버티는 태도 → 영어 관용 표현 'the hard no'.
+  'item.stage3.name': 'Master of the Hard No',
   'item.stage3.desc': 'The top-tier PM skill: verify AI output critically and turn down unnecessary demands without flinching. It fires as the final power skill against the Villain King in the Final Raid.',
-  'item.stage3.congrats': 'Congratulations. You have acquired "Baejjae Master", the top-tier PM skill for standing firm against the unnecessary demands that arise during a project.',
+  'item.stage3.congrats': 'Congratulations. You have acquired "Master of the Hard No", the top-tier PM skill for standing firm against the unnecessary demands that arise during a project.',
   'item.stage3.effect': 'Fires the final power skill',
   'item.effectLabel': 'EFFECT',
   'item.appoint': 'To the appointment',
@@ -503,9 +537,7 @@ const EN = {
   'badge.rank': 'Official Supervisor',
   'badge.finish': 'Finish Round 2 Qualifier',
 
-  // Director's final message (docs/game-flow.md §14.2) — shown on the closing screen
-  'ending.bossLabel': 'Final message from the Director',
-  'ending.bossMessage': 'Well done.\n\nYou resolved every case\nand protected the value of the project.\n\nFrom today you are\nofficial Supervisors of the PM Protection Bureau.',
+  // ※ The Director's final message was removed from the closing screen (2026-08-10 ops decision).
 
   // SCR-022 Final Ranking — admin console only
   'rank.eyebrow': 'FINAL RANKING',
@@ -524,10 +556,11 @@ const EN = {
   // SCR-023 Closing notice — the standing is announced by the supervisor, so it is not shown here.
   'end.tag': 'ROUND 2 COMPLETE',
   'end.title': 'Round 2 qualifier complete',
-  'end.msg': 'You protected the Value of the project.\n\nCongratulations on your appointment as an official Supervisor of the PM Protection Bureau.',
+  'end.msg': 'The Round 2 qualifier has been completed successfully.\n\nThe finals lineup will be announced after a combined evaluation with your Round 1 qualifier score.\n\nOur sincere thanks to every participant for taking part with such enthusiasm.',
   'end.rankLabel': 'Final Rank',
   'end.scoreLabel': 'Investigation Score',
-  'end.wait': 'Please wait for the supervisor to announce the final results.',
+  'end.close': 'Close browser',
+  'end.closeHint': 'If the window does not close by itself, please close this tab directly. (Ctrl+W)',
 
   // Capture guard
   'guard.gateTitle': 'Investigate cases in full screen',

@@ -2,9 +2,10 @@
 // 유튜브 임베드는 종료 자동감지(IFrame API)를 붙이지 않고, 시청 후 [팀 선택으로]로 진행한다.
 // see docs/screen-list.md SCR-002, docs/game-flow.md §6.2 / §19.2.
 import { el } from '../../utils/dom.js'
+import { icon } from '../../utils/icons.js'
 import { ASSETS } from '../../constants/assets.js'
 import { FLOW } from '../../constants/flow.js'
-import { t, bindCopy } from '../../lib/copy.js'
+import { t, bindCopy, copyEl } from '../../lib/copy.js'
 import { createButton } from '../../../components/primitives/button.js'
 
 const YT_ORIGIN = 'https://www.youtube.com'
@@ -137,7 +138,24 @@ export function createOpeningScreen (ctx) {
     proceed.el
   ])
 
-  const node = el('div', { class: 'screen screen--opening' }, [stage, controls])
+  // Edge 에서 영상이 재생되는 동안 아래쪽 진행 버튼을 못 찾고 헤매는 팀이 있었다(운영 보고 2026-08-10).
+  // 영상 위(=시선이 먼저 닿는 곳)에 다음 행동을 적어 두고, 언어를 잘못 골랐으면 첫 화면으로 돌아갈
+  // 길도 같이 남긴다 — 첫 화면(SCR-001)이 언어 선택 지점이다.
+  const backBtn = createButton({
+    label: t('common.backToStart'), variant: 'ghost', size: 'sm', icon: 'arrowLeft',
+    onClick: () => { if (!destroyed) ctx.goTo(FLOW.ENTRY) }
+  })
+  bindCopy(backBtn.el.querySelector('.btn__label'), 'common.backToStart')
+
+  const topbar = el('div', { class: 'opening__topbar' }, [
+    backBtn.el,
+    el('p', { class: 'opening__guide' }, [
+      icon('alert', { size: 16 }),
+      copyEl('span', {}, 'opening.guide')
+    ])
+  ])
+
+  const node = el('div', { class: 'screen screen--opening' }, [topbar, stage, controls])
 
   return {
     el: node,
@@ -149,6 +167,7 @@ export function createOpeningScreen (ctx) {
       soundBtn.destroy()
       skipBtn.destroy()
       proceed.destroy()
+      backBtn.destroy()
     }
   }
 }

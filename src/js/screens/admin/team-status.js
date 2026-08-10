@@ -6,6 +6,7 @@ import { el } from '../../utils/dom.js'
 import { icon } from '../../utils/icons.js'
 import { supabase, isServerMode } from '../../lib/supabase.js'
 import { createButton } from '../../../components/primitives/button.js'
+import { createAdminBackBar } from '../../../components/admin/back-bar.js'
 
 const REFRESH_MS = 5000
 
@@ -36,28 +37,58 @@ export function createTeamStatusView (props = {}) {
   let timer = null
 
   const closeBtn = createButton({
-    label: '관리자 콘솔로', variant: 'secondary', size: 'md', icon: 'refresh',
+    label: '관리자 콘솔로', variant: 'secondary', size: 'md', icon: 'arrowLeft',
     onClick: () => { if (onClose) onClose() }
   })
+  // 33행 표를 끝까지 스크롤하지 않아도 콘솔로 돌아갈 수 있어야 한다(운영 요청 2026-08-10).
+  const backBar = createAdminBackBar({ onBack: () => { if (onClose) onClose() } })
   const csvBtn = createButton({
     label: 'CSV 복사', variant: 'ghost', size: 'md', icon: 'file',
     onClick: () => copyCsv()
   })
+  const downloadBtn = createButton({
+    label: '엑셀 다운로드', variant: 'secondary', size: 'md', icon: 'download',
+    onClick: () => downloadCsv()
+  })
 
   let rows = []
 
-  function copyCsv () {
-    const header = ['team_no', 'team_name', 'is_claimed', 'member1', 'member2', 'member3', 'entered_at', 'submitted', 'last_submit_at', 'score', 'flags']
+  const CSV_HEADER = ['team_no', 'team_name', 'is_claimed', 'member1', 'member2', 'member3', 'entered_at', 'submitted', 'last_submit_at', 'score', 'flags']
+
+  function buildCsv () {
     const body = rows.map((r, i) => [
       i + 1, r.name, r.is_claimed ? 'Y' : 'N',
       (r.member_emails || [])[0] || '', (r.member_emails || [])[1] || '', (r.member_emails || [])[2] || '',
       r.entered_at || '', r.submitted_count, r.last_submit_at || '', r.score, (r.flags || []).join(' ')
     ])
-    const csv = [header, ...body].map((line) => line.map(csvCell).join(',')).join('\n')
+    return [CSV_HEADER, ...body].map((line) => line.map(csvCell).join(',')).join('\r\n')
+  }
+
+  function copyCsv () {
+    const csv = buildCsv()
     navigator.clipboard.writeText(csv).then(
       () => { csvBtn.update({ label: '복사됨!' }); setTimeout(() => csvBtn.update({ label: 'CSV 복사' }), 1400) },
       () => console.log('[team-status.csv]\n' + csv)
     )
+  }
+
+  // 파일로 내려받기 — 행사 후 집계를 Excel 에서 바로 열 수 있어야 한다(운영 요청 2026-08-10).
+  // UTF-8 BOM(﻿)을 앞에 붙여야 Excel 이 한글 팀명을 깨뜨리지 않는다. 줄바꿈은 CRLF.
+  // xlsx 네이티브 형식은 라이브러리 없이 ZIP 을 직접 만들어야 해서 쓰지 않는다(CLAUDE.md §3 의존성 제한).
+  function downloadCsv () {
+    if (!rows.length) { err.textContent = '내려받을 데이터가 없습니다. 먼저 조회가 되어야 합니다.'; return }
+    const now = new Date()
+    const stamp = `${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`
+    const blob = new Blob(['﻿' + buildCsv()], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = el('a', { href: url, download: `pmb-team-status-${stamp}.csv` })
+    document.body.append(a)
+    a.click()
+    a.remove()
+    // 즉시 해제하면 브라우저가 저장을 시작하기 전에 URL 이 죽는 경우가 있어 한 틱 뒤에 정리한다.
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+    downloadBtn.update({ label: '내려받음!' })
+    setTimeout(() => downloadBtn.update({ label: '엑셀 다운로드' }), 1400)
   }
 
   // 같은 이메일이 2개 이상 팀에 등록 = 팀 오선택 신호 (시작 전에 운영진이 정정)
@@ -131,13 +162,14 @@ export function createTeamStatusView (props = {}) {
 
   const node = el('div', { class: 'screen screen--finale screen--ranking' }, [
     el('div', { class: 'finale__inner finale__inner--wide' }, [
+      backBar.el,
       el('div', { class: 'ranking anim-fade' }, [
         el('span', { class: 'finale__eyebrow mono caps', text: 'TEAM STATUS' }),
         el('h1', { class: 'finale__title', text: '팀 현황' }),
         summary,
         err,
         el('div', { class: 'ranking__tablewrap' }, [el('div', { class: 'ranking__table is-teams' }, [head, list])]),
-        el('div', { class: 'ranking__actions' }, [csvBtn.el, closeBtn.el])
+        el('div', { class: 'ranking__actions' }, [downloadBtn.el, csvBtn.el, closeBtn.el])
       ])
     ])
   ])
@@ -147,6 +179,6 @@ export function createTeamStatusView (props = {}) {
 
   return {
     el: node,
-    destroy () { clearInterval(timer); closeBtn.destroy(); csvBtn.destroy(); node.remove() }
+    destroy () { clearInterval(timer); closeBtn.destroy(); csvBtn.destroy(); downloadBtn.destroy(); backBar.destroy(); node.remove() }
   }
 }

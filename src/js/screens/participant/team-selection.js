@@ -7,7 +7,7 @@ import { icon } from '../../utils/icons.js'
 import { FLOW } from '../../constants/flow.js'
 import { getTeams, findTeam } from '../../lib/teams.js'
 import {
-  getDeviceId, getEntry, teamStatus, claimTeam, transferTeam, subscribe, formatTime, refreshEntries
+  getDeviceId, getEntry, teamStatus, claimTeam, transferTeam, releaseTeam, subscribe, formatTime, refreshEntries
 } from '../../lib/entries.js'
 import { checkEmails, normalizeEmail, maskEmail } from '../../utils/email.js'
 import { t, copyEl, bindCopy } from '../../lib/copy.js'
@@ -42,6 +42,18 @@ export function createTeamScreen (ctx) {
   })
   bindCopy(startBtn.el.querySelector('.btn__label'), 'team.start')
 
+  // 첫 화면(SCR-001)이 언어 선택 지점이라 여기까지는 되돌아갈 길을 남긴다(운영 요청 2026-08-10).
+  // 단, **팀을 점유한 뒤에는 감춘다** — 등록을 마친 기기가 첫 화면으로 나가면 점유는 서버에 남는데
+  // 참가자는 나갔다고 오해해 팀을 다시 고르려 한다. 그때는 [수사관 등록 수정]으로 처리한다.
+  const backBtn = createButton({
+    label: t('common.backToStart'),
+    variant: 'ghost',
+    size: 'sm',
+    icon: 'arrowLeft',
+    onClick: () => ctx.goTo(FLOW.ENTRY)
+  })
+  bindCopy(backBtn.el.querySelector('.btn__label'), 'common.backToStart')
+
   const editBtn = el('button', { class: 'team-roster__edit', type: 'button' }, [
     icon('penLine', { size: 14 }),
     el('span', { text: t('team.registeredEdit') })
@@ -50,6 +62,52 @@ export function createTeamScreen (ctx) {
     const team = findTeam(selected)
     if (team) openRegister(team)
   })
+
+  // 팀 오선택 되돌리기(운영 요청 2026-08-10) — 등록까지 마친 뒤에야 잘못 골랐다는 걸 알아차리는 경우가
+  // 있는데, 그때까지는 [수정](이메일 오타 수정)뿐이라 팀 자체를 바꿀 길이 없었다.
+  // 점유를 서버에서 풀어야 한다 — 로컬만 비우면 그 팀이 계속 'taken' 으로 남아 아무도 못 고른다.
+  const cancelBtn = el('button', { class: 'team-roster__edit team-roster__edit--danger', type: 'button' }, [
+    icon('close', { size: 14 }),
+    el('span', { text: t('team.cancel') })
+  ])
+  cancelBtn.addEventListener('click', () => openCancel())
+
+  // 되돌릴 수 없는 조작이라(다른 기기가 즉시 그 팀을 잡을 수 있다) 확인을 받는다.
+  function openCancel () {
+    const teamId = selected
+    if (!teamId) return
+    closeModal()
+    const err = el('p', { class: 'auth-error' })
+    let busy = false
+    modal = createModal({
+      title: t('team.cancel.title'),
+      size: 'sm',
+      content: [el('p', { class: 'auth-hint', text: t('team.cancel.msg') }), err],
+      actions: [
+        { label: t('team.cancel.keep'), variant: 'ghost' },
+        {
+          label: t('team.cancel.confirm'),
+          variant: 'danger',
+          close: false,
+          onClick: async () => {
+            if (busy) return
+            busy = true
+            err.textContent = ''
+            const ok = await releaseTeam(teamId)
+            busy = false
+            if (!ok) { err.textContent = t('team.cancel.err'); return }
+            // 서약도 함께 지운다 — 서약은 그 팀으로 한 것이므로 팀이 바뀌면 다시 받아야 한다.
+            selected = null
+            ctx.update({ teamId: null, memberEmails: [], enteredAt: null, signerName: '', pledgedAt: null })
+            closeModal()
+            refreshView()
+          }
+        }
+      ],
+      onClose: () => { modal = null }
+    })
+    modal.open()
+  }
 
   const grid = el('div', { class: 'team-grid' })
   const roster = el('div', { class: 'team-roster', hidden: true })
@@ -72,6 +130,7 @@ export function createTeamScreen (ctx) {
     grid.replaceChildren(...getTeams().map(cardFor))
     renderRoster()
     startBtn.update({ disabled: !selected })
+    backBtn.el.hidden = !!selected // 점유 후에는 첫 화면으로 나가는 길을 닫는다
   }
 
   function renderRoster () {
@@ -88,7 +147,7 @@ export function createTeamScreen (ctx) {
         icon('check', { size: 13 }),
         el('span', { text: email }) // 사용자 입력 — textContent로만 렌더 (CLAUDE.md §11)
       ]))),
-      editBtn
+      el('div', { class: 'team-roster__actions' }, [editBtn, cancelBtn])
     )
   }
 
@@ -326,6 +385,7 @@ export function createTeamScreen (ctx) {
     el('div', { class: 'form-screen__inner' }, [
       el('header', { class: 'form-screen__head form-screen__head--row' }, [
         el('div', { class: 'form-screen__headings' }, [
+          backBtn.el,
           copyEl('span', { class: 'form-screen__step mono' }, 'team.step'),
           copyEl('h1', { class: 'form-screen__title' }, 'team.title'),
           copyEl('p', { class: 'form-screen__lead' }, 'team.lead')
@@ -343,6 +403,7 @@ export function createTeamScreen (ctx) {
       unsubscribe()
       closeModal()
       startBtn.destroy()
+      backBtn.destroy()
     }
   }
 }

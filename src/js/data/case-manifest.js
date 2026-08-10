@@ -4,7 +4,7 @@
 //   · 정답·해설 = 서버 public.case_answers + submit_answer RPC
 // 이 배열이 data/cases.js 에서 CASES 로 재노출되어 stage-progress·progress-mock 이 그대로 쓴다.
 export const CASE_MANIFEST = [
-  { id: 'case-001', stage: 1, caseNo: 1, fileNo: '#007', choiceCount: 4, multi: false, selectCount: 1 },
+  { id: 'case-001', stage: 1, caseNo: 1, fileNo: '#001', choiceCount: 4, multi: false, selectCount: 1 },
   { id: 'case-002', stage: 1, caseNo: 2, fileNo: '#002', choiceCount: 4, multi: false, selectCount: 1 },
   { id: 'case-003', stage: 1, caseNo: 3, fileNo: '#003', choiceCount: 4, multi: false, selectCount: 1 },
   { id: 'case-004', stage: 2, caseNo: 1, fileNo: '#004', choiceCount: 4, multi: false, selectCount: 1 },

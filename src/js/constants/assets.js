@@ -140,10 +140,18 @@ export const ASSETS = {
     q9_2_en: '/audio/sfx/question9/question9-2_en.mp3',
     q9_3_en: '/audio/sfx/question9/question9-3_en.mp3',
     q9_4_en: '/audio/sfx/question9/question9-4_en.mp3',
-    // 사건 #011 참가자 증언 — 증언 4명이 **한 파일**에 이어져 있다. 영문판은 4개 WAV 로 도착해
-    // 같은 형태로 병합했다(증언 사이 0.8초 공백 + 64kbps 모노 MP3). 원본 WAV 는 img/audio-src/ 보관.
-    q11: '/audio/sfx/question11/question11.mp3',
-    q11_en: '/audio/sfx/question11/question11_en.mp3',
+    // 사건 #011 참가자 증언 1~4 — 원래 한 파일에 이어 붙어 있어 참가자가 특정 증언만 다시 들을 수
+    // 없었다. 2026-08-10 에 화자별로 분할했다(국문 합 121.2s ≈ 원본 120.8s · 영문 106.7s ≈ 106.8s).
+    // 병합본(question11.mp3 · question11_en.mp3)은 img/audio-src/ 로 옮겼다(서빙 제외).
+    // 순서 = 화면 보기 번호 1~4 = dev/solutions.js 의 answerIndex 기준이다 — 재분할 시 순서를 지켜야 한다.
+    q11_1: '/audio/sfx/question11/question11-1.mp3',
+    q11_2: '/audio/sfx/question11/question11-2.mp3',
+    q11_3: '/audio/sfx/question11/question11-3.mp3',
+    q11_4: '/audio/sfx/question11/question11-4.mp3',
+    q11_1_en: '/audio/sfx/question11/question11-1_en.mp3',
+    q11_2_en: '/audio/sfx/question11/question11-2_en.mp3',
+    q11_3_en: '/audio/sfx/question11/question11-3_en.mp3',
+    q11_4_en: '/audio/sfx/question11/question11-4_en.mp3',
     // 사건 #014 후보 PM 인터뷰 A~D. 영문 음성 도착(2026-08-06) — 원본이 WAV(개당 0.7~1.2MB)로 와서
     // 국문과 같은 규격의 MP3(64kbps 모노)로 변환했다. 원본 WAV 는 img/audio-src/ 에 보관(서빙 제외).
     q14_1: '/audio/sfx/question14/question14-1.mp3',
