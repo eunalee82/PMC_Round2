@@ -568,3 +568,16 @@ Edge 에서 영상 재생 중 **하단 우측 진행 버튼이 플레이어 UI�
 
 ### 12.10 남은 일
 - **브라우저 실측 미완**: 이번 변경(타임오버 팝업 · 초기화 reload · 오프닝 상단바 · 엑셀 다운로드)은 `validate`·`build` 만 통과했고 실제 브라우저 확인은 아직이다.
+
+### 12.11 시드 적용 기록 — 2026-08-10 (다른 PC에서 `git pull` 후)
+
+> **두 시드는 저장소에 없다**(gitignore · 적용 후 삭제). 그래서 `git pull` 만 해서는 서버 콘텐츠가 갱신되지 않는다 — **새 PC로 옮기거나 콘텐츠를 고친 뒤에는 반드시 재생성 → 적용**한다.
+
+- **0012(스키마)는 이미 적용돼 있었다** — 새로 적용할 필요 없었다. 확인은 anon 키 읽기전용 프로브로 충분하다(관리자 로그인 불필요):
+  - `GET /rest/v1/cases?select=case_id` → `401 / 42501 permission denied` = 테이블 존재 + 직접 조회 전면 차단(정상)
+  - `POST /rest/v1/rpc/get_cases` (가짜 토큰) → `401 / not_owner` = 함수 존재 + 토큰 검증 동작. **`PGRST202`(함수 없음)가 오면 그때가 미적용이다.**
+- **0013(본문) · 0003(정답·해설) 재생성 후 SQL Editor 에서 적용 → 파일 삭제 완료.** 커밋 `6301603`(워킹트리 clean) 기준으로 `export-cases.mjs`·`export-seed.mjs` 를 돌렸다.
+  - `case-manifest.js` 는 재생성 결과가 커밋본과 **내용 동일**(줄바꿈 차이만) → 커밋할 것 없음. 이게 다르면 매니페스트가 stale 이라는 신호다.
+  - 디스크에 남아 있던 `0003_seed_answers.sql` 은 **8/6자 파일**이라 §12.1 의 해설 문체 수정(case-003 등)이 빠져 있었다. 재생성본과 비교하니 차이는 **해설 문장뿐이고 `answerIndex` 는 동일** — 채점 결과는 그대로, 참가자가 보는 사건 분석 보고서 문구만 갱신됐다.
+- **다음에 같은 상황이면**: `node scripts/export-cases.mjs` + `node scripts/export-seed.mjs` → 두 파일 SQL Editor 실행 → 삭제. 둘 다 멱등(`on conflict do update` + 유령 행 `delete`)이라 재실행이 안전하다.
+- **주의**: 시드는 자동생성 파일이다. 해설·본문을 고칠 때 SQL 을 직접 수정하지 말고 원본(`src/js/dev/solutions.js` · `src/js/dev/cases-content.js`)을 고쳐 재생성한다.
