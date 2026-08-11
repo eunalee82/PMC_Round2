@@ -72,4 +72,14 @@ export function startGame (durationMinutes = null) {
   return state
 }
 export function endGame () { state = { ...read(), status: ENDED }; persist(); return state }
+// 제한 시간 연장 — mock 은 endsAt 을 따로 두지 않으므로 startedAt 을 미래로 밀어 남은 시간을 늘린다.
+// 서버(0014)와 계약을 맞춘다: 진행 중일 때만 동작하고, 타임오버 뒤에는 '지금부터' 그만큼 준다.
+export function extendGame (minutes = 5) {
+  const s = read()
+  if (s.status !== STARTED || !s.startedAt) return s
+  const base = Math.max(s.startedAt, Date.now() - DURATION_MS) // 타임오버면 지금이 기준
+  state = { ...s, startedAt: base + minutes * 60 * 1000 }
+  persist()
+  return state
+}
 export function resetGame (wipeProgress = false) { state = { status: SCHEDULED, startedAt: null }; persist(); return state }

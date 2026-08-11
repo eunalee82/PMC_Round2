@@ -194,3 +194,10 @@ export async function resetGame (wipeProgress = false) {
   applyState(data, data && data.server_now)
   return state
 }
+// 제한 시간 연장 — 전 팀 공통(games 단일 로우). 진행 중일 때만 서버가 허용한다(0014).
+// 참가자 화면의 남은 시간은 Realtime 즉시 / 폴링 최대 5초 안에 함께 늘어난다.
+export async function extendGame (minutes = 5) {
+  const data = await rpc('admin_extend_game', { p_minutes: minutes })
+  applyState(data, data && data.server_now)
+  return state
+}

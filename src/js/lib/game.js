@@ -35,3 +35,5 @@ export function teardownGame () { if (impl.teardownGame) impl.teardownGame() }
 export async function startGame (durationMinutes = null) { return impl.startGame(durationMinutes) }
 export async function endGame () { return impl.endGame ? impl.endGame() : null }
 export async function resetGame (wipeProgress = false) { return impl.resetGame(wipeProgress) }
+// 제한 시간 연장 — 전 팀 공통. 서버는 진행 중일 때만 허용한다('game_not_started').
+export async function extendGame (minutes = 5) { return impl.extendGame ? impl.extendGame(minutes) : null }

@@ -12,7 +12,7 @@
 
 | # | 항목 | 확인 방법 | 현재 |
 |---|---|---|---|
-| 1 | 마이그레이션 `0001`~`0008` 전부 적용 | §2 쿼리 | ✅ `0001`~`0007` 적용(2026-08-04) · **`0008`(배점 100점) 적용 필요** |
+| 1 | 마이그레이션 `0001`~`0014` 전부 적용 | `node scripts/check-migrations.mjs` · §2 쿼리 | ✅ `0001`~`0013` 적용(2026-08-07 확인) · **`0014`([+5분 연장]) 적용 필요** |
 | 2 | 관리자 계정 1개 + `admins` 등록 + 로그인 성공 | §3 | ✅ (`euna.lee@lge.com`) |
 | 3 | Email provider **ON** (로그인 가능) | §3.1 | ✅ 2026-08-04 |
 | 3b | 공개 가입 **OFF** | §3.1 | ⚠️ 아직 열림 — **차단 아님**(§3.3) |
@@ -51,6 +51,12 @@ Supabase 대시보드 → **SQL Editor** 에서 **순서대로** 실행(파일 �
 | `0006_transfer_returns_emails.sql` | 기기 인계 시 팀원 명단 반환 |
 | `0007_fix_submit_end_reason.sql` | **종료 후 제출 사유를 `game_ended`로 정정** |
 | `0008_stage_points.sql` | **배점 변경: 스테이지별 7·7·6 → 총 100점** (기존 제출분 재환산 포함) |
+| `0009_multi_answer.sql` | 복수 정답 컬럼 · `same_index_set()` · `submit_answer` 교체 (**`0003`보다 먼저**) |
+| `0010_duration_80min.sql` | 제한 시간 60 → 80분 |
+| `0011_team_status_last_submit.sql` | 팀 현황에 마지막 제출 시각 |
+| `0012_cases_content.sql` | 사건 본문 서버 이관 — `cases` 테이블 + `get_cases()` RPC |
+| `0013_seed_cases.sql` | 사건 본문 15개 — **생성 후 적용, 파일은 삭제**(커밋 금지) |
+| `0014_admin_extend_game.sql` | **[+5분 연장] 버튼용 RPC** — 미적용 시 콘솔 버튼이 실패한다 |
 
 `0003` 생성: `node scripts/export-seed.mjs` → `supabase/migrations/0003_seed_answers.sql` 생성 → 적용 → **파일 삭제**.
 

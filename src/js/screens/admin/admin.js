@@ -8,13 +8,17 @@
 import { el } from '../../utils/dom.js'
 import { icon } from '../../utils/icons.js'
 import { supabase, isServerMode } from '../../lib/supabase.js'
-import { getStatus, getStartedAt, remainingSeconds, subscribe, initGame, startGame, endGame, resetGame, getConnection, subscribeConnection } from '../../lib/game.js'
+import { getStatus, getStartedAt, remainingSeconds, subscribe, initGame, startGame, endGame, extendGame, resetGame, getConnection, subscribeConnection } from '../../lib/game.js'
 import { resetAllProgress } from '../../lib/progress.js'
 import { createButton } from '../../../components/primitives/button.js'
 import { createRankingView } from './ranking.js'
 import { createTeamStatusView } from './team-status.js'
 
 const MOCK_PASSWORD = '2026' // mock 모드 전용(서버 모드에서는 쓰이지 않는다)
+
+// 장애 대응용 연장 단위 — 한 번에 크게 늘리기보다 필요한 만큼 눌러 쌓는다(연타 누적).
+// 전 팀 공통으로 적용된다(games 단일 로우). see operation-checklist.md §8.4 (C)
+const EXTEND_MINUTES = 5
 
 // 연결 상태 표기 — 운영진이 실시간 전파가 살아 있는지 한눈에 봐야 한다 (operation-checklist.md §6)
 const CONN_TEXT = {
@@ -147,9 +151,13 @@ export function mountAdmin (root) {
       if (confirmMsg && !window.confirm(confirmMsg)) return
       btn.update({ loading: true })
       try { await fn() } catch (e) {
-        err.textContent = e && e.code === 'forbidden'
+        const code = e && e.code
+        err.textContent = code === 'forbidden'
           ? '관리자 권한이 없습니다. admins 테이블에 등록된 계정으로 로그인하십시오.'
-          : '요청이 실패했습니다. 네트워크를 확인한 뒤 다시 시도하십시오.'
+          // 연장은 진행 중일 때만 허용된다(0014) — 종료된 게임을 연장하면 제출이 조용히 다시 열린다.
+          : code === 'game_not_started'
+            ? '진행 중일 때만 연장할 수 있습니다. 종료를 되돌리려면 운영 체크리스트 §8.10 (5)를 따르십시오.'
+            : '요청이 실패했습니다. 네트워크를 확인한 뒤 다시 시도하십시오.'
       } finally { btn.update({ loading: false }); refresh() }
     }
 
@@ -158,6 +166,12 @@ export function mountAdmin (root) {
 
     const endBtn = createButton({ label: '게임 종료', variant: 'danger', size: 'lg', icon: 'alert', block: true })
     endBtn.update({ onClick: guard(endBtn, () => endGame(), '게임을 종료합니다. 이후 모든 팀의 답안 제출이 차단됩니다. 계속하시겠습니까?') })
+
+    const extendBtn = createButton({ label: `+${EXTEND_MINUTES}분 연장`, variant: 'secondary', size: 'md', icon: 'clock', block: true })
+    extendBtn.update({
+      onClick: guard(extendBtn, () => extendGame(EXTEND_MINUTES),
+        `남은 시간을 ${EXTEND_MINUTES}분 연장합니다.\n\n※ 특정 팀만이 아니라 참가 중인 모든 팀에 함께 적용됩니다.\n※ 연장 후에는 참가자에게 방송으로 알리십시오.\n\n계속하시겠습니까?`)
+    })
 
     const teamsBtn = createButton({ label: '팀 현황', variant: 'secondary', size: 'md', icon: 'users', block: true, onClick: () => openOverlay(createTeamStatusView) })
     const rankBtn = createButton({ label: '최종 랭킹 발표', variant: 'gold', size: 'md', icon: 'award', block: true, onClick: () => openOverlay(createRankingView) })
@@ -182,6 +196,7 @@ export function mountAdmin (root) {
       remainVal.textContent = s === 'started' ? fmtClock(remainingSeconds()) : '—'
       startBtn.update({ disabled: s === 'started' })
       endBtn.update({ disabled: s !== 'started' })
+      extendBtn.update({ disabled: s !== 'started' }) // 서버도 같은 조건으로 거부한다(0014)
     }
     function paintConn (mode) {
       const c = CONN_TEXT[mode] || CONN_TEXT.connecting
@@ -211,7 +226,7 @@ export function mountAdmin (root) {
       row('CONNECTION', connVal),
       row('STARTED AT', startedVal),
       row('TIME LEFT', remainVal),
-      el('div', { class: 'admin__actions' }, [startBtn.el, endBtn.el, teamsBtn.el, rankBtn.el, resetBtn.el]),
+      el('div', { class: 'admin__actions' }, [startBtn.el, endBtn.el, extendBtn.el, teamsBtn.el, rankBtn.el, resetBtn.el]),
       err,
       el('a', { class: 'admin__link', href: '/', target: '_blank', rel: 'noopener' }, [
         icon('logIn', { size: 14 }), el('span', { text: '참가자 화면 새 탭으로 열기' })
