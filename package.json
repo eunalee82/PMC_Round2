@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "validate": "node scripts/validate.mjs"
+    "validate": "node scripts/validate.mjs && node scripts/verify-flow-guard.mjs",
+    "validate:flow": "node scripts/verify-flow-guard.mjs"
   },
   "devDependencies": {
     "vite": "^8.1.1"
