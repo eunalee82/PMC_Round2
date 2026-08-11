@@ -417,7 +417,11 @@ Stage 3 아이템(배째 마스터)
 
 ### 10.1 ⚠️ 서버 마이그레이션 — 배포보다 먼저, 이 순서로
 
-> **✅ 적용·검증 완료 (2026-08-07 확인).** 프로젝트 `teyngjaladwqolxwykqk` 에서 `teams=33 · case_answers=15 · duration=80` · `submit_answer(p_choice_indexes)` 존재 · `admin_team_status` 뷰 존재를 확인했다(정답 시드 case-002→1 · case-005→{1,2,4} 포함). **재적용 불필요.** 아래 절차는 DB 를 새로 만들거나 초기화한 뒤 다시 세팅할 때를 위한 참고용이다. 상태는 언제든 `node scripts/check-migrations.mjs`(0009·0010·0011, 읽기전용) + SQL Editor 의 `select count(*) from public.case_answers;`(0003=15) 로 재확인한다.
+> **✅ 적용·검증 완료 (2026-08-07 확인).** 프로젝트 `teyngjaladwqolxwykqk` 에서 `teams=33 · case_answers=15 · duration=80` · `submit_answer(p_choice_indexes)` 존재 · `admin_team_status` 뷰 존재를 확인했다(정답 시드 case-002→1 · case-005→{1,2,4} 포함). **재적용 불필요.** 아래 절차는 DB 를 새로 만들거나 초기화한 뒤 다시 세팅할 때를 위한 참고용이다. 상태는 언제든 `node scripts/check-migrations.mjs`(0009·0010·0011·**0014**, 읽기전용) + SQL Editor 의 `select count(*) from public.case_answers;`(0003=15) 로 재확인한다.
+>
+> **추가 (2026-08-11): `0014_admin_extend_game.sql` 적용 완료.** 관리자 콘솔 [+5분 연장] 버튼용 RPC.
+> 함수 존재 + anon 차단(`42501 permission denied` · `ends_at` 불변)까지 확인했다.
+> **관리자 로그인 상태에서의 실제 연장 동작은 아직 눌러보지 않았다** — 리허설 때 1회 확인할 것.
 
 Supabase SQL Editor 에서:
 
