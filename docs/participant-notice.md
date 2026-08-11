@@ -14,6 +14,10 @@
 | 제출 후 수정 불가 | `answers` 의 `unique(team_id, case_id)` + 클라이언트 가드 |
 | 복수 선택 사건 · 부분 점수 없음 | 사건 #005 (`multi: true, selectCount: 3`) |
 | 새로고침하면 복구 | `CLAUDE.md §2`, `resolveStep()` |
+| 끊겨도 사건 풀이는 가능, 제출만 실패 | `src/js/screens/gameplay/case.js:220-237` — 실패 시 선택 유지 + 버튼 복구 |
+| 끊긴 채 새로고침하면 연결 실패 화면 | `src/main.js:35-45` `showBootError()` |
+| 끊긴 동안에도 타이머 진행 | `src/js/lib/game-server.js:168-179` — `ends_at` 는 서버 절대 시각 |
+| 연결 표시(`SYNC`/`OFFLINE`) | `src/components/shell/app-header.js:36-42` |
 | 단서 이미지 클릭 확대 | `src/components/game/evidence-viewer.js` |
 | 국문/영문 선택 | 입장 화면 · `?lang=en` |
 
@@ -56,7 +60,14 @@
 > - **Chrome 또는 Edge 최신 버전**을 사용해 주십시오.
 > - 오프닝 영상은 YouTube로 재생됩니다.
 > - 노트북 기준 화면이 잘리지 않도록 브라우저 확대/축소는 100%로 맞춰 주십시오.
-> - 네트워크가 일시적으로 끊겨도 **새로고침하면 마지막 진행 지점부터 복구**됩니다. 당황하지 마시고 새로고침해 주십시오.
+>
+> **5-1. 네트워크가 끊겼을 때 — 새로고침이 먼저가 아닙니다**
+> - 화면 상단 **남은 시간 옆의 연결 표시**가 평소 `SYSTEM ONLINE`에서 `SYNC` 또는 `OFFLINE`으로 바뀌면 서버 연결이 불안정한 것입니다. **자동으로 재연결을 시도하니 그대로 두십시오.**
+> - 이때도 **사건을 읽고 보기를 선택하는 것은 그대로 가능합니다.** 팀 논의를 계속하셔도 됩니다.
+> - 제출이 실패하면 안내가 표시됩니다. **선택하신 보기는 그대로 남아 있으니**, 연결이 돌아온 뒤 [판단 제출]을 다시 눌러 주십시오. **다시 고르실 필요 없습니다.**
+> - **연결이 끊긴 상태에서는 새로고침하지 마십시오.** 서버 연결 화면에서 멈추게 됩니다.
+> - 연결이 정상으로 돌아온 뒤에도 화면이 이상하면 그때 새로고침해 주십시오. **진행 상황은 서버에 저장되어 있어 유실되지 않습니다.**
+> - ⚠️ **끊긴 동안에도 남은 시간은 계속 줄어듭니다.** 몇 분 이상 복구되지 않으면 즉시 운영진에게 알려 주십시오.
 >
 > **6. 진행 방식 참고**
 > - 단서 이미지는 클릭하면 **확대**해서 볼 수 있습니다.
@@ -106,7 +117,14 @@
 > - Please use the **latest version of Chrome or Edge**.
 > - The opening video plays via YouTube.
 > - Set browser zoom to 100% so that content is not cut off on a laptop screen.
-> - If your network drops briefly, **refreshing restores your last saved progress.** Don't panic — just refresh.
+>
+> **5-1. If your network drops — do not refresh first**
+> - If the connection indicator **next to the remaining time at the top of the screen** changes from `SYSTEM ONLINE` to `SYNC` or `OFFLINE`, your connection is unstable. **Leave it alone — it reconnects automatically.**
+> - You can still **read the case and select your answer** during this time. Feel free to keep discussing.
+> - If a submission fails, a notice appears. **Your selection is preserved** — once the connection returns, just press [Submit Judgment] again. **You do not need to re-select.**
+> - **Do not refresh while disconnected.** You will be stuck on the server connection screen.
+> - If the screen still looks wrong after the connection recovers, refresh then. **Your progress is saved on the server and will not be lost.**
+> - ⚠️ **The remaining time keeps counting down while you are disconnected.** If it does not recover within a few minutes, notify the staff immediately.
 >
 > **6. How it plays**
 > - Click a piece of evidence to **enlarge** it.
