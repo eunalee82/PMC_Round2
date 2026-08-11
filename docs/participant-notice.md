@@ -18,6 +18,8 @@
 | 끊긴 채 새로고침하면 연결 실패 화면 | `src/main.js:35-45` `showBootError()` |
 | 끊긴 동안에도 타이머 진행 | `src/js/lib/game-server.js:168-179` — `ends_at` 는 서버 절대 시각 |
 | 연결 표시(`SYNC`/`OFFLINE`) | `src/components/shell/app-header.js:36-42` |
+| 원격 팀 화면 공유 가능 (전체화면은 잠금이 아님) | `src/components/game/capture-guard.js:83-88` · `docs/operation-checklist.md §8.9` |
+| 다른 팀원이 접속하면 대표 기기가 끊김 | `claim_team`/`verify_and_transfer` (`0001_init.sql:203-206`) |
 | 단서 이미지 클릭 확대 | `src/components/game/evidence-viewer.js` |
 | 국문/영문 선택 | 입장 화면 · `?lang=en` |
 
@@ -73,6 +75,34 @@
 > - 단서 이미지는 클릭하면 **확대**해서 볼 수 있습니다.
 > - 사건 자료 일부는 영문으로 제작되어 있습니다. 화면 언어는 입장 시 **국문/영문 중 선택**할 수 있습니다.
 > - 감독관의 시작 신호 전까지는 대기 화면이 유지됩니다. **정상 상태이므로 새로고침하지 않아도 됩니다.**
+>
+> **7. 팀원이 서로 다른 근무지에 있는 경우 — 화면 공유로 참여 가능합니다**
+>
+> 온라인 회의(Webex, Teams, Zoom 등)로 모여 **한 명이 화면을 공유하고 함께 논의**하는 방식으로 참여하실 수 있습니다. 사용하시는 회의 도구에는 제한이 없습니다.
+> 사건 화면이 전체화면으로 진행되지만, 이는 화면을 잠그는 기능이 아니라 전체화면을 벗어나면 내용을 잠시 가리는 방식이므로 **화면 공유를 막지 않습니다.**
+>
+> 아래 네 가지만 지켜 주십시오.
+>
+> **① 대표 기기 1대를 정하고, 나머지 팀원은 접속하지 마십시오 — 가장 중요합니다**
+> 한 팀은 한 대의 기기로만 참여합니다. 다른 팀원이 각자 기기에서 접속하면 **진행 중이던 대표 기기의 연결이 끊기고 조작이 불가능해집니다.**
+> 대표 기기 한 대에서만 팀 등록·조작을 하시고, 나머지 팀원은 **공유된 화면만 보며 논의**해 주십시오.
+>
+> **② 화면 공유 시 "컴퓨터 소리 포함"을 반드시 켜 주십시오**
+> 15개 사건 중 **7개가 음성 단서(녹취·인터뷰·브리핑)** 입니다. 이 옵션을 켜지 않으면 대표 기기에서만 소리가 나고 **나머지 팀원은 녹취를 들을 수 없습니다.**
+> - Teams: 화면 공유 창의 **[컴퓨터 소리 포함]** 체크
+> - Webex: 공유 시 **[컴퓨터 오디오 공유]** 체크
+> - Zoom: **[소리 공유]** 체크
+>
+> **③ 개별 창이 아니라 "화면 전체(데스크톱)"를 공유해 주십시오**
+> 화면 공유를 누르면 무엇을 공유할지 고르는 화면이 나옵니다. 여기서 **"Chrome" 같은 개별 창(Window)을 선택하지 마시고, 모니터 화면 전체를 선택**해 주십시오.
+> 창 단위로 공유하면 전체화면으로 전환되는 순간 **상대방 화면이 검게 보이거나 멈출 수 있습니다.**
+>
+> **④ 순서: 화면 공유를 먼저 시작한 뒤, 전체화면으로 입장하십시오**
+> 반대 순서로 하시면 회의 도구를 조작하기 위해 전체화면을 벗어나야 합니다.
+> 진행 중 전체화면이 해제되면 [전체화면으로 돌아가기]를 한 번 누르시면 되며, **진행 상황은 서버에 저장되어 유실되지 않습니다.**
+>
+> 참고 · 공유 화면에 **팀명과 시각 워터마크**가 함께 표시됩니다. 자료 유출 방지를 위한 것으로 정상 동작이니 참고해 주십시오.
+> 참고 · 원격 참여는 인터넷 회선이 여러 개 관여합니다. 연결이 끊긴 경우 **5-1 항목**을 따라 주시고, 끊긴 팀원이 관전자라면 게임 진행에는 영향이 없습니다.
 >
 > 준비되셨다면 수사관 여러분의 활약을 기대하겠습니다.
 >
@@ -130,6 +160,34 @@
 > - Click a piece of evidence to **enlarge** it.
 > - Some case material is provided in English. You can choose **Korean or English** for the interface when you enter.
 > - The waiting screen stays until the auditor starts the game. **This is normal — you do not need to refresh.**
+>
+> **7. If your teammates work at different sites — screen sharing is supported**
+>
+> You may join by meeting online (Webex, Teams, Zoom, etc.) with **one member sharing their screen while the team discusses together**. Any meeting tool is fine.
+> Case screens run in full screen, but this does not lock your screen — it simply hides the case content if you leave full screen, so it **does not block screen sharing.**
+>
+> Please observe the following four points.
+>
+> **① Designate one device, and have everyone else stay off the site — this matters most**
+> Each team plays on exactly one device. If another member connects from their own device, **the device already in play loses its connection and can no longer be operated.**
+> Register and play from a single device, and have the other members **watch the shared screen and discuss.**
+>
+> **② Turn on "include computer sound" when you share**
+> **7 of the 15 cases rely on audio evidence** (recordings, interviews, briefings). Without this option, only the sharing device has sound and **the rest of the team cannot hear the evidence.**
+> - Teams: check **[Include computer sound]**
+> - Webex: check **[Share computer audio]**
+> - Zoom: check **[Share sound]**
+>
+> **③ Share your whole screen (desktop), not a single window**
+> When you start sharing you will be asked what to share. **Do not pick an individual window such as "Chrome" — pick the entire monitor.**
+> Window-level sharing can turn the viewers' screen black or freeze it the moment the browser goes full screen.
+>
+> **④ Order: start sharing first, then enter full screen**
+> Doing it the other way round forces you to leave full screen to operate the meeting tool.
+> If full screen is released during play, just press [Return to Full Screen] once. **Your progress is saved on the server and will not be lost.**
+>
+> Note · A watermark with your team name and the time appears on the shared screen. This is intended to prevent case material from leaking and is normal.
+> Note · Remote play involves several internet connections. If you get disconnected, follow item **5-1**. If the member who dropped is only watching, gameplay is unaffected.
 >
 > We look forward to seeing you in action, Agents.
 >
