@@ -136,7 +136,7 @@ EvidenceViewer가 네이티브 컨트롤로 재생하고 헤더 소리 설정(�
 | /audio/sfx/question3/question3.mp3 | Stage 1 · 3번째 사건 #003 감독관 브리핑 · 국문 (2026-08-06 도착) | 있음 · 사용 중 |
 | /audio/sfx/question3/question3_en.mp3 | 같은 브리핑 **영문판** | 있음 · 사용 중 |
 | /audio/sfx/question4/question4.mp3 | Stage 2 · 사건 #004 관계자 인터뷰 · 국문. **인터뷰 1~4가 한 파일** — 사건 #011은 2026-08-10에 화자별로 나눴으므로 이제 이 사건만 병합 형태다 | 있음 · 사용 중 |
-| /audio/sfx/question4/question4_en.mp3 | 같은 인터뷰 **영문판** | 있음 · 사용 중 |
+| /audio/sfx/question4/question4_en.mp3 | 같은 인터뷰 **영문판**. 2026-08-11 파일 교체(2.26MB → 1.35MB) | 있음 · 사용 중 |
 | /audio/sfx/question7/question7-1~4.mp3 | Stage 2 · 사건 #007 PM 후보 A~D 답변 · 국문 | 있음 · 사용 중 |
 | /audio/sfx/question7/question7-1~4_en.mp3 | 같은 답변 **영문판** | 있음 · 사용 중 |
 | /audio/sfx/question9/question9-1~4.mp3 | Stage 2 · 사건 #009 인터뷰 A~D(개발조직장·사업부 임원·HR·Chief Architect) · 국문 | 있음 · 사용 중 |
