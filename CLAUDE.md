@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 1. 프로젝트 개요 및 목표
 
-**PM Protection Bureau (PM보호국)** — PMBOK® 8th Edition 기반 PM 역량 검증 **크라임씬 게임**. 교육용 실시간 컴페티션으로, 참가자는 "시험 응시자"가 아니라 **PM보호국 신입 수사관**이 되어 프로젝트 현장의 "사건"을 해결한다.
+**PM Protection Bureau (PM보호국)** — PMBOK® 8th Edition 기반 PM 역량 검증 **크라임씬 게임**. 교육용 실시간 컴페티션으로, 참가자는 "시험 응시자"가 아니라 **PM보호국 신입 감독관**이 되어 프로젝트 현장의 "사건"을 해결한다.
 
 - **최종 목표(제품)**: 여러 팀이 동시에 참여하는 행사에서, Opening → 팀 선택 → 서약 → 대기 → Stage 1~3 → 아이템 획득 → 감독관 임명 → Final Raid → 엔딩 → 랭킹까지 **끊김 없는 몰입형 플로우**를 제공한다.
 - **핵심 품질 목표**: (1) AAA 게임/비밀기관 HUD 수준의 몰입감, (2) 행사 운영 안정성(관리자 제어, 새로고침 복구, 종료 시간 강제), (3) 정답·점수의 서버 보호.
@@ -278,7 +278,7 @@ PMC_ROUND2/
 | 점수 | **Investigation Score** | `score` |
 | Stage | **Mission** | `stage` |
 | 아이템 | **Evidence / Equipment** | `item` |
-| 응시자 | **신입 수사관 → (정식) 감독관** | `agent` |
+| 응시자 | **신입 감독관 → (정식) 감독관** | `agent` |
 
 **규칙**: UI 문자열은 `src/js/constants/terms.js`에 모아 한 곳에서 관리(오탈자·톤 일관성). 코드 식별자는 중립 영어를 써도 되지만, **화면 출력 시점에 반드시 게임 용어로 변환**한다.
 

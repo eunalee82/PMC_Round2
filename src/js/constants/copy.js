@@ -4,7 +4,7 @@
 //   지금은 콘텐츠 미제작 단계라 en은 비어 있고 전부 ko로 폴백된다. DEV 편집은 현재 로케일에만 적용.
 // Keep keys stable; edit values freely.
 
-const OATH_TEXT_KO = `본인은 PM보호국 신입 수사관으로서
+const OATH_TEXT_KO = `본인은 PM보호국 신입 감독관으로서
 프로젝트의 Value를 최우선으로 판단하며,
 왜곡된 실행과 잘못된 의사결정을 발견할 경우
 PMBOK® 8th Edition의 원칙에 따라
@@ -31,14 +31,14 @@ const KO = {
   'opening.briefingStamp': 'PMB 브리핑',
   'opening.briefing1': '현대의 프로젝트는 기술이 아니라 잘못된 판단으로 실패한다.',
   'opening.briefing2': '그 실패를 만드는 존재를 PM보호국은 "빌런"이라 부른다.',
-  'opening.briefing3': '신입 수사관이여, 15개의 사건을 해결하고 프로젝트의 가치를 지켜라.',
+  'opening.briefing3': '신입 감독관이여, 15개의 사건을 해결하고 프로젝트의 가치를 지켜라.',
   'opening.fallbackRetry': '다시 재생',
   'opening.fallbackProceed': '팀 선택으로',
   'opening.soundOn': '소리 켜기',
   'opening.soundOff': '음소거',
 
   // SCR-003 Team Selection
-  'team.step': 'STEP 01 · 신입 수사관 등록',
+  'team.step': 'STEP 01 · 신입 감독관 등록',
   'team.title': '소속 팀을 선택하십시오',
   'team.lead': '소속 팀을 선택하고 수사관 3명을 등록하면 사건 접수를 시작할 수 있습니다.',
   'team.start': '사건 접수 시작',
@@ -194,7 +194,7 @@ const KO = {
   'appoint.message': '수사관 여러분,\n\n모든 자격 검증 Mission을 통과했습니다.\n\n지금부터 여러분을\nPM보호국 정식 감독관으로 임명합니다.',
   'appoint.stagesLabel': '자격 검증 결과',
   'appoint.itemsLabel': '확보 장비',
-  'appoint.rankFrom': '신입 수사관',
+  'appoint.rankFrom': '신입 감독관',
   'appoint.rankTo': '정식 감독관',
   'appoint.badgeCaption': '임시 배지 — 금배지는 최종 임무 완수 후 수여됩니다.',
   'appoint.accept': '임명 수락',
@@ -291,7 +291,7 @@ const KO = {
   'evidence.close': '닫기',
   'evidence.recording': '녹취',
   'evidence.loadFail': '단서 이미지를 불러오지 못했습니다.',
-  'agent.rankRookie': '신입 수사관',
+  'agent.rankRookie': '신입 감독관',
   'sidebar.points': '점',
   'audio.control': '소리 조절',
   'audio.mute': '음소거',
@@ -310,7 +310,7 @@ const KO = {
 }
 
 // 영문(en) — ko와 같은 키. 비어 있는 키는 lib/copy.js가 자동으로 ko로 폴백한다.
-const OATH_TEXT_EN = `As a rookie agent of the PM Protection Bureau,
+const OATH_TEXT_EN = `As a rookie supervisor of the PM Protection Bureau,
 I place the project's Value above all in my judgment,
 and upon finding distorted execution or a wrong decision,
 I pledge to investigate the case fairly
@@ -333,14 +333,14 @@ const EN = {
   'opening.briefingStamp': 'PMB BRIEFING',
   'opening.briefing1': 'Modern projects fail not from technology, but from wrong judgment.',
   'opening.briefing2': 'The Bureau calls the force behind that failure the "Villain".',
-  'opening.briefing3': 'Rookie agent, resolve the 15 cases and protect the value of the project.',
+  'opening.briefing3': 'Rookie supervisor, resolve the 15 cases and protect the value of the project.',
   'opening.fallbackRetry': 'Replay',
   'opening.fallbackProceed': 'To team selection',
   'opening.soundOn': 'Sound on',
   'opening.soundOff': 'Mute',
 
   // SCR-003 Team Selection
-  'team.step': 'STEP 01 · Agent Registration',
+  'team.step': 'STEP 01 · Rookie Supervisor Registration',
   'team.title': 'Select your team',
   'team.lead': 'Select your team and register 3 agents to begin case intake.',
   'team.start': 'Begin Case Intake',
@@ -488,7 +488,7 @@ const EN = {
   'appoint.message': 'Agents,\n\nYou have passed every qualification Mission.\n\nFrom this moment you are appointed\nofficial Supervisors of the PM Protection Bureau.',
   'appoint.stagesLabel': 'Qualification Results',
   'appoint.itemsLabel': 'Secured Equipment',
-  'appoint.rankFrom': 'Rookie Agent',
+  'appoint.rankFrom': 'Rookie Supervisor',
   'appoint.rankTo': 'Official Supervisor',
   'appoint.badgeCaption': 'Provisional badge — the gold badge is awarded after the final mission.',
   'appoint.accept': 'Accept Appointment',
@@ -581,7 +581,7 @@ const EN = {
   'evidence.close': 'Close',
   'evidence.recording': 'Recording',
   'evidence.loadFail': 'Failed to load the clue image.',
-  'agent.rankRookie': 'Rookie Agent',
+  'agent.rankRookie': 'Rookie Supervisor',
   'sidebar.points': 'pts',
   'audio.control': 'Sound',
   'audio.mute': 'Mute',

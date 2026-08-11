@@ -23,7 +23,8 @@ export function createLeftSidebar (props = {}) {
 
   function render (p) {
     const {
-      team = { name: 'UNASSIGNED', rank: '신입 수사관', score: 0, scoreMax: SCORE_MAX },
+      // 계급 문구는 copy.js 를 단일 출처로 둔다 — 하드코딩하면 로케일 전환 시 국문이 남는다 (CLAUDE.md §15)
+      team = { name: 'UNASSIGNED', rank: t('agent.rankRookie'), score: 0, scoreMax: SCORE_MAX },
       ranking = [],
       stageScore = [],
       items = [],

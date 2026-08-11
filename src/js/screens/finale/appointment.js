@@ -1,7 +1,7 @@
 // SCR-015 Officer Appointment — 세 Stage를 모두 통과한 팀을 PM보호국 정식 감독관으로 임명한다.
 // 진입 조건(docs/game-flow.md §11.1): Stage 1~3 완료 + 세 보상 확보 → 라우터 가드가 검증한다
 // (constants/flow.js resolveStep). [임명 수락] 시 감독관 상태를 저장하고 긴급 경보(SCR-016)로 넘어간다.
-// 연출: 국장 등장 → 계급 변화(신입 수사관 → 정식 감독관) → 임시 배지 활성화. 실패해도 진행은 막지 않는다(§13).
+// 연출: 국장 등장 → 계급 변화(신입 감독관 → 정식 감독관) → 임시 배지 활성화. 실패해도 진행은 막지 않는다(§13).
 import { el } from '../../utils/dom.js'
 import { icon } from '../../utils/icons.js'
 import { t } from '../../lib/copy.js'
@@ -77,7 +77,7 @@ export function createAppointmentScreen (ctx) {
         el('span', { class: 'appoint__team-name', text: teamName })
       ]),
 
-      // 계급 변화 — 신입 수사관에서 정식 감독관으로.
+      // 계급 변화 — 신입 감독관에서 정식 감독관으로.
       el('div', { class: 'appoint__rank' }, [
         el('span', { class: 'appoint__rank-from', text: t('appoint.rankFrom') }),
         el('span', { class: 'appoint__rank-arrow', text: '→' }),
