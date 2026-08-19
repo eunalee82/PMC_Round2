@@ -6,6 +6,7 @@ import { ASSETS } from '../../constants/assets.js'
 import { FLOW } from '../../constants/flow.js'
 import { t, copyEl, bindCopy } from '../../lib/copy.js'
 import { getLocale, setLocale } from '../../lib/i18n.js'
+import { isSoloMode } from '../../lib/mode.js'
 import { createButton } from '../../../components/primitives/button.js'
 import { createSoundTest } from '../../../components/shell/sound-test.js'
 
@@ -31,6 +32,24 @@ export function createEntryScreen (ctx) {
     }
   })
   bindCopy(enterBtn.el.querySelector('.btn__label'), 'entry.enter')
+
+  // [이어서 계속하기] — 사건 화면에서 [처음으로]로 나왔다 돌아온 경우. 진행은 로컬에 남아 있으므로
+  // 오프닝·서약을 다시 거치지 않고 그 자리로 복귀한다(연습 모드 자유 이동, 2026-08-19).
+  // 가드가 최종 판정하므로 저장된 지점이 더 이상 유효하지 않으면 알맞은 화면으로 되돌려 준다.
+  const resumeStep = isSoloMode() && ctx.session.pledgedAt ? ctx.session.resumeStep : null
+  const resumeBtn = resumeStep
+    ? createButton({
+      label: t('entry.resume'),
+      variant: 'gold',
+      size: 'lg',
+      icon: 'crosshair',
+      onClick: () => {
+        ctx.audio.unlock()
+        ctx.goTo(resumeStep)
+      }
+    })
+    : null
+  if (resumeBtn) bindCopy(resumeBtn.el.querySelector('.btn__label'), 'entry.resume')
 
   const audioBtn = el('button', { class: 'ghost-chip', type: 'button', 'aria-label': '음향 켜기 또는 음소거' }, [
     icon(muted ? 'volumeOff' : 'volume', { size: 18 }),
@@ -94,10 +113,17 @@ export function createEntryScreen (ctx) {
       ]),
       langSelect,
       soundTest.el,
-      el('div', { class: 'entry__cta' }, [enterBtn.el])
+      el('div', { class: 'entry__cta' }, [resumeBtn ? resumeBtn.el : null, enterBtn.el])
     ]),
     copyEl('span', { class: 'entry__foot mono' }, 'entry.foot')
   ])
 
-  return { el: node, destroy () { soundTest.destroy(); enterBtn.destroy() } }
+  return {
+    el: node,
+    destroy () {
+      soundTest.destroy()
+      enterBtn.destroy()
+      if (resumeBtn) resumeBtn.destroy()
+    }
+  }
 }

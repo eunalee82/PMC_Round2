@@ -2,12 +2,14 @@
 //
 //   서버 모드: submit_answer RPC 가 **한 트랜잭션에서** 채점 + 저장 + 진행 갱신을 하고
 //             정답 인덱스·해설을 돌려준다. 클라이언트는 판정하지 않는다 (CLAUDE.md §2 §11).
+//   solo 모드: check_answer RPC 가 채점만 한다(서버 저장 없음) → 진행은 progress-mock 에 기록.
 //   mock 모드: cases.js 의 SOLUTIONS 로 채점하고 progress-mock 에 기록한다(비상 경로).
 //
 // 반환: { ok: true, isCorrect, correctIndex, analysis }
 //     | { ok: false, reason: 'already_submitted'|'game_ended'|'game_not_started'|'not_owner'|'unknown_case'|'error' }
 // see docs/supabase-minimum-design.md §6.1 §9.1
 import { isServerMode, rpc } from './supabase.js'
+import { isSoloMode } from './mode.js'
 import { getLocale } from './i18n.js'
 import { getClaimToken } from './entries.js'
 import { applySubmit, recordSubmission } from './progress.js'
@@ -20,6 +22,35 @@ const sameSet = (a, b) => {
   if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false
   const s = new Set(b)
   return a.every((v) => s.has(v))
+}
+
+// 공개 연습 모드 채점 — 서버는 **판정만** 하고 아무것도 저장하지 않는다(팀·점유·랭킹이 없다).
+// 정답은 여전히 서버에만 있다(CLAUDE.md §11): check_answer 가 정답 인덱스와 해설을 돌려주고,
+// 진행/점수는 이 기기(progress-mock, localStorage)에만 쌓인다. see 0015_practice_mode.sql
+async function submitPractice ({ teamId, caseId, stage, choiceIndex, choiceIndexes }) {
+  try {
+    const args = {
+      p_case_id: caseId,
+      p_choice_index: choiceIndexes ? null : choiceIndex,
+      p_locale: getLocale()
+    }
+    // 0009 와 같은 이유로 복수 정답 사건일 때만 넣는다(함수 시그니처 모호성 방지).
+    if (choiceIndexes) args.p_choice_indexes = choiceIndexes
+    const data = await rpc('check_answer', args)
+    const isCorrect = !!data.is_correct
+    recordSubmission(teamId, caseId, data.stage || stage, isCorrect)
+    return {
+      ok: true,
+      isCorrect,
+      correctIndex: data.correct_index,
+      correctIndexes: data.correct_indexes || null,
+      analysis: data.analysis || ''
+    }
+  } catch (err) {
+    const reason = SERVER_REASONS.includes(err.code) ? err.code : 'error'
+    console.warn('[grade] 연습 모드 채점 실패', caseId, reason, err)
+    return { ok: false, reason }
+  }
 }
 
 export async function submitCase ({ teamId, caseId, stage, choiceIndex, choiceIndexes = null }) {
@@ -43,6 +74,8 @@ export async function submitCase ({ teamId, caseId, stage, choiceIndex, choiceIn
       analysis: localizeAnalysis(sol)
     }
   }
+
+  if (isSoloMode()) return submitPractice({ teamId, caseId, stage, choiceIndex, choiceIndexes })
 
   const token = getClaimToken(teamId)
   if (!token) return { ok: false, reason: 'not_owner' }

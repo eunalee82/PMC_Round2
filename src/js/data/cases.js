@@ -9,6 +9,7 @@
 // see docs/handoff.md · docs/supabase-minimum-design.md · CLAUDE.md §11
 import { CASE_MANIFEST } from './case-manifest.js'
 import { isServerMode, rpc } from '../lib/supabase.js'
+import { isSoloMode } from '../lib/mode.js'
 import { getLocale } from '../lib/i18n.js'
 
 // 라우팅·진행 판정(stage-progress·progress-mock)은 구조 메타만 있으면 된다 → 매니페스트를 그대로 CASES 로 노출.
@@ -32,7 +33,11 @@ export async function loadCases (teamId = null, token = null) {
   inflight = (async () => {
     const map = {}
     if (isServerMode()) {
-      const rows = await rpc('get_cases', { p_team_id: teamId, p_token: token, p_locale: locale })
+      // 공개 연습 모드에는 팀 토큰도 게임 시작 상태도 없다 → 본문만 내려주는 전용 RPC 를 쓴다.
+      // 정답·해설은 여기서도 나오지 않는다(채점은 lib/grade.js 의 check_answer). see 0015_practice_mode.sql
+      const rows = isSoloMode()
+        ? await rpc('get_cases_public', { p_locale: locale })
+        : await rpc('get_cases', { p_team_id: teamId, p_token: token, p_locale: locale })
       for (const row of rows || []) map[row.case_id] = row.content
     } else if (import.meta.env.DEV) {
       // 비상/개발 경로 — 본문 사본은 DEV 전용 모듈에만 있고 프로덕션 번들에서 통째로 제거된다.

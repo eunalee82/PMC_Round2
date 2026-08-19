@@ -12,10 +12,12 @@ import { t } from '../../lib/copy.js'
 import { ASSETS } from '../../constants/assets.js'
 import { FLOW } from '../../constants/flow.js'
 import { STAGE_META } from '../../constants/stages.js'
-import { findTeam } from '../../lib/teams.js'
+import { isSoloMode } from '../../lib/mode.js'
+import { playerName } from '../../lib/player.js'
 import { getFinale, recordFinale } from '../../lib/progress.js'
 import { STAGES } from '../../lib/stage-progress.js'
 import { createButton } from '../../../components/primitives/button.js'
+import { createHomeLink } from '../../../components/shell/home-link.js'
 
 const RAID_MS = 20000 // 레이드 시간 20초 (docs/game-flow.md §13.3)
 // 이 횟수를 먼저 채우면 20초 전에 체력이 0이 된다(연타 보상). 못 채워도 20초에 종료된다(성공 보장).
@@ -35,14 +37,15 @@ const reduceMotion = () => typeof window !== 'undefined' &&
 
 export function createRaidScreen (ctx) {
   const teamId = ctx.session.teamId
-  const team = findTeam(teamId)
-  const teamName = team ? team.name : 'UNASSIGNED'
+  const teamName = playerName(ctx.session) // 행사 = 팀명, 연습 = 서약 서명
 
   const prevStage = document.documentElement.dataset.stage
   document.documentElement.dataset.stage = 'raid' // Final Raid = Red 국면 (§21)
 
   const host = el('div', { class: 'finale__inner' })
-  const node = el('div', { class: 'screen screen--finale screen--raid' }, [host])
+  // 국면(경보 → 준비 → 전투 → 격퇴)이 host 안에서 통째로 교체되므로 [처음으로]는 host 밖에 둔다.
+  const homeLink = isSoloMode() ? createHomeLink({ onHome: () => ctx.goHome() }) : null
+  const node = el('div', { class: 'screen screen--finale screen--raid' }, [homeLink ? homeLink.el : null, host])
 
   // ── 수명 관리 — 하위 국면의 컴포넌트/타이머는 국면 전환 때 반드시 정리한다 (CLAUDE.md §9) ──
   let viewParts = []
@@ -360,6 +363,7 @@ export function createRaidScreen (ctx) {
       stopRaf()
       clearTimers()
       clearView()
+      if (homeLink) homeLink.destroy()
     }
   }
 }

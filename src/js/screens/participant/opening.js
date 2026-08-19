@@ -6,6 +6,7 @@ import { icon } from '../../utils/icons.js'
 import { ASSETS } from '../../constants/assets.js'
 import { FLOW } from '../../constants/flow.js'
 import { t, bindCopy, copyEl } from '../../lib/copy.js'
+import { isSoloMode } from '../../lib/mode.js'
 import { createButton } from '../../../components/primitives/button.js'
 
 const YT_ORIGIN = 'https://www.youtube.com'
@@ -30,7 +31,12 @@ function hasUserActivation () {
 export function createOpeningScreen (ctx) {
   let destroyed = false
   const timers = []
-  function toTeam () { if (!destroyed) ctx.goTo(FLOW.TEAM) }
+  // 다음 단계는 모드가 정한다 — 행사는 팀 선택(SCR-003), 공개 연습은 팀이 없으니 곧장 서약으로.
+  const solo = isSoloMode()
+  const NEXT_STEP = solo ? FLOW.OATH : FLOW.TEAM
+  const NEXT_KEY = solo ? 'opening.proceedSolo' : 'opening.fallbackProceed'
+  const GUIDE_KEY = solo ? 'opening.guideSolo' : 'opening.guide'
+  function toNext () { if (!destroyed) ctx.goTo(NEXT_STEP) }
 
   const iframe = el('iframe', {
     class: 'opening__video',
@@ -126,10 +132,10 @@ export function createOpeningScreen (ctx) {
     }
   })
 
-  const skipBtn = createButton({ label: t('opening.skip'), variant: 'ghost', size: 'sm', icon: 'skipForward', onClick: toTeam })
+  const skipBtn = createButton({ label: t('opening.skip'), variant: 'ghost', size: 'sm', icon: 'skipForward', onClick: toNext })
   bindCopy(skipBtn.el.querySelector('.btn__label'), 'opening.skip')
-  const proceed = createButton({ label: t('opening.fallbackProceed'), variant: 'primary', size: 'sm', icon: 'logIn', onClick: toTeam })
-  bindCopy(proceed.el.querySelector('.btn__label'), 'opening.fallbackProceed')
+  const proceed = createButton({ label: t(NEXT_KEY), variant: 'primary', size: 'sm', icon: 'logIn', onClick: toNext })
+  bindCopy(proceed.el.querySelector('.btn__label'), NEXT_KEY)
 
   const controls = el('div', { class: 'opening__controls' }, [
     soundBtn.el,
@@ -151,7 +157,7 @@ export function createOpeningScreen (ctx) {
     backBtn.el,
     el('p', { class: 'opening__guide' }, [
       icon('alert', { size: 16 }),
-      copyEl('span', {}, 'opening.guide')
+      copyEl('span', {}, GUIDE_KEY)
     ])
   ])
 

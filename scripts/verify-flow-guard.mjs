@@ -21,6 +21,15 @@ const session = (over = {}) => ({
   ...over
 })
 
+// 공개 연습 모드 세션 — 팀도 등록 수사관도 없고, 서약(성명)만으로 입장이 성립한다.
+const solo = (over = {}) => ({
+  teamId: 'solo', // lib/player.js SOLO_PLAYER_ID — 이 기기의 진행 저장 키
+  memberEmails: [],
+  signerName: '홍길동',
+  pledgedAt: '2026-08-19T01:00:00Z',
+  ...over
+})
+
 // [설명, 저장된 step, 세션, facts, 기대 복귀 화면]
 const CASES = [
   // ── 정상 진행 중 새로고침 (CLAUDE.md §2 재진입 가능)
@@ -76,7 +85,34 @@ const CASES = [
   ['등록 전에는 서약할 수 없다',
     FLOW.OATH, { teamId: null, memberEmails: [] }, {}, FLOW.TEAM],
   ['알 수 없는 step은 첫 화면으로',
-    'nonsense-step', session(), { gameStarted: true }, FLOW.ENTRY]
+    'nonsense-step', session(), { gameStarted: true }, FLOW.ENTRY],
+
+  // ── 공개 연습 모드 (facts.solo) — 팀 선택·대기실·관리자 Start 가 없다 (lib/mode.js, 2026-08-19)
+  //    solo 세션에는 teamId 가 고정 키('solo')로 채워지고 memberEmails 는 비어 있다.
+  ['연습: 서약 전에는 사건에 접근할 수 없다',
+    FLOW.CASE, solo({ pledgedAt: null }), { solo: true }, FLOW.OATH],
+  ['연습: 서약을 마치면 관리자 Start 없이 바로 사건',
+    FLOW.CASE, solo(), { solo: true, gameStarted: false }, FLOW.CASE],
+  ['연습: 없어진 팀 선택 화면 요청 → 사건으로 접는다',
+    FLOW.TEAM, solo(), { solo: true }, FLOW.CASE],
+  ['연습: 서약 전 팀 선택 요청 → 서약으로 접는다',
+    FLOW.TEAM, solo({ pledgedAt: null }), { solo: true }, FLOW.OATH],
+  ['연습: 없어진 대기실 요청 → 사건으로 접는다',
+    FLOW.WAITING, solo(), { solo: true }, FLOW.CASE],
+  ['연습: 게임 종료 상태가 흘러들어와도 진행을 끊지 않는다',
+    FLOW.CASE, solo(), { solo: true, gameEnded: true }, FLOW.CASE],
+  ['연습: 사건이 남았는데 임명으로 건너뛰기 → 사건',
+    FLOW.APPOINT, solo(), { solo: true, stagesCleared: false }, FLOW.CASE],
+  ['연습: 완주 후 임명 → 임명',
+    FLOW.APPOINT, solo(), { solo: true, stagesCleared: true, finale: {} }, FLOW.APPOINT],
+  ['연습: 임명 전 레이드 건너뛰기 → 임명',
+    FLOW.RAID, solo(), { solo: true, stagesCleared: true, finale: {} }, FLOW.APPOINT],
+  ['연습: 임명 후 레이드 → 레이드',
+    FLOW.RAID, solo(), { solo: true, stagesCleared: true, finale: { appointedAt: 1 } }, FLOW.RAID],
+  ['연습: 레이드 완료 후 금배지 → 금배지',
+    FLOW.ENDING, solo(), { solo: true, stagesCleared: true, finale: { appointedAt: 1, raidEndedAt: 2 } }, FLOW.ENDING],
+  ['연습: 알 수 없는 step은 첫 화면으로',
+    'nonsense-step', solo(), { solo: true }, FLOW.ENTRY]
 ]
 
 const failures = []

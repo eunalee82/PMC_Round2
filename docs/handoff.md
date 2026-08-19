@@ -624,3 +624,81 @@ Edge 에서 영상 재생 중 **하단 우측 진행 버튼이 플레이어 UI�
 **시뮬레이션 방법(재현용)**: anon 키 + `@supabase/supabase-js` 로 32 클라이언트를 만들어 `claim_team`(기기 ID 32개 분리) → `get_cases` → `my_progress` → `submit_answer` → `release_team` 순으로 동시 호출한다. ⚠️ **`claim_team` 은 같은 `device_id` 가 쥔 다른 팀의 점유를 지운다**(`0001_init.sql:227`) — 기기 ID 를 분리하지 않으면 서로 점유를 뺏어 측정이 무의미해진다. 뒷정리는 `release_team`(점유) + 관리자 [전부 초기화](제출·점수)다.
 
 **남은 변수**: 참가자가 각자 다른 장소에서 접속하면 행사장 WiFi 병목은 성립하지 않는다(운영 확인). 남는 것은 개별 회선 품질뿐이며, 에셋 총량은 `public/` 36MB(오디오 26MB)다.
+
+---
+
+## 13. 2026-08-19 세션 기록 — 공개 연습 모드(solo) 추가 · 팀 선택 제거
+
+**요청**: "누구나 들어와서 퀴즈를 풀어볼 수 있게. 팀 선택 메뉴는 없애도 된다."
+
+**결정(운영 확인)**: 행사(팀 대항) 흐름을 지우지 않고 **모드 스위치**를 뒀다. 기본은 공개 연습(solo),
+행사는 `?event`. 진행/점수는 연습에서 **브라우저 로컬만** 쓰고 랭킹에 넣지 않는다. 관리자 [게임 시작]
+대기실은 연습 흐름에서 뺐다(들어온 즉시 사건). 두 모드의 표는 `CLAUDE.md §16.3`.
+
+### 13.1 무엇이 어디서 갈라지는가
+
+| 관심사 | 파일 | 갈라짐 |
+|---|---|---|
+| 모드 판정(단일 출처) | `src/js/lib/mode.js` | URL(`?event`·`?solo`·`?admin`) → `pmb.mode.v1` → 기본 solo. **부팅 시 1회** |
+| 흐름 가드 | `src/js/constants/flow.js` | `facts.solo` → `resolveStepSolo()` · `SOLO_ORDER = [entry, opening, oath]` |
+| 세션 주체 | `src/js/flow.js` `normalize()` | solo 는 `teamId='solo'`(`lib/player.js SOLO_PLAYER_ID`), 모드가 바뀌면 반대편 세션을 비운다 |
+| 게임 상태 | `src/js/lib/game.js` → `game-solo.js` | 항상 `started` · 제한 시간/종료/연결감시 없음 |
+| 진행·점수 | `src/js/lib/progress.js` | solo 는 서버 env 가 있어도 `progress-mock`(localStorage) |
+| 사건 본문 | `src/js/data/cases.js` | solo → `get_cases_public` (토큰·시작상태 불요) |
+| 채점 | `src/js/lib/grade.js` `submitPractice()` | solo → `check_answer` (판정만, 서버 기록 없음) → 로컬 기록 |
+| 화면 이름 | `src/js/lib/player.js` `playerName()` | 행사=팀명 / 연습=서약 서명 |
+
+화면 쪽 변경: 오프닝의 다음 단계(팀 선택 ↔ 서약), 서약 화면의 팀/수사관 블록 숨김·되돌아갈 곳,
+사건 화면의 타이머 숨김(`app-header` `showTimer`)·랭킹 비움·**캡처 가드 미적용**, 엔딩의 [처음부터 다시 도전].
+
+### 13.2 서버 — 0015 적용 완료 (2026-08-19)
+
+`supabase/migrations/0015_practice_mode.sql` — `get_cases_public(p_locale)` · `check_answer(...)` 두 개를
+추가한다. **기존 `get_cases`·`submit_answer` 는 손대지 않았다**(행사 경로의 토큰·시작상태·중복제출
+방어를 연습 때문에 느슨하게 만들지 않는다). 정답은 여전히 서버에만 있다.
+
+**적용·검증 결과 (anon 키로 실측)**
+
+| 확인 항목 | 결과 |
+|---|---|
+| `get_cases_public` 본문 | ko 15건 · en 15건 (`title,brief,prompt,choices,evidence` — 정답 없음) |
+| `check_answer` 단일 선택 14건 | 사건마다 정답으로 판정되는 보기가 **정확히 1개** |
+| `check_answer` 복수 정답(case-005) | 배열 채점 동작 · 형태 어긋난 제출(`answer_shape`) 거부 |
+| 같은 사건 반복 제출 | 매번 판정만 (기록 안 함 = 랭킹·팀 진행 영향 없음) |
+| `cases` · `case_answers` 직접 조회 | 401 (변함없이 차단) |
+
+- 재확인: `node scripts/check-migrations.mjs` → `0015_practice_mode` ✔
+- 연습만 즉시 닫으려면 두 함수의 `grant execute` 를 회수하면 된다(SQL 파일 머리말에 명령 있음).
+
+### 13.2b 배포 — 기존 사이트가 연습 사이트가 됐다
+
+별도 사이트를 만들 수도 있었지만(한때 `VITE_DEFAULT_MODE` env 스위치까지 넣었다가 **되돌렸다**),
+운영 결정은 **기존 URL 하나로 간다**였다 → `https://pmc-round2.vercel.app` = 연습 사이트,
+행사 흐름이 필요하면 `?event`.
+
+- 배포: `npx vercel --prod --yes` (프로젝트 `pmc-round2`, 주소 그대로)
+- ⚠️ **빈 Vercel 프로젝트 `pmc-practice` 가 남아 있다** — 별도 사이트를 검토하다 생성됐고 배포는 0건이다.
+  지우려면 `npx vercel project rm pmc-practice`.
+- 참가자 기기에 남아 있던 옛 세션(팀·서약)은 `flow.js normalize()` 가 첫 화면부터 다시 시작하도록 정리한다.
+  화면이 예전 같으면 강력 새로고침(Ctrl+Shift+R), 행사 모드가 저장돼 있으면 `?solo` 로 푼다.
+
+### 13.2c 자유 이동 — [처음으로] · [이어서 계속하기] (연습 모드 전용)
+
+"모든 화면에서 처음으로 돌아갈 수 있어야 한다"(운영 요청)를 진행 손실 없이 만든 방식:
+
+- `ctx.goHome()`(`flow.js`)이 **나가기 직전 step 을 `session.resumeStep` 에 남기고** 첫 화면으로 보낸다.
+- 첫 화면(`entry.js`)은 `resumeStep` 이 있으면 **[이어서 계속하기]** 를 띄워 오프닝·서약을 건너뛰고 복귀시킨다.
+  (그냥 [PM보호국 입장]으로 들어와도 진행은 로컬에 남아 있어 풀던 사건부터 이어진다.)
+- 붙는 곳: 사건 화면은 헤더(`app-header.js` `onHome`), 셸이 없는 종반부 3화면은 고정 칩
+  (`components/shell/home-link.js` + `.home-fab`). 오프닝·서약에는 원래 있던 [첫 화면으로]가 그 역할을 한다.
+- **행사 모드에는 붙이지 않는다** — 시험 중 사건 화면을 벗어나는 길을 열지 않는다.
+
+### 13.3 알아 둘 것
+
+- 연습 모드는 사건 본문을 **누구에게나** 내려준다 — 그것이 이 모드의 목적이다. 같은 문제로 다시 대회를
+  치를 계획이 있다면 13.2 의 회수 명령으로 닫아 두고 행사 URL(`?event`)만 쓴다.
+- 캡처 가드(워터마크·전체화면 강제)를 연습에서 뺀 이유: 공개 페이지에서 전체화면을 강요하면 문턱만 되고,
+  막으려는 대상(문제 유출)이 이미 공개돼 있어 방어의 뜻이 없다.
+- 관리자 초기화(`clearParticipantState`)가 `pmb.mode.v1` 을 지우지 않도록 KEEP 에 넣었다 — 지우면 행사
+  기기가 다음 새로고침에 연습 모드로 떨어진다.
+- 가드 회귀 시나리오 12개(연습 모드)를 `scripts/verify-flow-guard.mjs` 에 추가했다 → 총 33개.

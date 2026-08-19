@@ -14,7 +14,9 @@ const KEEP = new Set([
   // 기기 식별자 — 팀 점유/인계 판정의 기준값이라 유지한다(초기화로 새 기기가 되어선 안 된다).
   'pmb.device.v1',
   // DEV 메뉴 잠금 해제 — 리허설 편의(프로덕션 번들에는 DEV 메뉴가 없다).
-  'pmb.dev.unlocked'
+  'pmb.dev.unlocked',
+  // 플레이 모드(solo/event) — 지우면 행사용 기기가 다음 새로고침에 연습 모드로 떨어진다(lib/mode.js).
+  'pmb.mode.v1'
 ])
 
 // 지운 키 목록을 돌려준다(운영 중 원인 추적용 로그).

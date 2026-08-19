@@ -1,12 +1,15 @@
 // 게임 상태 — 백엔드 라우터. 화면·라우터는 이 파일만 import 한다(계약 유지).
+//   solo 모드(공개 연습)         → game-solo.js   (항상 '진행 중' · 제한 시간 없음)
 //   VITE_BACKEND=supabase(기본) → game-server.js (Supabase RPC + Realtime + 5초 폴링)
 //   VITE_BACKEND=mock 또는 env 없음 → game-mock.js (localStorage, 행사 당일 비상 경로)
-// see docs/supabase-minimum-design.md §10
+// see docs/supabase-minimum-design.md §10 · lib/mode.js
 import { isServerMode } from './supabase.js'
+import { isSoloMode } from './mode.js'
 import * as mock from './game-mock.js'
 import * as server from './game-server.js'
+import * as solo from './game-solo.js'
 
-const impl = isServerMode() ? server : mock
+const impl = isSoloMode() ? solo : (isServerMode() ? server : mock)
 
 // ── 동기 조회 ──
 export function getStatus () { return impl.getStatus() }

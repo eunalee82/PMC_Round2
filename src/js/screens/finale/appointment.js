@@ -9,14 +9,17 @@ import { ASSETS } from '../../constants/assets.js'
 import { FLOW } from '../../constants/flow.js'
 import { STAGE_META } from '../../constants/stages.js'
 import { findTeam } from '../../lib/teams.js'
+import { isSoloMode } from '../../lib/mode.js'
+import { playerName } from '../../lib/player.js'
 import { getProgress, recordFinale } from '../../lib/progress.js'
 import { builtTotal, STAGES } from '../../lib/stage-progress.js'
 import { createButton } from '../../../components/primitives/button.js'
+import { createHomeLink } from '../../../components/shell/home-link.js'
 
 export function createAppointmentScreen (ctx) {
   const teamId = ctx.session.teamId
-  const team = findTeam(teamId)
-  const teamName = team ? team.name : 'UNASSIGNED'
+  const team = findTeam(teamId) // 연습 모드에는 팀이 없다 → null (색 점만 빠진다)
+  const teamName = playerName(ctx.session)
   const p = getProgress(teamId)
 
   const prevStage = document.documentElement.dataset.stage
@@ -59,7 +62,11 @@ export function createAppointmentScreen (ctx) {
     ])
   })
 
+  // 연습 모드에서는 어느 화면에서든 첫 화면으로 나갈 수 있다(진행은 로컬에 남는다).
+  const homeLink = isSoloMode() ? createHomeLink({ onHome: () => ctx.goHome() }) : null
+
   const node = el('div', { class: 'screen screen--finale screen--appoint' }, [
+    homeLink ? homeLink.el : null,
     el('div', { class: 'finale__inner anim-rise' }, [
       el('span', { class: 'finale__eyebrow mono caps', text: t('appoint.eyebrow') }),
       el('h1', { class: 'finale__title', text: t('appoint.title') }),
@@ -110,6 +117,7 @@ export function createAppointmentScreen (ctx) {
       if (prevStage) document.documentElement.dataset.stage = prevStage
       else delete document.documentElement.dataset.stage
       acceptBtn.destroy()
+      if (homeLink) homeLink.destroy()
     }
   }
 }

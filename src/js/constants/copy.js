@@ -22,6 +22,9 @@ const KO = {
   // 첫 화면(SCR-001)이 언어 선택 지점이라, 팀을 점유하기 전까지는 되돌아올 길을 남겨 둔다
   // (운영 요청 2026-08-10 — 언어를 잘못 고른 팀이 처음으로 못 돌아가던 문제).
   'common.backToStart': '첫 화면으로 돌아가기',
+  // 연습 모드 자유 이동(2026-08-19) — 사건·종반부 화면에도 첫 화면으로 나가는 길을 둔다.
+  'common.home': '처음으로',
+  'entry.resume': '이어서 계속하기',
 
   // SCR-002 Opening
   'opening.skip': '건너뛰기',
@@ -34,6 +37,9 @@ const KO = {
   'opening.briefing3': '신입 감독관이여, 15개의 사건을 해결하고 프로젝트의 가치를 지켜라.',
   'opening.fallbackRetry': '다시 재생',
   'opening.fallbackProceed': '팀 선택으로',
+  // 공개 연습 모드(lib/mode.js) — 팀 선택이 없어 곧장 서약으로 간다.
+  'opening.proceedSolo': '서약하고 시작하기',
+  'opening.guideSolo': '영상 시청이 끝나면 화면 아래쪽 [서약하고 시작하기] 버튼을 눌러 다음 단계로 이동하십시오.',
   'opening.soundOn': '소리 켜기',
   'opening.soundOff': '음소거',
 
@@ -80,6 +86,9 @@ const KO = {
   'oath.agree': '위 서약 내용에 동의하며, 감독관으로서 성실히 임무를 수행하겠습니다.',
   'oath.submit': '서약 완료',
   'oath.back': '팀 선택으로 돌아가기',
+  // 공개 연습 모드 — 팀 등록이 없어 서약이 첫 단계이고, 서약을 마치면 바로 첫 사건이 배정된다.
+  'oath.stepSolo': 'STEP 01 · 기밀 유지 서약',
+  'oath.leadSolo': '감독관 성명(또는 닉네임)을 적고 서약에 동의하면 곧바로 첫 사건이 배정됩니다.',
   // 관리자 게임 종료 시 참가자 안내 팝업 → 마지막 화면(종료 안내)으로 이동
   'gameEnded.title': '게임이 종료되었습니다',
   'gameEnded.msg': '감독관이 게임을 종료했습니다. 마지막 화면으로 이동합니다.',
@@ -278,6 +287,9 @@ const KO = {
   // 브라우저 종료 — 스크립트로 열지 않은 탭은 window.close()가 무시되므로 안내 문구를 함께 둔다.
   'end.close': '브라우저 종료하기',
   'end.closeHint': '창이 자동으로 닫히지 않으면 이 탭을 직접 닫아 주십시오. (Ctrl+W)',
+  // 공개 연습 모드 — 행사 마무리(본선 안내)가 아니라 "다시 풀어볼 수 있다"가 마지막 메시지다.
+  'end.msgSolo': '15개 사건을 모두 마치고 빌런왕을 격퇴했습니다.\n\n기록은 이 브라우저에만 저장되며 순위 집계에는 반영되지 않습니다.\n\n언제든 처음부터 다시 도전할 수 있습니다.',
+  'end.replay': '처음부터 다시 도전',
 
   // 캡처 가드 (게임플레이 오버레이)
   'guard.gateTitle': '전체화면에서 사건을 조사합니다',
@@ -326,6 +338,8 @@ const EN = {
   'entry.enter': 'Enter the Bureau',
   'entry.foot': 'PMB-OS · CLASSIFIED',
   'common.backToStart': 'Back to First Screen',
+  'common.home': 'Home',
+  'entry.resume': 'Continue where you left off',
 
   // SCR-002 Opening
   'opening.skip': 'Skip',
@@ -336,6 +350,8 @@ const EN = {
   'opening.briefing3': 'Rookie supervisor, resolve the 15 cases and protect the value of the project.',
   'opening.fallbackRetry': 'Replay',
   'opening.fallbackProceed': 'To team selection',
+  'opening.proceedSolo': 'Take the oath & begin',
+  'opening.guideSolo': 'When the video ends, press [Take the oath & begin] at the bottom of the screen to continue.',
   'opening.soundOn': 'Sound on',
   'opening.soundOff': 'Mute',
 
@@ -379,6 +395,8 @@ const EN = {
   'oath.agree': 'I agree to the oath above and will faithfully carry out my duty as a supervisor.',
   'oath.submit': 'Complete Oath',
   'oath.back': 'Back to Team Selection',
+  'oath.stepSolo': 'STEP 01 · Confidentiality Oath',
+  'oath.leadSolo': 'Enter your supervisor name (or nickname) and agree to the oath — your first case is assigned right away.',
   'gameEnded.title': 'The Game Has Ended',
   'gameEnded.msg': 'The supervisor has ended the game. Moving to the final screen.',
   'gameEnded.confirm': 'Go to Final Screen',
@@ -568,6 +586,8 @@ const EN = {
   'end.scoreLabel': 'Investigation Score',
   'end.close': 'Close browser',
   'end.closeHint': 'If the window does not close by itself, please close this tab directly. (Ctrl+W)',
+  'end.msgSolo': 'You resolved all 15 cases and defeated the Villain King.\n\nYour record is stored in this browser only and does not count toward the rankings.\n\nYou can start over any time.',
+  'end.replay': 'Start over',
 
   // Capture guard
   'guard.gateTitle': 'Investigate cases in full screen',

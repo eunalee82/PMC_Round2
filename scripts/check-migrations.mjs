@@ -80,6 +80,20 @@ try {
   results.push(['0014_admin_extend_game', false, `조회 실패 — ${e.message}`])
 }
 
+// ── 0015: 공개 연습 모드 RPC(check_answer) 존재 여부 ──────────
+// 없는 사건 id 로 찔러 본다 → 적용됐으면 'unknown_case', 미적용이면 PGRST202.
+// (get_cases_public 을 부르면 사건 본문이 콘솔에 쏟아지므로 채점 쪽으로 확인한다.)
+try {
+  const r = await fetch(`${URL}/rest/v1/rpc/check_answer`, {
+    method: 'POST', headers: H, body: JSON.stringify({ p_case_id: '__probe__', p_choice_index: 0, p_locale: 'ko' })
+  })
+  const b = await r.json().catch(() => ({}))
+  const missing = b.code === 'PGRST202' || /Could not find the function/i.test(b.message || '')
+  results.push(['0015_practice_mode', !missing, missing ? '함수 없음 — 연습 모드에서 채점이 실패한다' : '함수 존재(unknown_case 는 정상)'])
+} catch (e) {
+  results.push(['0015_practice_mode', false, `조회 실패 — ${e.message}`])
+}
+
 // ── 0003: 정답 시드 (anon 은 case_answers 를 못 읽는다) ────────
 // scoreboard 로 팀 수만 확인하고, 정답은 관리자 로그인 후 SQL 로 세라고 안내한다.
 console.log('\n[check-migrations] 서버에 적용된 마이그레이션')
@@ -97,7 +111,8 @@ if (!allOk) {
   console.log('  2) supabase/migrations/0010_duration_80min.sql')
   console.log('  3) supabase/migrations/0011_team_status_last_submit.sql')
   console.log('  4) supabase/migrations/0014_admin_extend_game.sql  (콘솔 [+5분 연장])')
-  console.log('  5) node scripts/export-seed.mjs → 0003_seed_answers.sql 실행 후 파일 삭제')
+  console.log('  5) supabase/migrations/0015_practice_mode.sql      (공개 연습 모드 — 본문/채점 RPC)')
+  console.log('  6) node scripts/export-seed.mjs → 0003_seed_answers.sql 실행 후 파일 삭제')
   process.exit(1)
 }
-console.log('\n✔ 0009·0010·0011·0014 적용 확인')
+console.log('\n✔ 0009·0010·0011·0014·0015 적용 확인')

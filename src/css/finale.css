@@ -26,6 +26,13 @@
 .finale__label { color: var(--text-3); font-size: var(--text-xs); letter-spacing: var(--tracking-caps); }
 .screen--finale .btn--block { max-width: 380px; margin-top: var(--s-4); }
 
+/* [처음으로] — 종반부 화면 위에 고정(components/shell/home-link.js). 연습 모드에서만 붙는다.
+   화면마다 레이아웃이 달라 흐름에 끼우지 않고 좌상단에 띄운다. */
+.home-fab { position: fixed; top: var(--s-4); left: var(--s-4); z-index: var(--z-header); }
+@media (max-width: 760px) {
+  .home-fab { top: var(--s-2); left: var(--s-2); height: 34px; padding: 0 var(--s-2); }
+}
+
 /* ── SCR-015 감독관 임명 ── */
 .appoint__boss {
   display: flex; align-items: center; gap: var(--s-5); text-align: left; width: 100%;

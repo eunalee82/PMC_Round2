@@ -9,16 +9,19 @@
 import { el } from '../../utils/dom.js'
 import { t } from '../../lib/copy.js'
 import { ASSETS } from '../../constants/assets.js'
-import { findTeam } from '../../lib/teams.js'
-import { getProgress, recordFinale } from '../../lib/progress.js'
+import { FLOW } from '../../constants/flow.js'
+import { isSoloMode } from '../../lib/mode.js'
+import { playerName } from '../../lib/player.js'
+import { getProgress, recordFinale, resetProgress } from '../../lib/progress.js'
 import { isEnded } from '../../lib/game.js'
 import { allStagesCleared } from '../../lib/stage-progress.js'
 import { createButton } from '../../../components/primitives/button.js'
+import { createHomeLink } from '../../../components/shell/home-link.js'
 
 export function createEndingScreen (ctx) {
   const teamId = ctx.session.teamId
-  const team = findTeam(teamId)
-  const teamName = team ? team.name : 'UNASSIGNED'
+  const solo = isSoloMode()
+  const teamName = playerName(ctx.session)
 
   const prevStage = document.documentElement.dataset.stage
   document.documentElement.dataset.stage = 'ending' // 엔딩 = Gold 국면 (§21)
@@ -57,9 +60,25 @@ export function createEndingScreen (ctx) {
     }
   })
 
+  // 연습 모드만: 처음부터 다시 — 행사에서는 재도전이 없다(제출은 사건당 1회, 서버가 막는다).
+  // 진행 기록(localStorage)과 서약을 비우고 첫 화면으로 되돌린다. 언어 선택도 그 화면에 있다.
+  const replayBtn = solo
+    ? createButton({
+      label: t('end.replay'), variant: 'gold', size: 'lg', icon: 'refresh', block: true,
+      onClick: () => {
+        resetProgress(teamId)
+        ctx.update({ signerName: '', pledgedAt: null, resumeStep: null })
+        ctx.goTo(FLOW.ENTRY, { skipGuard: true })
+      }
+    })
+    : null
+
   // 배지 이미지에 'PM보호국 / PM PROTECTION BUREAU' 가 이미 인쇄되어 있어 같은 문구를 화면에 다시
   // 적지 않는다(CLAUDE.md §16.2 와 같은 이유). 미완주 팀은 배지 대신 종료 안내 제목을 쓴다.
+  const homeLink = solo ? createHomeLink({ onHome: () => ctx.goHome() }) : null
+
   const node = el('div', { class: 'screen screen--finale screen--ending' }, [
+    homeLink ? homeLink.el : null,
     el('div', { class: 'finale__inner' }, [
       el('div', { class: 'gameend anim-fade' }, [
         withBadge
@@ -74,13 +93,16 @@ export function createEndingScreen (ctx) {
           el('span', { class: 'ceremony__team-name', text: teamName }),
           el('span', { class: 'ceremony__team-rank mono caps', text: t('badge.rank') })
         ]),
-        el('p', { class: 'gameend__msg', text: t('end.msg') }),
+        // 행사 마무리 문구(본선 안내)는 연습 모드에 맞지 않는다 — 다시 풀어볼 수 있다고 알린다.
+        el('p', { class: 'gameend__msg', text: solo ? t('end.msgSolo') : t('end.msg') }),
         el('div', { class: 'gameend__stats' }, [
           stat(t('end.rankLabel'), t('badge.rank')),
           stat(t('end.scoreLabel'), String(progress.score)),
           stat(t('rank.colSolved'), `${solved}/15`)
         ]),
-        el('div', { class: 'gameend__actions' }, [closeBtn.el]),
+        // 연습 모드에서는 [브라우저 종료하기]를 두지 않는다 — 공개 페이지에서 창을 닫으라는 안내는
+        // 행사 운영(현장 PC 정리) 맥락에서만 뜻이 있다.
+        el('div', { class: 'gameend__actions' }, [replayBtn ? replayBtn.el : closeBtn.el]),
         closeHint
       ])
     ])
@@ -97,6 +119,8 @@ export function createEndingScreen (ctx) {
       if (prevStage) document.documentElement.dataset.stage = prevStage
       else delete document.documentElement.dataset.stage
       closeBtn.destroy()
+      if (replayBtn) replayBtn.destroy()
+      if (homeLink) homeLink.destroy()
     }
   }
 }

@@ -35,6 +35,7 @@ function createVolumeControl () {
 // (컴포넌트가 상태 모듈을 직접 참조하지 않는다 — CLAUDE.md §9)
 const CONNECTION_STATES = {
   realtime: { label: 'SYSTEM ONLINE', dot: '' },
+  practice: { label: 'PRACTICE MODE', dot: '' }, // 공개 연습 모드 — 서버 게임 상태를 보지 않는다
   polling: { label: 'SYNC · 5s', dot: 'is-reconnecting' },
   connecting: { label: 'CONNECTING', dot: 'is-reconnecting' },
   offline: { label: 'OFFLINE', dot: 'is-off' },
@@ -56,10 +57,12 @@ export function createAppHeader (props = {}) {
     hasNotification = true,
     timerSeconds = 45 * 60,
     running = false,
+    showTimer = true, // 제한 시간이 없는 모드(연습)에서는 타이머를 아예 감춘다
     onMenu = null,
     onAudio = null,
     onSettings = null,
-    onNotifications = null
+    onNotifications = null,
+    onHome = null // 있으면 헤더에 [처음으로]가 붙는다 (연습 모드 자유 이동)
   } = props
 
   const iconButton = (name, label, onClick, extra = null) => el('button', {
@@ -127,14 +130,25 @@ export function createAppHeader (props = {}) {
 
   const volume = createVolumeControl()
 
+  // [처음으로] — 사건 화면에서도 첫 화면으로 나갈 수 있어야 한다. 진행은 저장돼 있어 다시 들어오면
+  // 풀던 자리로 복귀한다(첫 화면의 [이어서 계속하기]). 행사 모드에서는 넘기지 않아 나타나지 않는다.
+  const homeBtn = onHome
+    ? el('button', { class: 'ghost-chip', type: 'button', 'aria-label': t('common.home') }, [
+      icon('arrowLeft', { size: 16 }),
+      el('span', { text: t('common.home') })
+    ])
+    : null
+  if (homeBtn) homeBtn.addEventListener('click', () => onHome())
+
   const node = el('header', { class: 'app-header' }, [
     menuBtn,
     brandEl,
-    timerEl,
+    showTimer ? timerEl : null,
     statusEl,
     el('div', { class: 'app-header__spacer' }),
     el('div', { class: 'app-header__actions' }, [
       // 종(알림)·설정 아이콘은 동작 없는 placeholder라 제거. 소리 조절만 유지(듣기평가 대응).
+      homeBtn,
       volume.el
     ])
   ])

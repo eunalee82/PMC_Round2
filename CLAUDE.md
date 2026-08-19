@@ -339,6 +339,40 @@ PMC_ROUND2/
 
 ---
 
+### 16.3 플레이 모드 — 공개 연습(solo) · 행사(event) (확정, 2026-08-19)
+
+**"누구나 들어와서 풀어볼 수 있는" 공개 연습 모드가 기본이고, 행사(팀 대항) 흐름은 플래그로 남긴다.**
+스위치는 `src/js/lib/mode.js` 하나다 — 다른 모듈은 `isSoloMode()`만 보고 갈라진다.
+
+| | solo (기본) | event (`?event`) |
+|---|---|---|
+| 입장 흐름 | Entry → Opening → **서약(성명만)** → 사건 | Entry → Opening → 팀 선택 → 서약 → 대기실 → 사건 |
+| 팀 선택(SCR-003)·대기실(SCR-005) | **없음** (요청이 와도 가드가 접는다) | 그대로 |
+| 시작 게이트 | 없음 — 서약 즉시 Stage 1 | 관리자 [게임 시작] 필요 |
+| 제한 시간·종료 | 없음 (`lib/game-solo.js` 는 항상 `started`) | 80분 · 관리자 종료 · 타임오버 |
+| 진행/점수 | **이 브라우저에만** (`progress-mock`, localStorage) | Supabase (`progress-server`) |
+| 랭킹 | 표시하지 않음 | 사이드바 + 관리자 콘솔(SCR-022) |
+| 캡처 가드(전체화면 강제) | 걸지 않음 — 공개 연습에 문턱만 된다 | 그대로 |
+| 화면 이탈 | 모든 화면에 [처음으로] + 첫 화면의 [이어서 계속하기] | 없음 (사건 화면을 벗어나지 않는다) |
+| 사건 본문 / 채점 | `get_cases_public` / `check_answer` (기록 없음) | `get_cases` / `submit_answer` (토큰 + 서버 기록) |
+
+**규칙**
+- **모드 판정은 부팅 시 1회.** URL(`?event` / `?solo` / `?admin`) → localStorage(`pmb.mode.v1`) → 기본 solo.
+  실행 중에 바뀌면 라우터 가드와 백엔드 라우터가 어긋난다. `?admin` 은 언제나 event 로 보되 저장하지 않는다.
+- **정답은 두 모드 모두 서버에만 둔다.** 연습이라고 정답을 번들에 넣지 않는다(§11). `check_answer` 는
+  **판정만** 하고 아무것도 저장하지 않으므로 랭킹·팀 진행에 영향이 없다.
+- **행사 경로의 보안 조건을 연습 때문에 느슨하게 만들지 않는다.** `get_cases`·`submit_answer` 는 손대지 않고
+  전용 RPC를 따로 뒀다(`supabase/migrations/0015_practice_mode.sql`). 연습만 닫으려면 그 두 함수의
+  `grant execute` 만 회수하면 된다.
+- **`teamId` 자리는 solo 에서 고정 키 `'solo'`**(`lib/player.js` `SOLO_PLAYER_ID`)가 대신한다 — 진행/점수 API의
+  시그니처를 바꾸지 않기 위해서다. 화면에 보일 이름은 `playerName(session)`(행사=팀명, 연습=서약 서명).
+- **자유 이동은 진행을 잃지 않는다.** `ctx.goHome()` 이 나가기 직전 step 을 `session.resumeStep` 에 남기고,
+  첫 화면의 [이어서 계속하기]가 그 자리로 되돌린다. 진행 기록은 로컬에 그대로 있으므로 어느 경로로
+  다시 들어와도 풀던 사건부터 이어진다.
+- 가드 회귀는 `scripts/verify-flow-guard.mjs` 가 두 모드를 함께 고정한다(`npm run validate`).
+
+---
+
 ## 17. 테스트 체크리스트
 
 새 화면/기능 완료 판정 기준 (`docs/screen-list.md §12`, `docs/game-flow.md §24` 기반):

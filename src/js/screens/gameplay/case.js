@@ -13,7 +13,8 @@ import { STAGE_META, STAGE_ITEM_ICONS } from '../../constants/stages.js'
 import { localizeCase, loadCases } from '../../data/cases.js'
 import { submitCase } from '../../lib/grade.js'
 import { getClaimToken } from '../../lib/entries.js'
-import { findTeam } from '../../lib/teams.js'
+import { isSoloMode } from '../../lib/mode.js'
+import { playerName } from '../../lib/player.js'
 import { remainingSeconds, isEnded, subscribe as subscribeGame, getConnection, subscribeConnection } from '../../lib/game.js'
 import { getProgress, getRanking, STAGE_TOTALS, SCORE_MAX, pointsFor, subscribeProgress } from '../../lib/progress.js'
 import { stageCases, builtTotal, submittedCount, isStageComplete, firstIncompleteStage } from '../../lib/stage-progress.js'
@@ -26,13 +27,19 @@ import { createCaptureGuard } from '../../../components/game/capture-guard.js'
 
 // Stage 메타·보상 아이템 표는 constants/stages.js가 단일 출처 (임명·레이드·랭킹 화면도 같은 표를 쓴다).
 
-// 좌측 사이드바 스냅샷 — 진행 상황(progress) + 랭킹(getRanking).
-// EVIDENCE 아이템 = 해당 스테이지의 모든 사건을 '제출 완료'했을 때 해제(정답 여부 무관).
-function sidebarSnapshot (teamId, teamName, p) {
+// 랭킹 상위 4팀 — 아직 아무도 점수를 못 냈으면 내 팀 줄만 보여준다.
+function rankingTop (teamId) {
   const ranking = getRanking()
   const scored = ranking.filter((r) => r.score > 0)
   const base = scored.length ? scored : ranking.filter((r) => r.teamId === teamId)
-  const rankingRows = base.slice(0, 4).map((r) => ({ rank: r.rank, name: r.name, score: r.score, isMe: r.teamId === teamId }))
+  return base.slice(0, 4).map((r) => ({ rank: r.rank, name: r.name, score: r.score, isMe: r.teamId === teamId }))
+}
+
+// 좌측 사이드바 스냅샷 — 진행 상황(progress) + 랭킹(getRanking).
+// EVIDENCE 아이템 = 해당 스테이지의 모든 사건을 '제출 완료'했을 때 해제(정답 여부 무관).
+// 연습 모드(solo)에는 겨룰 상대가 없다 → 랭킹 섹션을 비운다(빈 배열이면 화면에 줄이 그려지지 않는다).
+function sidebarSnapshot (teamId, teamName, p, solo = false) {
+  const rankingRows = solo ? [] : rankingTop(teamId)
   return {
     team: { name: teamName, rank: t('agent.rankRookie'), score: p.score, scoreMax: SCORE_MAX },
     ranking: teamName !== 'UNASSIGNED' ? rankingRows : [],
@@ -66,21 +73,32 @@ export function createCaseScreen (ctx) {
   let confirmModal = null
   const closeConfirm = () => { if (confirmModal) { confirmModal.destroy(); confirmModal = null } }
 
-  const teamId = ctx && ctx.session ? ctx.session.teamId : null
-  const team = findTeam(teamId)
-  const teamName = team ? team.name : 'UNASSIGNED'
+  const session = (ctx && ctx.session) || {}
+  const solo = isSoloMode()
+  const teamId = session.teamId || null
+  const teamName = playerName(session)
 
   const prevStage = document.documentElement.dataset.stage
   const caseHost = el('div', { class: 'case__inner anim-fade' })
 
   const shell = track(createAppShell({
-    header: { running: true, timerSeconds: remainingSeconds() },
-    sidebar: sidebarSnapshot(teamId, teamName, getProgress(teamId))
+    // 연습 모드에는 제한 시간이 없다 → 미션 타이머 자체를 숨긴다(00:00 이 남으면 오해를 부른다).
+    // [처음으로]도 연습 모드에만 붙인다 — 행사 중에는 사건 화면을 벗어나는 길을 열지 않는다.
+    header: {
+      running: !solo,
+      timerSeconds: remainingSeconds(),
+      showTimer: !solo,
+      onHome: solo ? () => ctx.goHome() : null
+    },
+    sidebar: sidebarSnapshot(teamId, teamName, getProgress(teamId), solo)
   }))
   shell.content.append(caseHost)
-  track(createCaptureGuard({ label: team ? team.name : '테스트' }))
+  // 캡처 억제(워터마크·전체화면 게이트·복사 차단)는 행사 문제 유출을 막는 장치다.
+  // 공개 연습 모드에서는 같은 문제를 누구에게나 열어 두는 것이 목적이므로 걸지 않는다
+  // — 전체화면을 강제하면 "그냥 풀어보러 온" 사람에게 문턱만 된다 (운영 결정 2026-08-19).
+  if (!solo) track(createCaptureGuard({ label: teamName === 'UNASSIGNED' ? '테스트' : teamName }))
 
-  // 서버 연결 상태를 헤더에 반영 (Realtime / 5초 폴링 / 오프라인)
+  // 서버 연결 상태를 헤더에 반영 (Realtime / 5초 폴링 / 오프라인 / 연습 모드)
   shell.header.setConnection(getConnection())
   const unsubConn = subscribeConnection((mode) => shell.header.setConnection(mode))
   // 점수·랭킹 캐시가 갱신되면 사이드바를 다시 그린다(제출 직후 순위가 늦게 반영되던 문제).
@@ -108,7 +126,7 @@ export function createCaseScreen (ctx) {
   })
 
   const setTheme = (s) => { document.documentElement.dataset.stage = String(s) }
-  const refreshSidebar = () => shell.sidebar.update(sidebarSnapshot(teamId, teamName, getProgress(teamId)))
+  const refreshSidebar = () => shell.sidebar.update(sidebarSnapshot(teamId, teamName, getProgress(teamId), solo))
   // 스테이지 사건 목록·완료 판정은 lib/stage-progress.js가 단일 출처 — 라우터 가드와 같은 기준을 쓴다.
   const stageCasesFor = (s) => stageCases(s)
 
@@ -391,7 +409,8 @@ export function createCaseScreen (ctx) {
   async function bootstrap () {
     mountView(el('div', { class: 'case-loading' }, [el('p', { class: 'case-loading__text', text: t('case.loading') })]))
     try {
-      await loadCases(teamId, getClaimToken(teamId))
+      // 연습 모드에는 팀 점유 토큰이 없다 — 본문은 공개 RPC(get_cases_public)로 받는다.
+      await loadCases(teamId, solo ? null : getClaimToken(teamId))
     } catch (e) {
       console.warn('[case] 본문 로드 실패', e)
       const retry = trackView(createButton({ label: t('case.retry'), variant: 'primary', icon: 'refresh', onClick: () => bootstrap() }))

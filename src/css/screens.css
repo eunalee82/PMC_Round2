@@ -93,7 +93,8 @@
   .sound-test__bars.is-playing .sound-test__bar { animation: none; height: 12px; }
 }
 
-.entry__cta { margin-top: var(--s-3); }
+/* 버튼이 둘일 수 있다 — [이어서 계속하기] + [PM보호국 입장] (연습 모드 복귀) */
+.entry__cta { margin-top: var(--s-3); display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-3); }
 .entry__foot { font-size: var(--text-xs); color: var(--text-3); letter-spacing: var(--tracking-caps); }
 
 /* ─────────────── SCR-002 Opening Video ─────────────── */

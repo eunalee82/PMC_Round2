@@ -3,9 +3,14 @@
 PMBOK® Guide 8판 기반 PM 역량 검증 **크라임씬 게임**. 참가자는 PM보호국 신입 감독관이 되어
 15개의 "사건"을 해결한다. 32팀 동시 진행 · 제한 시간 80분.
 
-- **참가자**: https://pmc-round2.vercel.app
+- **상시 공개 연습(기본)**: https://pmc-round2.vercel.app — 누구나 팀 선택 없이 서약(성명)만 하면 바로 사건. 시작 대기·제한 시간 없음, 몇 번이든 다시 도전. 기록은 그 브라우저에만 남고 순위 집계에 들어가지 않는다.
+- **행사(팀 대항) — 필요할 때만**: https://pmc-round2.vercel.app/?event — 팀 선택 → 서약 → 대기실 → 관리자 [게임 시작]. 한 번 열면 그 기기는 계속 행사 모드(되돌리려면 `?solo`).
 - **감독관(운영진) 콘솔**: https://pmc-round2.vercel.app/?admin
 - 스택: Vanilla JS (ES Modules) + Vite · Supabase (Postgres · RLS · Realtime · Auth) · Vercel
+
+> 두 모드의 차이와 규칙은 `CLAUDE.md §16.3`. 공개 연습 모드는 서버에
+> `supabase/migrations/0015_practice_mode.sql` 이 적용돼 있어야 사건 본문·채점이 동작한다
+> (`node scripts/check-migrations.mjs` 로 확인).
 
 ---
 
@@ -109,9 +114,10 @@ npx vercel --prod --yes --scope pingjueuna-3402s-projects
 
 ---
 
-## 6. 상태 (2026-08-11 기준)
+## 6. 상태 (2026-08-19 기준)
 
-- 프로덕션 배포 완료 · 마이그레이션 `0001`~`0014` 전부 적용
+- **상시 공개 연습 모드로 전환 · 배포 완료** — 기본 주소가 연습 사이트다(팀 선택·대기실 없음). 행사 흐름은 `?event` 로 남아 있다. 규칙은 `CLAUDE.md §16.3`, 경위는 `docs/handoff.md §13`
+- 프로덕션 배포 완료 · 마이그레이션 `0001`~`0015` 전부 적용
 - 사건 **15개 전부 확정**(임시 데이터 없음) · 사건 본문과 정답은 **서버에만** 내려간다
 - 32팀 동시 진행 부하 시뮬레이션 통과 (`docs/handoff.md §12.12`)
 - 알려진 미해결: Final Raid BGM 미재생 (`docs/handoff.md §5`)
